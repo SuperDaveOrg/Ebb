@@ -12,6 +12,7 @@ import 'package:ebb/models/profile.dart';
 import 'package:ebb/services/notification_service.dart';
 import 'package:ebb/services/reminder_sync.dart';
 import 'package:ebb/services/settings_service.dart';
+import 'package:ebb/ui/calendar_screen.dart';
 import 'package:ebb/ui/cycle_editor.dart';
 import 'package:ebb/ui/cycle_ring.dart';
 import 'package:ebb/ui/history_screen.dart';
@@ -265,6 +266,23 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
               )
             : const Text('Ebb'),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.calendar_month_outlined),
+            tooltip: 'Calendar',
+            onPressed: () async {
+              await Navigator.of(context).push(MaterialPageRoute(
+                builder: (_) => CalendarScreen(
+                  who: _who,
+                  repository: widget.repository,
+                  settings: widget.settings,
+                  title: _hasPeople
+                      ? '${_who.whoseCap} calendar'
+                      : 'Calendar',
+                ),
+              ));
+              await _refresh();
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.history),
             tooltip: 'History',
