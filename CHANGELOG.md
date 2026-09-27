@@ -9,6 +9,8 @@ turns that section into the release's own when it's cut.
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-09-27
+
 ### Added
 - A calendar, from the icon beside History. Logged periods, the likely
   window for the next one, and today, month by month. Tap any past day to

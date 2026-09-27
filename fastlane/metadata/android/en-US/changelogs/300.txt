@@ -1,0 +1,2 @@
+• New calendar view, from the icon beside History. It shows logged periods, the likely window for the next one, and today, month by month.
+• Tap any past day in the calendar to log a period starting or ending there, how heavy the flow was, or a note.
