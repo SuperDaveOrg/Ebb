@@ -1,7 +1,7 @@
 # Ebb — feature roadmap
 
 A working list of what Ebb does, what it should probably do next, and what it
-deliberately won't do. Written to be argued with.
+deliberately won't do. Feedback is welcome.
 
 Priorities below are informed by published research on what users actually
 complain about in existing trackers (sources at the bottom), but **none of this
@@ -67,15 +67,15 @@ month grid showing logged days, predicted days, and today.
 
 ## Deliberately not doing
 
-Worth being explicit about these, because they're the norm in this category.
+Worth being explicit about these.
 
 | Not doing | Why |
 |---|---|
 | Accounts, cloud sync, "log in with Google" | The entire premise. Data that never leaves can't be sold or subpoenaed. |
-| Analytics, crash reporting, ad SDKs | These are precisely how competitors leaked health data. Flo settled with the FTC in 2021 over sharing period and pregnancy data with Facebook and Google, and settled a class action in 2025. |
+| Analytics, crash reporting, ad SDKs | These are precisely how competitors leaked health data. |
 | Premium tier, upsell prompts | Paywall nag is a top user complaint. |
 | Feature creep beyond cycles | Users resent trackers that sprout calorie counting and unrelated wellness features. |
-| Auto-logging a predicted period as actual | A specific, widely-reported bug in other apps: the app assumes the period arrived on schedule and corrupts the history. Ebb only records what she tells it. |
+| Auto-logging a predicted period as actual | A specific, widely-reported bug in other apps: the app assumes the period arrived on schedule and corrupts the history. Ebb only records what the user tells it. |
 | Pink-and-flowers styling | One of the most consistent complaints in the research. Ebb uses a muted, neutral palette. |
 | Gendered assumptions in copy | Existing apps routinely assume the user is a woman and her partner is a man. Ebb's copy shouldn't assume either. |
 | Duress PIN / disguised icon / decoy screens | Euki offers a duress PIN. It's a thoughtful feature for its threat model, but it's the wrong posture for Ebb — it frames the user's own body as something to hide. See [privacy.md](privacy.md). An ordinary optional app lock is fine; theatre isn't. |
@@ -212,21 +212,9 @@ multi-device badly enough to pay that price.
 
 ## Open questions for review
 
-The ones that actually need a user's opinion, in rough order of how much they'd
-change the app:
-
-1. **What is she tracking for?** Symptom management, conception, avoiding
-   conception, perimenopause, or plain curiosity? These want genuinely
-   different home screens, and guessing wrong makes the app feel like it's
-   about someone else.
-2. **Is the fertile window useful or a liability?** Off by default today. Should
+1. **Is the fertile window useful or a liability?** Off by default today. Should
    it be more prominent, or removed entirely?
-3. **How much daily logging is realistic?** Full symptom tracking every day, or
-   just flow? Apps that ask too much get abandoned.
-4. **What should the reminder actually say,** and how far ahead is useful?
-5. **Does the uncertainty framing land as honest or as unhelpful?** Showing a
-   range instead of a date is a deliberate bet that honesty beats false
-   confidence. Worth checking that bet with a real user.
+2. **What should the reminder actually say,** and how far ahead is useful?
 
 ---
 

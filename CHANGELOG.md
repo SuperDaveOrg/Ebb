@@ -41,7 +41,7 @@ turns that section into the release's own when it's cut.
   instead of reporting "busy" on every later attempt.
 - A misread QR frame can no longer freeze the Receive screen.
 
-## [0.1.0] - 2026-09-27
+## [0.1.0] - 2026-09-20
 
 ### Added
 - Log a period with one tap, or on an earlier day; add and correct past
