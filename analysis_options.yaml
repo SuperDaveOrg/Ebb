@@ -13,6 +13,8 @@ analyzer:
   exclude:
     - build/**
     - android/**
+    # Where release builds keep downloaded packages; see tool/build_release.sh.
+    - .pub-cache/**
 
 linter:
   # The lint rules applied to this project can be customized in the

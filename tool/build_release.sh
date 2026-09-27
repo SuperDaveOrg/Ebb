@@ -3,8 +3,12 @@ set -euo pipefail
 
 # Build a release APK from an exact git commit, and prove it's what it claims.
 #
-# Builds in a temporary git worktree, so uncommitted changes can't leak in and
-# the result depends only on the commit. Then refuses to hand back an APK that
+# Builds in a git worktree at a fixed path, so uncommitted changes can't leak
+# in and the result depends only on the commit. The path is fixed because
+# Flutter writes it into the compiled app: F-Droid rebuilds at the same path
+# and publishes this APK only if its build matches byte for byte (see
+# "Reproducible builds" in docs/RELEASING.md). Then refuses to hand back an
+# APK that
 #   - asks for any permission beyond the allow-list below (INTERNET above all),
 #   - is signed with the debug key (unless --allow-debug-signing),
 #   - has a version that disagrees with the tag it was built from.
@@ -81,7 +85,14 @@ fi
 
 COMMIT="$(git -C "$REPO" rev-parse --verify "$REF^{commit}")" || die "unknown ref: $REF"
 SHORT="${COMMIT:0:9}"
-WORKTREE="$(mktemp -d "${TMPDIR:-/tmp}/ebb-release-XXXXXX")"
+# Never $TMPDIR: the path must be the same on every machine. F-Droid's recipe
+# builds here too, so changing it means changing the recipe in fdroiddata.
+WORKTREE="/tmp/ebb-build"
+if [[ -e $WORKTREE ]]; then
+  # A worktree of ours left by --keep-worktree or an interrupted build.
+  git -C "$REPO" worktree remove --force "$WORKTREE" 2>/dev/null ||
+    die "$WORKTREE is in the way (another build running?); remove it and retry"
+fi
 cleanup() {
   if (( KEEP_WORKTREE )); then
     echo "Worktree kept at $WORKTREE"
@@ -114,10 +125,21 @@ else
   echo "Note: $SHORT isn't tagged v$VERSION, so this is a snapshot build."
 fi
 
+# F-Droid shows this as the release's "what's new", and caps it at 500
+# characters.
+if [[ $KIND == release ]]; then
+  notes="fastlane/metadata/android/en-US/changelogs/$CODE.txt"
+  [[ -f $notes ]] || die "no $notes: write a short \"what's new\" for $VERSION"
+  (( $(tr -d '\n' < "$notes" | wc -m) <= 500 )) || die "$notes is over F-Droid's 500 characters"
+fi
+
 # --- Build -------------------------------------------------------------------
 
+# Packages are fetched into the build path, as F-Droid's recipe does (so its
+# scanner can inspect them), and at exactly the versions in pubspec.lock.
+export PUB_CACHE="$WORKTREE/.pub-cache"
 step "flutter pub get"
-flutter pub get >/dev/null
+flutter pub get --enforce-lockfile >/dev/null
 
 if (( RUN_TESTS )); then
   step "flutter analyze"

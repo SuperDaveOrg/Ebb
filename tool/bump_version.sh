@@ -61,7 +61,9 @@ echo "Version: $old+$old_code -> $new+$code"
 cat <<EOF
 
 Next (docs/RELEASING.md, "Cutting a release"):
-  1. Check CHANGELOG.md reads well for $new.
+  1. Check CHANGELOG.md reads well for $new, and write a short summary for
+     F-Droid in fastlane/metadata/android/en-US/changelogs/$code.txt
+     (500 characters at most; release builds refuse to run without it).
   2. git commit -am "Release v$new", push, open a PR, merge once CI passes.
   3. On main: git tag -a v$new -m "Release v$new" && git push origin v$new
   4. tool/build_release.sh --ref v$new
