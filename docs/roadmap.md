@@ -203,7 +203,7 @@ So, in order of preference:
 Cloud sync, a hosted backend, or an account system — including the
 "end-to-end encrypted blob store" variant where the server holds ciphertext it
 cannot read. That design is legitimate and some good apps use it, but it would
-trade a claim the user can verify herself ("check the permissions") for one only
+trade a claim the user can verify themselves ("check the permissions") for one only
 an expert can ("trust the cryptography"), and it means running paid
 infrastructure forever. Revisit only with real evidence that users want
 multi-device badly enough to pay that price.
