@@ -120,6 +120,30 @@ section[id], main[id] { scroll-margin-top: 90px; }
   align-items: center;
   padding: 40px 0 64px;
 }
+/* The logo and name, large, above the eyebrow: the lockup LedgerSprout's and
+   LedgerDock's pages open with. The logo is a round badge, so its shadow
+   follows the circle. */
+.hero-brand-lockup {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.95rem;
+  margin-bottom: 0.9rem;
+}
+.hero-mark {
+  width: clamp(110px, 14vw, 165px);
+  height: auto;
+  filter: drop-shadow(0 14px 24px rgba(20, 52, 75, 0.22));
+}
+.hero-name {
+  font-family: var(--serif);
+  font-variation-settings: "SOFT" 100;
+  font-size: clamp(2.4rem, 5.4vw, 4.2rem);
+  font-weight: 700;
+  line-height: 0.93;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+}
+
 .eyebrow {
   display: inline-block;
   font-weight: 700;
@@ -233,7 +257,8 @@ section.alt .card { background: var(--cream); }
 
 @media (max-width: 900px) {
   .hero, .download { grid-template-columns: 1fr; }
-  .hero-shot { order: -1; width: min(280px, 80%); }
+  /* The logo and name lead on phones too; the screenshot follows. */
+  .hero-shot { width: min(280px, 80%); }
   .grid, .grid.four { grid-template-columns: 1fr 1fr; }
   .shots { grid-template-columns: 1fr 1fr; }
 }
@@ -244,7 +269,8 @@ section.alt .card { background: var(--cream); }
   .site-header .wrap { justify-content: center; }
   .brand { display: none; }
   .site-header nav { gap: 0; flex-wrap: wrap; justify-content: center; padding: 4px; }
-  .site-header nav a { padding: 6px 7px; font-size: 0.8rem; white-space: nowrap; }
+  .site-header nav a { padding: 6px 6px; font-size: 0.76rem; white-space: nowrap; }
+  .site-header nav { flex-wrap: nowrap; }
   .grid, .grid.four { grid-template-columns: 1fr; }
   .more { grid-template-columns: 1fr; text-align: left; }
   .more img { width: 110px; height: 110px; }
