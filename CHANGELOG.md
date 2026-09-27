@@ -9,6 +9,11 @@ turns that section into the release's own when it's cut.
 
 ## [Unreleased]
 
+### Added
+- A calendar, from the icon beside History. Logged periods, the likely
+  window for the next one, and today, month by month. Tap any past day to
+  log a period starting or ending there, its flow, or a note.
+
 ## [0.2.0] - 2026-09-27
 
 ### Added

@@ -27,6 +27,7 @@ actually uses a period tracker.
 | Fertile-window estimate | **Off by default.** Clearly labelled as not contraception. |
 | Delete all data | Immediate and complete. |
 | "Your data" explainer | Plain-language screen describing where data lives. |
+| Calendar view | Added after v0.2.0 build. Provides good visualization and easy editing of past periods in a point-and-click UX |
 
 ---
 
@@ -41,7 +42,7 @@ mood, notes, on any date.
 purpose. A hardcoded list quietly tells the user which experiences count. A
 suggested-but-editable vocabulary is probably the right compromise. 🟡
 
-### 2. Calendar view
+### 2. Calendar view - (added after v0.2.0)
 
 The single most expected feature in this category and currently missing. A
 month grid showing logged days, predicted days, and today.
