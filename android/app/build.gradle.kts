@@ -61,7 +61,19 @@ android {
             signingConfig = signingConfigs.getByName(
                 if (keyProperties.isEmpty) "debug" else "release"
             )
+            // Leave out the git commit AGP would record: a worktree build
+            // finds no repository and F-Droid's clone does, so the APKs would
+            // differ by that one file.
+            vcsInfo.include = false
         }
+    }
+
+    // No dependency-metadata block in the APK signature. It is encrypted for
+    // Google Play, which Ebb doesn't use, and F-Droid rejects APKs carrying
+    // it. See docs/RELEASING.md, "Reproducible builds".
+    dependenciesInfo {
+        includeInApk = false
+        includeInBundle = false
     }
 }
 
