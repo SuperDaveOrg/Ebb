@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <title>Ebb logo</title>
+  <desc>A lavender-grey cycle ring settling into the tide, with a navy dot for today in its gap. The ring is the in-app ring's elapsed-days colour. SuperDaveLab family style: flat shapes on a cream badge.</desc>
+  <defs>
+    <clipPath id="badge"><circle cx="256" cy="256" r="232"/></clipPath>
+  </defs>
+  <!-- Badge, as LedgerDock -->
+  <circle cx="256" cy="256" r="236" fill="#F5F1EA" stroke="#D3CCC1" stroke-width="8"/>
+  <g clip-path="url(#badge)">
+    <!-- The cycle: an open ring, clockwise from the gap. The elapsed-days colour from the in-app ring (EbbPalette.elapsed). -->
+    <path d="M 359.8 194.0 A 112 112 0 1 1 279.3 126.4" fill="none" stroke="#A09EB9" stroke-width="38" stroke-linecap="round"/>
+    <!-- Today, in the gap: navy, as on the in-app ring -->
+    <circle cx="328.0" cy="150.2" r="21" fill="#14344B"/>
+    <!-- The tide going out: two tapered bands, cut free of the ring by a cream edge -->
+    <g fill="#1A8783" stroke="#F5F1EA" stroke-width="12" paint-order="stroke" stroke-linejoin="round">
+      <path d="M 40 356 C 120 300, 196 292, 262 322 C 324 350, 392 362, 478 326 C 420 378, 336 392, 262 366 C 196 342, 120 334, 40 356 Z"/>
+      <path d="M 70 426 C 146 384, 214 378, 272 402 C 332 428, 398 434, 470 404 C 414 450, 330 462, 266 440 C 204 418, 140 412, 70 426 Z"/>
+    </g>
+  </g>
+</svg>

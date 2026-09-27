@@ -1,0 +1,1055 @@
+{
+  "ebbBackup": 1,
+  "exportedOn": "2026-09-20",
+  "people": [
+    {
+      "name": null,
+      "cycles": [
+        {
+          "start": "2024-09-30",
+          "end": "2024-10-04"
+        },
+        {
+          "start": "2024-10-28",
+          "end": "2024-11-01"
+        },
+        {
+          "start": "2024-11-24",
+          "end": "2024-11-28"
+        },
+        {
+          "start": "2024-12-23",
+          "end": "2024-12-28"
+        },
+        {
+          "start": "2025-01-20",
+          "end": "2025-01-24"
+        },
+        {
+          "start": "2025-02-17",
+          "end": "2025-02-20"
+        },
+        {
+          "start": "2025-03-20",
+          "end": "2025-03-23"
+        },
+        {
+          "start": "2025-04-16",
+          "end": "2025-04-21",
+          "excluded": true,
+          "notes": "Had flu, cycle ran long."
+        },
+        {
+          "start": "2025-05-31",
+          "end": "2025-06-04"
+        },
+        {
+          "start": "2025-06-29",
+          "end": "2025-07-02"
+        },
+        {
+          "start": "2025-07-28",
+          "end": "2025-08-02"
+        },
+        {
+          "start": "2025-08-27",
+          "end": "2025-09-01"
+        },
+        {
+          "start": "2025-09-26",
+          "end": "2025-09-30"
+        },
+        {
+          "start": "2025-10-25",
+          "end": "2025-10-28"
+        },
+        {
+          "start": "2025-11-21",
+          "end": "2025-11-24"
+        },
+        {
+          "start": "2025-12-19",
+          "end": "2025-12-24"
+        },
+        {
+          "start": "2026-01-18",
+          "end": "2026-01-21"
+        },
+        {
+          "start": "2026-02-15",
+          "end": "2026-02-20"
+        },
+        {
+          "start": "2026-03-15",
+          "end": "2026-03-20"
+        },
+        {
+          "start": "2026-04-13",
+          "end": "2026-04-18",
+          "excluded": true,
+          "notes": "Had flu, cycle ran long."
+        },
+        {
+          "start": "2026-05-28",
+          "end": "2026-05-31"
+        },
+        {
+          "start": "2026-06-26",
+          "end": "2026-07-01"
+        },
+        {
+          "start": "2026-07-25",
+          "end": "2026-07-29"
+        },
+        {
+          "start": "2026-08-24",
+          "end": "2026-08-28"
+        }
+      ],
+      "days": [
+        {
+          "date": "2024-09-30",
+          "flow": "heavy",
+          "symptoms": [
+            "tired",
+            "tender breasts",
+            "low mood",
+            "cravings"
+          ],
+          "notes": "Better than last month."
+        },
+        {
+          "date": "2024-10-01",
+          "flow": "heavy",
+          "symptoms": [
+            "cramps",
+            "low mood"
+          ]
+        },
+        {
+          "date": "2024-10-02",
+          "flow": "medium",
+          "symptoms": [
+            "headache"
+          ],
+          "notes": "Long run, felt fine."
+        },
+        {
+          "date": "2024-10-03",
+          "flow": "light",
+          "symptoms": [
+            "cramps",
+            "headache",
+            "low mood"
+          ],
+          "notes": "Better than last month."
+        },
+        {
+          "date": "2024-10-04",
+          "flow": "light",
+          "symptoms": [
+            "cravings"
+          ]
+        },
+        {
+          "date": "2024-10-28",
+          "flow": "heavy",
+          "symptoms": [
+            "bloating"
+          ]
+        },
+        {
+          "date": "2024-10-29",
+          "flow": "heavy",
+          "symptoms": [
+            "cramps",
+            "headache",
+            "low mood"
+          ]
+        },
+        {
+          "date": "2024-10-30",
+          "flow": "medium",
+          "symptoms": [
+            "cramps",
+            "tender breasts"
+          ]
+        },
+        {
+          "date": "2024-10-31",
+          "flow": "light"
+        },
+        {
+          "date": "2024-11-01",
+          "flow": "light",
+          "symptoms": [
+            "tender breasts"
+          ],
+          "notes": "Long run, felt fine."
+        },
+        {
+          "date": "2024-11-24",
+          "flow": "heavy",
+          "symptoms": [
+            "headache",
+            "cravings"
+          ]
+        },
+        {
+          "date": "2024-11-25",
+          "flow": "heavy"
+        },
+        {
+          "date": "2024-11-26",
+          "flow": "medium",
+          "symptoms": [
+            "cramps",
+            "headache",
+            "tired",
+            "low mood"
+          ]
+        },
+        {
+          "date": "2024-11-27",
+          "flow": "light",
+          "notes": "Better than last month."
+        },
+        {
+          "date": "2024-11-28",
+          "flow": "light",
+          "symptoms": [
+            "tired",
+            "bloating",
+            "back ache",
+            "tender breasts"
+          ],
+          "notes": "Took ibuprofen in the morning."
+        },
+        {
+          "date": "2024-12-23",
+          "flow": "heavy",
+          "symptoms": [
+            "tired"
+          ]
+        },
+        {
+          "date": "2024-12-24",
+          "flow": "heavy",
+          "symptoms": [
+            "bloating"
+          ]
+        },
+        {
+          "date": "2024-12-25",
+          "flow": "medium",
+          "notes": "Better than last month."
+        },
+        {
+          "date": "2024-12-26",
+          "flow": "light"
+        },
+        {
+          "date": "2024-12-27",
+          "flow": "light",
+          "symptoms": [
+            "cravings"
+          ],
+          "notes": "Slept badly."
+        },
+        {
+          "date": "2024-12-28",
+          "flow": "spotting",
+          "symptoms": [
+            "bloating",
+            "low mood"
+          ],
+          "notes": "Busy week at work."
+        },
+        {
+          "date": "2025-01-20",
+          "flow": "heavy",
+          "symptoms": [
+            "cramps",
+            "tired",
+            "tender breasts"
+          ]
+        },
+        {
+          "date": "2025-01-21",
+          "flow": "heavy",
+          "symptoms": [
+            "bloating"
+          ]
+        },
+        {
+          "date": "2025-01-22",
+          "flow": "medium",
+          "symptoms": [
+            "cramps"
+          ]
+        },
+        {
+          "date": "2025-01-23",
+          "flow": "light"
+        },
+        {
+          "date": "2025-01-24",
+          "flow": "light"
+        },
+        {
+          "date": "2025-02-17",
+          "flow": "heavy",
+          "symptoms": [
+            "back ache",
+            "low mood"
+          ]
+        },
+        {
+          "date": "2025-02-18",
+          "flow": "heavy",
+          "symptoms": [
+            "tender breasts"
+          ]
+        },
+        {
+          "date": "2025-02-19",
+          "flow": "medium",
+          "symptoms": [
+            "tender breasts"
+          ],
+          "notes": "Took ibuprofen in the morning."
+        },
+        {
+          "date": "2025-02-20",
+          "flow": "light",
+          "symptoms": [
+            "cramps",
+            "tender breasts",
+            "cravings"
+          ]
+        },
+        {
+          "date": "2025-03-20",
+          "flow": "heavy"
+        },
+        {
+          "date": "2025-03-21",
+          "flow": "heavy",
+          "symptoms": [
+            "cramps",
+            "cravings"
+          ]
+        },
+        {
+          "date": "2025-03-22",
+          "flow": "medium",
+          "symptoms": [
+            "bloating",
+            "tender breasts"
+          ]
+        },
+        {
+          "date": "2025-03-23",
+          "flow": "light",
+          "symptoms": [
+            "headache",
+            "tender breasts"
+          ],
+          "notes": "Slept badly."
+        },
+        {
+          "date": "2025-04-16",
+          "flow": "heavy"
+        },
+        {
+          "date": "2025-04-17",
+          "flow": "heavy",
+          "symptoms": [
+            "headache",
+            "back ache"
+          ]
+        },
+        {
+          "date": "2025-04-18",
+          "flow": "medium",
+          "symptoms": [
+            "cramps",
+            "tired"
+          ]
+        },
+        {
+          "date": "2025-04-19",
+          "flow": "light",
+          "symptoms": [
+            "tired"
+          ]
+        },
+        {
+          "date": "2025-04-20",
+          "flow": "light"
+        },
+        {
+          "date": "2025-04-21",
+          "flow": "spotting",
+          "symptoms": [
+            "bloating"
+          ]
+        },
+        {
+          "date": "2025-05-31",
+          "flow": "heavy",
+          "symptoms": [
+            "headache"
+          ],
+          "notes": "Busy week at work."
+        },
+        {
+          "date": "2025-06-01",
+          "flow": "heavy",
+          "symptoms": [
+            "bloating",
+            "cravings"
+          ],
+          "notes": "Took ibuprofen in the morning."
+        },
+        {
+          "date": "2025-06-02",
+          "flow": "medium",
+          "symptoms": [
+            "cramps",
+            "back ache",
+            "cravings"
+          ]
+        },
+        {
+          "date": "2025-06-03",
+          "flow": "light",
+          "symptoms": [
+            "cramps",
+            "bloating",
+            "low mood"
+          ]
+        },
+        {
+          "date": "2025-06-04",
+          "flow": "light"
+        },
+        {
+          "date": "2025-06-29",
+          "flow": "heavy",
+          "symptoms": [
+            "cramps",
+            "tired"
+          ]
+        },
+        {
+          "date": "2025-06-30",
+          "flow": "heavy",
+          "symptoms": [
+            "tired",
+            "bloating",
+            "back ache"
+          ],
+          "notes": "Better than last month."
+        },
+        {
+          "date": "2025-07-01",
+          "flow": "medium"
+        },
+        {
+          "date": "2025-07-02",
+          "flow": "light",
+          "symptoms": [
+            "back ache",
+            "tender breasts",
+            "cravings"
+          ]
+        },
+        {
+          "date": "2025-07-28",
+          "flow": "heavy"
+        },
+        {
+          "date": "2025-07-29",
+          "flow": "heavy",
+          "symptoms": [
+            "cramps",
+            "cravings"
+          ]
+        },
+        {
+          "date": "2025-07-30",
+          "flow": "medium"
+        },
+        {
+          "date": "2025-07-31",
+          "flow": "light",
+          "symptoms": [
+            "headache",
+            "tired",
+            "back ache"
+          ]
+        },
+        {
+          "date": "2025-08-01",
+          "flow": "light",
+          "symptoms": [
+            "cramps",
+            "headache",
+            "back ache"
+          ],
+          "notes": "Busy week at work."
+        },
+        {
+          "date": "2025-08-02",
+          "flow": "spotting",
+          "symptoms": [
+            "tired"
+          ]
+        },
+        {
+          "date": "2025-08-27",
+          "flow": "heavy",
+          "symptoms": [
+            "low mood"
+          ]
+        },
+        {
+          "date": "2025-08-28",
+          "flow": "heavy",
+          "symptoms": [
+            "tired",
+            "low mood"
+          ]
+        },
+        {
+          "date": "2025-08-29",
+          "flow": "medium",
+          "symptoms": [
+            "back ache"
+          ]
+        },
+        {
+          "date": "2025-08-30",
+          "flow": "light",
+          "symptoms": [
+            "bloating"
+          ]
+        },
+        {
+          "date": "2025-08-31",
+          "flow": "light"
+        },
+        {
+          "date": "2025-09-01",
+          "flow": "spotting",
+          "symptoms": [
+            "headache",
+            "low mood"
+          ],
+          "notes": "Better than last month."
+        },
+        {
+          "date": "2025-09-26",
+          "flow": "heavy",
+          "symptoms": [
+            "cramps",
+            "bloating",
+            "back ache",
+            "low mood"
+          ]
+        },
+        {
+          "date": "2025-09-27",
+          "flow": "heavy",
+          "symptoms": [
+            "bloating"
+          ],
+          "notes": "Took ibuprofen in the morning."
+        },
+        {
+          "date": "2025-09-28",
+          "flow": "medium",
+          "symptoms": [
+            "back ache"
+          ]
+        },
+        {
+          "date": "2025-09-29",
+          "flow": "light",
+          "symptoms": [
+            "cramps",
+            "back ache"
+          ]
+        },
+        {
+          "date": "2025-09-30",
+          "flow": "light",
+          "symptoms": [
+            "tender breasts"
+          ]
+        },
+        {
+          "date": "2025-10-25",
+          "flow": "heavy"
+        },
+        {
+          "date": "2025-10-26",
+          "flow": "heavy",
+          "symptoms": [
+            "bloating",
+            "tender breasts"
+          ]
+        },
+        {
+          "date": "2025-10-27",
+          "flow": "medium",
+          "symptoms": [
+            "cramps",
+            "headache",
+            "back ache"
+          ]
+        },
+        {
+          "date": "2025-10-28",
+          "flow": "light",
+          "symptoms": [
+            "headache",
+            "cravings"
+          ]
+        },
+        {
+          "date": "2025-11-21",
+          "flow": "heavy",
+          "symptoms": [
+            "back ache"
+          ]
+        },
+        {
+          "date": "2025-11-22",
+          "flow": "heavy",
+          "symptoms": [
+            "headache",
+            "bloating"
+          ]
+        },
+        {
+          "date": "2025-11-23",
+          "flow": "medium",
+          "symptoms": [
+            "low mood",
+            "cravings"
+          ]
+        },
+        {
+          "date": "2025-11-24",
+          "flow": "light"
+        },
+        {
+          "date": "2025-12-19",
+          "flow": "heavy",
+          "symptoms": [
+            "bloating",
+            "back ache",
+            "tender breasts",
+            "cravings"
+          ]
+        },
+        {
+          "date": "2025-12-20",
+          "flow": "heavy",
+          "symptoms": [
+            "tired",
+            "tender breasts"
+          ],
+          "notes": "Better than last month."
+        },
+        {
+          "date": "2025-12-21",
+          "flow": "medium",
+          "symptoms": [
+            "cramps",
+            "back ache"
+          ],
+          "notes": "Slept badly."
+        },
+        {
+          "date": "2025-12-22",
+          "flow": "light",
+          "symptoms": [
+            "tired",
+            "back ache",
+            "tender breasts"
+          ]
+        },
+        {
+          "date": "2025-12-23",
+          "flow": "light",
+          "symptoms": [
+            "cramps",
+            "low mood"
+          ]
+        },
+        {
+          "date": "2025-12-24",
+          "flow": "spotting",
+          "symptoms": [
+            "back ache",
+            "low mood"
+          ]
+        },
+        {
+          "date": "2026-01-18",
+          "flow": "heavy",
+          "symptoms": [
+            "tender breasts",
+            "cravings"
+          ]
+        },
+        {
+          "date": "2026-01-19",
+          "flow": "heavy",
+          "symptoms": [
+            "back ache"
+          ]
+        },
+        {
+          "date": "2026-01-20",
+          "flow": "medium",
+          "symptoms": [
+            "cramps",
+            "headache",
+            "tender breasts",
+            "low mood"
+          ]
+        },
+        {
+          "date": "2026-01-21",
+          "flow": "light"
+        },
+        {
+          "date": "2026-02-15",
+          "flow": "heavy",
+          "symptoms": [
+            "cravings"
+          ]
+        },
+        {
+          "date": "2026-02-16",
+          "flow": "heavy"
+        },
+        {
+          "date": "2026-02-17",
+          "flow": "medium",
+          "symptoms": [
+            "headache",
+            "back ache"
+          ]
+        },
+        {
+          "date": "2026-02-18",
+          "flow": "light",
+          "symptoms": [
+            "cravings"
+          ]
+        },
+        {
+          "date": "2026-02-19",
+          "flow": "light",
+          "symptoms": [
+            "headache"
+          ]
+        },
+        {
+          "date": "2026-02-20",
+          "flow": "spotting",
+          "symptoms": [
+            "back ache"
+          ]
+        },
+        {
+          "date": "2026-03-15",
+          "flow": "heavy",
+          "symptoms": [
+            "cravings"
+          ],
+          "notes": "Busy week at work."
+        },
+        {
+          "date": "2026-03-16",
+          "flow": "heavy"
+        },
+        {
+          "date": "2026-03-17",
+          "flow": "medium",
+          "symptoms": [
+            "back ache"
+          ]
+        },
+        {
+          "date": "2026-03-18",
+          "flow": "light",
+          "notes": "Busy week at work."
+        },
+        {
+          "date": "2026-03-19",
+          "flow": "light"
+        },
+        {
+          "date": "2026-03-20",
+          "flow": "spotting",
+          "symptoms": [
+            "low mood",
+            "cravings"
+          ]
+        },
+        {
+          "date": "2026-04-13",
+          "flow": "heavy",
+          "symptoms": [
+            "bloating",
+            "back ache"
+          ]
+        },
+        {
+          "date": "2026-04-14",
+          "flow": "heavy",
+          "symptoms": [
+            "cramps",
+            "back ache"
+          ]
+        },
+        {
+          "date": "2026-04-15",
+          "flow": "medium",
+          "symptoms": [
+            "cramps",
+            "cravings"
+          ],
+          "notes": "Busy week at work."
+        },
+        {
+          "date": "2026-04-16",
+          "flow": "light",
+          "symptoms": [
+            "headache",
+            "bloating"
+          ]
+        },
+        {
+          "date": "2026-04-17",
+          "flow": "light",
+          "symptoms": [
+            "cramps",
+            "tired",
+            "bloating"
+          ]
+        },
+        {
+          "date": "2026-04-18",
+          "flow": "spotting",
+          "symptoms": [
+            "cramps",
+            "headache",
+            "cravings"
+          ]
+        },
+        {
+          "date": "2026-05-28",
+          "flow": "heavy",
+          "symptoms": [
+            "tired"
+          ],
+          "notes": "Busy week at work."
+        },
+        {
+          "date": "2026-05-29",
+          "flow": "heavy",
+          "symptoms": [
+            "cramps",
+            "tender breasts"
+          ]
+        },
+        {
+          "date": "2026-05-30",
+          "flow": "medium",
+          "symptoms": [
+            "back ache"
+          ]
+        },
+        {
+          "date": "2026-05-31",
+          "flow": "light",
+          "symptoms": [
+            "bloating"
+          ],
+          "notes": "Slept badly."
+        },
+        {
+          "date": "2026-06-26",
+          "flow": "heavy",
+          "symptoms": [
+            "tender breasts"
+          ],
+          "notes": "Better than last month."
+        },
+        {
+          "date": "2026-06-27",
+          "flow": "heavy",
+          "symptoms": [
+            "cramps",
+            "low mood"
+          ],
+          "notes": "Busy week at work."
+        },
+        {
+          "date": "2026-06-28",
+          "flow": "medium",
+          "symptoms": [
+            "tender breasts",
+            "cravings"
+          ]
+        },
+        {
+          "date": "2026-06-29",
+          "flow": "light",
+          "symptoms": [
+            "cramps"
+          ]
+        },
+        {
+          "date": "2026-06-30",
+          "flow": "light",
+          "symptoms": [
+            "bloating"
+          ]
+        },
+        {
+          "date": "2026-07-01",
+          "flow": "spotting",
+          "notes": "Long run, felt fine."
+        },
+        {
+          "date": "2026-07-25",
+          "flow": "heavy",
+          "symptoms": [
+            "bloating",
+            "back ache"
+          ],
+          "notes": "Better than last month."
+        },
+        {
+          "date": "2026-07-26",
+          "flow": "heavy",
+          "symptoms": [
+            "cramps",
+            "headache",
+            "low mood"
+          ],
+          "notes": "Busy week at work."
+        },
+        {
+          "date": "2026-07-27",
+          "flow": "medium",
+          "symptoms": [
+            "tender breasts"
+          ],
+          "notes": "Took ibuprofen in the morning."
+        },
+        {
+          "date": "2026-07-28",
+          "flow": "light",
+          "symptoms": [
+            "tired",
+            "tender breasts",
+            "low mood",
+            "cravings"
+          ]
+        },
+        {
+          "date": "2026-07-29",
+          "flow": "light",
+          "symptoms": [
+            "back ache"
+          ]
+        },
+        {
+          "date": "2026-08-24",
+          "flow": "heavy",
+          "symptoms": [
+            "bloating"
+          ]
+        },
+        {
+          "date": "2026-08-25",
+          "flow": "heavy",
+          "symptoms": [
+            "back ache"
+          ],
+          "notes": "Took ibuprofen in the morning."
+        },
+        {
+          "date": "2026-08-26",
+          "flow": "medium",
+          "symptoms": [
+            "tired",
+            "cravings"
+          ]
+        },
+        {
+          "date": "2026-08-27",
+          "flow": "light",
+          "symptoms": [
+            "tender breasts",
+            "low mood"
+          ]
+        },
+        {
+          "date": "2026-08-28",
+          "flow": "light",
+          "symptoms": [
+            "back ache"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Sam",
+      "cycles": [
+        {
+          "start": "2026-01-23",
+          "end": "2026-01-28"
+        },
+        {
+          "start": "2026-02-18",
+          "end": "2026-02-23"
+        },
+        {
+          "start": "2026-03-18",
+          "end": "2026-03-22"
+        },
+        {
+          "start": "2026-04-16",
+          "end": "2026-04-21"
+        },
+        {
+          "start": "2026-05-24",
+          "end": "2026-05-29"
+        },
+        {
+          "start": "2026-06-26",
+          "end": "2026-07-01"
+        },
+        {
+          "start": "2026-07-26",
+          "end": "2026-07-30"
+        },
+        {
+          "start": "2026-08-22",
+          "end": "2026-08-27"
+        }
+      ],
+      "days": []
+    }
+  ]
+}

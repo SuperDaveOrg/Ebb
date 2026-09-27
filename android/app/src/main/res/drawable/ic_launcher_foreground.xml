@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generated from assets/brand/ebb_logo.svg. Adaptive icon foreground. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <group android:scaleX="0.15517" android:scaleY="0.15517"
+        android:translateX="14.2759" android:translateY="14.2759">
+        <path android:pathData="M 359.8 194.0 A 112 112 0 1 1 279.3 126.4"
+            android:strokeColor="#FFA09EB9" android:strokeWidth="38"
+            android:strokeLineCap="round"/>
+        <path android:pathData="M 307.0,150.2 a 21,21 0 1,0 42,0 a 21,21 0 1,0 -42,0 Z" android:fillColor="#FF14344B"/>
+        <group android:pivotX="256" android:scaleX="1.45">
+            <path android:pathData="M 40 356 C 120 300, 196 292, 262 322 C 324 350, 392 362, 478 326 C 420 378, 336 392, 262 366 C 196 342, 120 334, 40 356 Z" android:fillColor="#FFF5F1EA"
+                android:strokeColor="#FFF5F1EA" android:strokeWidth="12"
+                android:strokeLineJoin="round"/>
+            <path android:pathData="M 40 356 C 120 300, 196 292, 262 322 C 324 350, 392 362, 478 326 C 420 378, 336 392, 262 366 C 196 342, 120 334, 40 356 Z" android:fillColor="#FF1A8783"/>
+            <path android:pathData="M 70 426 C 146 384, 214 378, 272 402 C 332 428, 398 434, 470 404 C 414 450, 330 462, 266 440 C 204 418, 140 412, 70 426 Z" android:fillColor="#FFF5F1EA"
+                android:strokeColor="#FFF5F1EA" android:strokeWidth="12"
+                android:strokeLineJoin="round"/>
+            <path android:pathData="M 70 426 C 146 384, 214 378, 272 402 C 332 428, 398 434, 470 404 C 414 450, 330 462, 266 440 C 204 418, 140 412, 70 426 Z" android:fillColor="#FF1A8783"/>
+        </group>
+    </group>
+</vector>
