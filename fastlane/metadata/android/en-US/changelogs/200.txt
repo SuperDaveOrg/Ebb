@@ -1,0 +1,5 @@
+• Add a note to any period, for example why it isn't counted in predictions.
+• When periods go unlogged for a while, the estimate moves on and says so; History points out long gaps.
+• A period with no end logged stops counting as ongoing after two weeks.
+• Reminders follow you across time zones.
+• Stricter checks when restoring a backup, and several fixes to restore, file backups and phone-to-phone transfer.

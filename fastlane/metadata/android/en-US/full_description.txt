@@ -1,0 +1,28 @@
+Ebb records your menstrual cycle, estimates when your next period is likely, and reminds you beforehand. It does all of that on your phone.
+
+<b>Your data stays on your phone</b>
+• No account, no server, no sync. Everything you log is kept in a database on your device.
+• No internet permission. Android itself stops Ebb from sending anything anywhere, and you can check that in the app's permission list.
+• No analytics, advertising or tracking, and excluded from Android's cloud backup.
+• Delete everything in Settings whenever you like.
+
+<b>An estimate that's honest about what it knows</b>
+Ebb learns your rhythm from your own recent cycles and shows the next period as a range, with how sure it is. With little history it leans on a typical 28-day cycle and says so. Irregular cycles get a wider window, not false confidence. The method is plain arithmetic, explained in the app.
+
+<b>Forgiving when life happens</b>
+• Forgot to log? Add a period on an earlier day, or fill in past ones.
+• A cycle thrown off by illness or a medication change can be left out of the estimate, with a note to remember why.
+• If periods go unlogged for a while, the estimate carries on, says so, and History points out the gaps.
+
+<b>Reminders without the cloud</b>
+A heads-up before your period is expected, scheduled on the phone itself, so it arrives with no signal and in airplane mode.
+
+<b>Backups and new phones</b>
+Save your history to a plain, documented file wherever you choose, or move it to another phone by scanning a few QR codes: one phone shows, the other looks. Nothing goes over a network.
+
+<b>More than one person</b>
+Helping a child who's just starting? Track them too, switch with a tap, and hand their history over to their own phone when the time comes.
+
+There's no cloud copy of your history, so a lost phone means lost history unless you've saved a backup file.
+
+Ebb is free, open source under the MIT licence, and has no ads or premium tier.
