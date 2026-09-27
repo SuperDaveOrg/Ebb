@@ -83,7 +83,12 @@ cp assets/brand/ebb_logo_512.png "$OUT/assets/logo.png"
 cp fastlane/metadata/android/en-US/images/phoneScreenshots/*.png "$OUT/assets/screenshots/"
 cp "$apk" "$apk.sha256" "$OUT/downloads/"
 
+# The stylesheet's URL changes with its content, so a browser holding an old
+# copy can't pair it with new markup.
+CSS_HASH="$(sha256sum site/style.css | cut -c1-10)"
+
 sed -i \
+  -e "s|{{CSS_HASH}}|$CSS_HASH|g" \
   -e "s|{{VERSION}}|$VERSION|g" \
   -e "s|{{APK_FILE}}|$APK_FILE|g" \
   -e "s|{{APK_SIZE}}|$APK_SIZE|g" \
