@@ -22,7 +22,7 @@ turns that section into the release's own when it's cut.
 - A period with no end logged stops counting as "in progress" after two
   weeks; the home screen offers to add the end instead.
 - Reminders are rescheduled whenever Ebb comes back to the screen, and in the
-  phone's current time zone, so they follow her when she travels.
+  phone's current time zone, so they follow you when you travel.
 - Restoring a backup checks it more strictly: overlapping periods, anything
   dated after the backup was made, and blank, overlong or duplicate names are
   refused.

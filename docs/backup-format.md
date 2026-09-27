@@ -5,7 +5,7 @@ and importable by any other tool, so nobody is locked into Ebb. This document
 is the contract; [`lib/data/backup.dart`](../lib/data/backup.dart) is one
 implementation of it.
 
-Ebb never writes a backup on its own. She chooses **Settings → Back up to a
+Ebb never writes a backup on its own. The user chooses **Settings → Back up to a
 file**, and Android's own Save picker decides where it goes.
 
 ## Example
@@ -77,7 +77,7 @@ one `start` to the next.
 |---|---|---|
 | `date` | date, required | Unique per person. |
 | `flow` | string, optional | One of `spotting`, `light`, `medium`, `heavy`. Absent means none. |
-| `symptoms` | array of strings, optional | Free text, in her words. Each must be non-empty and contain no tab character. |
+| `symptoms` | array of strings, optional | Free text, in the user's own words. Each must be non-empty and contain no tab character. |
 | `notes` | string, optional | Free text. |
 
 ## Compatibility rules
@@ -97,5 +97,5 @@ one `start` to the next.
 ## What a backup does not contain
 
 Preferences such as reminder timing or the fertile-window setting are not
-included. A backup holds her history; settings take seconds to redo on a new
+included. A backup holds the user's history; settings take seconds to redo on a new
 phone.
