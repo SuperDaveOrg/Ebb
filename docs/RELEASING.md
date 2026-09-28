@@ -95,7 +95,15 @@ git switch main && git pull
 git switch -c release-0.2.0
 tool/bump_version.sh minor          # or patch / major / an exact X.Y.Z
 
-# 3. Commit, open a pull request, and merge it once CI passes.
+# 2b. Write the store's release notes: a short, user-facing summary of the
+#     CHANGELOG.md section, 500 characters at most, in
+#     fastlane/metadata/android/en-US/changelogs/<versionCode>.txt (200.txt
+#     for 0.2.0). bump_version.sh prints the name; build_release.sh refuses to
+#     build without it.
+
+# 3. Commit, open a pull request, and merge it once CI passes. The notes are
+#    a new file, so add them first: `commit -a` skips untracked files.
+git add fastlane/metadata/android/en-US/changelogs/
 git commit -am "Release v0.2.0"
 git push -u origin release-0.2.0
 gh pr create --fill && gh pr merge --rebase   # after CI is green
