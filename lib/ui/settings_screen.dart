@@ -12,6 +12,7 @@ import 'package:ebb/models/profile.dart';
 import 'package:ebb/domain/dates.dart';
 import 'package:ebb/services/app_info.dart';
 import 'package:ebb/services/document_service.dart';
+import 'package:ebb/services/links.dart';
 import 'package:ebb/services/notification_service.dart';
 import 'package:ebb/services/person_removal.dart';
 import 'package:ebb/services/settings_service.dart';
@@ -110,6 +111,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
     await widget.settings.setRemindersEnabled(value);
     setState(() => _reminders = value);
+  }
+
+  Future<void> _openLink(Uri uri) async {
+    if (!await openInBrowser(uri)) {
+      _say('No browser to open it with. Visit $websiteLabel instead.');
+    }
   }
 
   void _say(String message) {
@@ -567,6 +574,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       subtitle:
                           const Text('Where it lives and who can see it.'),
                       onTap: () => open(const AboutScreen()),
+                    ),
+                    ListTile(
+                      leading: const Icon(Icons.public),
+                      title: const Text('Website'),
+                      subtitle: const Text(websiteLabel),
+                      trailing: const Icon(Icons.open_in_new),
+                      onTap: () => _openLink(websiteUri),
+                    ),
+                    ListTile(
+                      leading: const Icon(Icons.feedback_outlined),
+                      title: const Text('Send feedback'),
+                      subtitle:
+                          const Text('A form on the website, in your browser.'),
+                      trailing: const Icon(Icons.open_in_new),
+                      onTap: () => _openLink(feedbackUri),
                     ),
                   ],
                 ),
