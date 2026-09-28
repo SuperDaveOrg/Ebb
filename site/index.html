@@ -8,12 +8,12 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Ebb — a period tracker that keeps your data on your phone</title>
-  <meta name="description" content="Ebb is a free period tracker for Android. No account, no server, no internet permission: your cycle history never leaves your phone." />
+  <title>Ebb — private, offline period tracker for Android</title>
+  <meta name="description" content="Free, open-source period tracker for Android that works entirely offline. No account, no ads, no internet permission. Honest estimates for irregular cycles." />
   <link rel="canonical" href="https://ebb.superdavelab.com/" />
   <link rel="icon" href="assets/logo.png" type="image/png" />
-  <meta property="og:title" content="Ebb — a period tracker that keeps your data on your phone" />
-  <meta property="og:description" content="Free, no account, and no internet permission. Your cycle history never leaves your phone." />
+  <meta property="og:title" content="Ebb — private, offline period tracker for Android" />
+  <meta property="og:description" content="Free and open source, with no account and no internet permission. Your cycle history stays on your phone." />
   <meta property="og:image" content="https://ebb.superdavelab.com/assets/screenshots/1_home.png" />
   <meta property="og:url" content="https://ebb.superdavelab.com/" />
   <meta property="og:type" content="website" />
@@ -25,7 +25,7 @@
     "@type": "MobileApplication",
     "name": "Ebb",
     "url": "https://ebb.superdavelab.com/",
-    "description": "A free period tracker for Android. No account, no server, no internet permission: your cycle history never leaves your phone.",
+    "description": "Free, open-source period tracker for Android that works entirely offline. No account, no ads, no internet permission. Honest estimates for irregular cycles.",
     "applicationCategory": "HealthApplication",
     "operatingSystem": "Android",
     "softwareVersion": "{{VERSION}}",
@@ -54,7 +54,8 @@
       <nav class="pill" aria-label="Sections">
         <a href="#features">Features</a>
         <a href="#privacy">Your data</a>
-        <a href="#ledgersprout">LedgerSprout</a>
+        <a href="#faq">FAQ</a>
+        <a class="nav-wide" href="#ledgersprout">LedgerSprout</a>
         <a href="https://github.com/SuperDaveOrg/Ebb">GitHub</a>
         <a class="nav-cta" href="#download">Download</a>
       </nav>
@@ -68,12 +69,14 @@
           <img class="hero-mark" src="assets/logo.png" alt="Ebb icon" width="180" height="180" />
           <span class="hero-name">Ebb</span>
         </div>
-        <p class="eyebrow">Free period tracker for Android · Public beta</p>
+        <p class="eyebrow">Free, open-source period tracker for Android · Public beta</p>
         <h1>Your cycle, on your phone. Nowhere else.</h1>
         <p class="lede">
-          Ebb tracks your period, estimates when the next one is due — honestly,
-          as a range — and reminds you beforehand. There's no account and no
-          server, and it doesn't even have permission to use the internet.
+          Ebb is a private period tracker that works entirely offline. It tracks
+          your period, estimates when the next one is due — honestly, as a
+          range, even when your cycles are irregular — and reminds you
+          beforehand. There's no account and no server, and it doesn't even have
+          permission to use the internet.
         </p>
         <div class="hero-cta">
           <a class="btn" href="#download">Download the beta <small>v{{VERSION}}</small></a>
@@ -81,6 +84,7 @@
         </div>
         <ul class="hero-points">
           <li>Free, no ads</li>
+          <li>Open source</li>
           <li>No account</li>
           <li>No internet permission</li>
           <li>Phones and tablets</li>
@@ -224,6 +228,58 @@
             Found a problem? Mention the version shown at the bottom of Ebb's
             Settings when you report it.
           </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="alt" id="faq">
+      <div class="wrap">
+        <h2>Questions people ask</h2>
+        <p class="section-lede">
+          Plain answers, including the one trade-off that comes with keeping
+          everything on your phone.
+        </p>
+        <div class="faq">
+          <div>
+            <h3>Is Ebb really free?</h3>
+            <p>Yes. There are no ads, no subscription and nothing to unlock. Ebb is open source under the MIT licence, and SuperDaveLab's paid desktop apps are what pay for it.</p>
+          </div>
+          <div>
+            <h3>Does Ebb work offline?</h3>
+            <p>It only works offline. Ebb has no permission to use the internet, so the estimates, reminders and backups all happen on your phone. Reminders arrive in airplane mode too.</p>
+          </div>
+          <div>
+            <h3>Does it work with irregular periods?</h3>
+            <p>Yes. Ebb shows the next period as a range with how sure it is, and irregular cycles get a wider range rather than a confident wrong date. With only a little history it leans on a typical 28-day cycle and says so. A cycle thrown off by illness or a medication change can be left out of the estimate.</p>
+          </div>
+          <div>
+            <h3>Where is my data stored?</h3>
+            <p>On your phone, and nowhere else. There's no account and no server, so it never reaches us, and Ebb is left out of Android's cloud backup, so it isn't copied anywhere either. You can delete everything in Settings whenever you like.</p>
+          </div>
+          <div>
+            <h3>What if I lose my phone?</h3>
+            <p>Then your history goes with it, because there's no cloud copy to restore from. That's the trade-off for keeping it on your phone. Use <em>Back up to a file</em> in Settings now and then, and keep the file somewhere other than your phone.</p>
+          </div>
+          <div>
+            <h3>Can I move my history to a new phone?</h3>
+            <p>Yes. Choose <em>Send to another phone</em> in Settings on the old phone and <em>Receive from another phone</em> on the new one, then point the camera at the QR codes. No internet needed. A backup file works too: <em>Restore from a backup</em> brings it back.</p>
+          </div>
+          <div>
+            <h3>Can I track someone else's period too?</h3>
+            <p>Yes — a child who's just starting, for example. Choose <em>Track someone else too</em> in Settings and switch between people from the home screen. When they get their own phone, send just their history over to it.</p>
+          </div>
+          <div>
+            <h3>Does Ebb predict ovulation or fertile days?</h3>
+            <p>It can show an estimated fertile window, but only if you turn it on in Settings. It's worked out from cycle timing alone, which isn't reliable enough to use as contraception.</p>
+          </div>
+          <div>
+            <h3>How is Ebb different from other period tracker apps?</h3>
+            <p>Many popular period trackers keep your history on their servers so it can sync between devices. Ebb has no server: your history lives on your phone and moves only when you move it. It's also free and open source. It can't import from other apps yet, but you can add past periods by hand.</p>
+          </div>
+          <div>
+            <h3>Where can I download Ebb?</h3>
+            <p>Right here: <a href="#download">download the APK</a> for Android 7.0 or newer, on phones and tablets. It's coming to F-Droid. Updates install over the top and keep your history.</p>
+          </div>
         </div>
       </div>
     </section>
