@@ -231,6 +231,11 @@ section.alt .card { background: var(--cream); }
 .steps li { margin-bottom: 10px; }
 .note { color: var(--muted); font-size: 0.95rem; }
 
+/* FAQ: question and answer pairs, two columns on wide screens. */
+.faq { display: grid; grid-template-columns: 1fr 1fr; gap: 30px 44px; }
+.faq h3 { font-size: 1.15rem; margin-bottom: 0.35em; }
+.faq p { margin: 0; color: var(--muted); }
+
 /* More from SuperDaveLab */
 
 .more {
@@ -261,6 +266,7 @@ section.alt .card { background: var(--cream); }
   .hero-shot { width: min(280px, 80%); }
   .grid, .grid.four { grid-template-columns: 1fr 1fr; }
   .shots { grid-template-columns: 1fr 1fr; }
+  .faq { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 600px) {
@@ -271,6 +277,8 @@ section.alt .card { background: var(--cream); }
   .site-header nav { gap: 0; flex-wrap: wrap; justify-content: center; padding: 4px; }
   .site-header nav a { padding: 6px 6px; font-size: 0.76rem; white-space: nowrap; }
   .site-header nav { flex-wrap: nowrap; }
+  /* Six links don't fit a phone's width; LedgerSprout is still linked below. */
+  .site-header nav a.nav-wide { display: none; }
   .grid, .grid.four { grid-template-columns: 1fr; }
   .more { grid-template-columns: 1fr; text-align: left; }
   .more img { width: 110px; height: 110px; }
