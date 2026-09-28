@@ -1,0 +1,2 @@
+• Ebb is now licensed under the GNU General Public License, version 3 or later. It stays free and open source, and anyone who shares a changed version must share its source code too.
+• Nothing else changes: your history, reminders and settings carry over as they are.
