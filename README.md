@@ -36,7 +36,7 @@ because we never receive it.
 - **Erasable instantly.** Delete your data in Settings, or uninstall the app.
   Ebb keeps no other copy; the only ones are backups you saved or phones you
   sent your history to yourself.
-- **Auditable.** MIT-licensed and open source. Published builds are made from
+- **Auditable.** Open source under the GNU GPL. Published builds are made from
   this code.
 
 The trade-off, stated plainly: **there is no cloud backup, so a lost phone
@@ -131,4 +131,13 @@ enough to use as contraception.
 
 ## Licence
 
-MIT — see [LICENSE](LICENSE).
+Copyright (C) 2026 SuperDaveLab
+
+Ebb is free software: you can redistribute it and/or modify it under the
+terms of the GNU General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later
+version. It is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE. See [LICENSE](LICENSE) for the full text.
+
+Versions up to and including 0.3.0 were released under the MIT licence.
