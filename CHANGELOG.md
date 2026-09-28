@@ -9,6 +9,11 @@ turns that section into the release's own when it's cut.
 
 ## [Unreleased]
 
+### Changed
+- Ebb is now licensed under the GNU General Public License, version 3 or
+  later. Versions up to and including 0.3.0 remain available under the MIT
+  licence.
+
 ## [0.3.0] - 2026-09-27
 
 ### Added

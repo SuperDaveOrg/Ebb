@@ -20,7 +20,7 @@ Concretely:
 - The release build ships without the `INTERNET` permission, so Android itself
   prevents the app from sending anything anywhere. The promise is enforced by
   the operating system, not by our good intentions.
-- The app is MIT-licensed and open source, so the claim is auditable by anyone
+- The app is open source under the GNU GPL, so the claim is auditable by anyone
   who cares to check.
 
 ## What we do NOT mean

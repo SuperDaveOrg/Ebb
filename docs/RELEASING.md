@@ -54,8 +54,11 @@ Keep it outside the repository, with a backup somewhere safe (an encrypted
 USB stick, a password manager's file storage). The build refuses to use the
 debug key for a release.
 
-F-Droid signs its own builds with its own key, so this key covers APKs you
-distribute yourself (GitHub releases, IzzyOnDroid, sideloading).
+F-Droid publishes APKs signed with this key too: it rebuilds each release
+and ships the one from the GitHub release if the two match (see
+"Reproducible builds"). So one key covers every copy of Ebb — F-Droid,
+GitHub releases, IzzyOnDroid, the website — and people can update from any
+of them.
 
 ### Creating it (once)
 
@@ -144,6 +147,44 @@ commit the tag points to on GitHub. It's the same file the site offers:
 signed by this key, not built by CI. IzzyOnDroid can pick new versions up
 from these releases.
 
+## Reproducible builds
+
+F-Droid rebuilds each release from source and publishes the developer-signed
+APK only if its own build matches byte for byte. What makes that work:
+
+- `build_release.sh` always builds at `/tmp/ebb-build`, because Flutter
+  writes the build path into the compiled app. F-Droid's recipe builds there
+  too.
+- Packages come from `pubspec.lock` exactly (`--enforce-lockfile`), fetched
+  into the build directory.
+- `android/app/build.gradle.kts` leaves out AGP's VCS info and the
+  dependency-metadata signing block, which F-Droid rejects.
+- `android/reproducible.cmake` drops the linker build ID from native plugin
+  code (the QR scanner's zxing-cpp).
+
+Checked for v0.3.0: a rebuild with the Flutter SDK at a different path gave
+an APK that `apksigcopier compare` accepts against the released one — the
+same check F-Droid runs. Not yet checked: a different Android SDK/NDK path.
+F-Droid's first build settles that; if it doesn't match, remove `Binaries`
+and `AllowedAPKSigningKeys` from the recipe and F-Droid signs with its own
+key instead (then its users can't update from the website's APK, or back).
+
+To run the check yourself (`sudo apt install apksigcopier`):
+
+```bash
+apksigcopier compare dist/release/ebb-X.Y.Z.apk other-build.apk && echo match
+```
+
+## F-Droid
+
+The recipe is drafted in [fdroid/com.superdavelab.ebb.yml](fdroid/com.superdavelab.ebb.yml).
+To submit: fork https://gitlab.com/fdroid/fdroiddata, add it as
+`metadata/com.superdavelab.ebb.yml` with the version fields set to a real
+release, and open a merge request. After that, F-Droid finds new versions
+from the tags on its own — no new merge request per release. Store text,
+screenshots and per-version changelogs come from `fastlane/metadata/android/`
+in this repo, keyed by version code.
+
 ## Keeping up to date
 
 Flutter moves fast. For one developer the aim is to upgrade on purpose, not
@@ -176,7 +217,8 @@ update before the next SDK upgrade.
   tag-triggered signed build, like LedgerSprout's, would need the signing key
   as a repository secret. Worth it once releases are regular; until then the
   key stays on one machine.
-- **Per-processor APKs.** The script builds one universal APK. F-Droid builds
-  its own per-processor APKs and adjusts version codes itself.
-- **F-Droid metadata.** Store text, screenshots and per-version changelogs in
-  `fastlane/metadata/android/`, generated from `CHANGELOG.md`.
+- **Per-processor APKs.** The script builds one universal APK, and so does
+  F-Droid's recipe, since it must match it.
+- **Generated changelogs.** The per-version files in
+  `fastlane/metadata/android/en-US/changelogs/` are written by hand;
+  generating them from `CHANGELOG.md` would keep the two in step.

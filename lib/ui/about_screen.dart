@@ -52,8 +52,9 @@ class AboutScreen extends StatelessWidget {
     (
       Icons.code,
       'You can check our work',
-      'Ebb is open source under the MIT licence. Anyone can read exactly what '
-          'it does, and the published builds are made from that same code.',
+      'Ebb is open source under the GNU General Public License. Anyone can '
+          'read exactly what it does, and the published builds are made from '
+          'that same code.',
     ),
   ];
 
