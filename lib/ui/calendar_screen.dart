@@ -328,8 +328,9 @@ class _Month extends StatelessWidget {
                 child: Builder(
                   builder: (context) {
                     final i = row * 7 + col - lead;
-                    if (i < 0 || i >= days)
+                    if (i < 0 || i >= days) {
                       return const SizedBox(height: _Cell.height);
+                    }
                     final date = DateTime(month.year, month.month, i + 1);
                     return _Cell(
                       date: date,

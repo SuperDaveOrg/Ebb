@@ -242,8 +242,9 @@ class Predictor {
   }
 
   PredictionConfidence _confidence(int n, double variability) {
-    if (n >= historyWindow && variability <= 4)
+    if (n >= historyWindow && variability <= 4) {
       return PredictionConfidence.good;
+    }
     if (n >= 3) return PredictionConfidence.moderate;
     return PredictionConfidence.low;
   }
