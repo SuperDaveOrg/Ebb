@@ -25,7 +25,8 @@ code = major * 10000 + minor * 100 + patch        0.1.0 → 100, 1.2.3 → 10203
 
 So minor and patch stay below 100, and the code always goes up with the
 version, which Android and F-Droid require. `tool/bump_version.sh` enforces
-both.
+both. Each APK's own version code is ten times this plus a digit for its
+processor type; see "ABI splits".
 
 Three other version numbers exist and move **independently** of the app's:
 
@@ -97,9 +98,10 @@ tool/bump_version.sh minor          # or patch / major / an exact X.Y.Z
 
 # 2b. Write the store's release notes: a short, user-facing summary of the
 #     CHANGELOG.md section, 500 characters at most, in
-#     fastlane/metadata/android/en-US/changelogs/<versionCode>.txt (200.txt
-#     for 0.2.0). bump_version.sh prints the name; build_release.sh refuses to
-#     build without it.
+#     fastlane/metadata/android/en-US/changelogs/<code>1.txt, then copy it to
+#     <code>2.txt and <code>3.txt (5011.txt, 5012.txt and 5013.txt for 0.5.1;
+#     see "ABI splits"). bump_version.sh prints the exact commands;
+#     build_release.sh refuses to build without all three.
 
 # 3. Commit, open a pull request, and merge it once CI passes. The notes are
 #    a new file, so add them first: `commit -a` skips untracked files.
@@ -132,26 +134,32 @@ snapshot or debug-signed build), and rsyncs it to
 deletes anything on the server, so earlier APKs stay downloadable.
 
 `tool/build_release.sh` builds in a clean temporary checkout of exactly that
-tag, runs `flutter analyze` and `flutter test`, and then **refuses** the APK if:
+tag, runs `flutter analyze` and `flutter test`, builds one APK per ABI and
+one universal APK, and then **refuses** them all if any one:
 
 - it asks for any permission outside the allow-list at the top of the script
   (notifications, boot, vibrate, camera) — `INTERNET` above all;
 - it's signed with the debug key;
-- its version doesn't match `pubspec.yaml`, or the code doesn't match the
-  formula.
+- has a version that doesn't match `pubspec.yaml`, or a code that doesn't
+  match the formula (see "ABI splits");
+- is signed by a different key from the others.
 
-Output lands in `dist/release/` (gitignored): `ebb-X.Y.Z.apk`, its `.sha256`,
-and a `BUILD-INFO.txt` recording the commit, Flutter version and signing
-certificate. Builds from an untagged commit are named
-`ebb-X.Y.Z-<commit>.apk` so they can't pass for a release.
+Output lands in `dist/release/` (gitignored): the universal `ebb-X.Y.Z.apk`,
+the per-ABI `ebb-X.Y.Z-armeabi-v7a.apk`, `-arm64-v8a.apk` and `-x86_64.apk`,
+a `.sha256` for each, and a `BUILD-INFO.txt` recording the commit, Flutter
+version, signing certificate and every APK's version code and SHA-256. Builds
+from an untagged commit are named `ebb-X.Y.Z-<commit>.apk` (and so on) so
+they can't pass for a release.
 
 `build_release.sh` uploads nothing; publishing is steps 6 and 7, separate
 and deliberate.
 
-`tool/github_release.sh` attaches that same APK and its `.sha256` to a GitHub
-release for the tag, with the version's CHANGELOG.md section and the signing
-certificate's fingerprint as the notes. It checks the APK was built from the
-commit the tag points to on GitHub. It's the same file the site offers:
+`tool/github_release.sh` attaches all four APKs and their `.sha256` files to
+a GitHub release for the tag, with the version's CHANGELOG.md section and the
+signing certificate's fingerprint as the notes. It checks the APKs were built
+from the commit the tag points to on GitHub; F-Droid's recipe fetches the
+per-ABI ones by name, so don't rename them. The universal APK is the same
+file the site offers:
 signed by this key, not built by CI. IzzyOnDroid can pick new versions up
 from these releases.
 
@@ -189,6 +197,34 @@ To run the check yourself (`sudo apt install apksigcopier`):
 apksigcopier compare dist/release/ebb-X.Y.Z.apk other-build.apk && echo match
 ```
 
+## ABI splits
+
+F-Droid asks Flutter apps to ship one APK per processor type (ABI) rather
+than one universal APK carrying all three: each is about a third of the size.
+The website keeps offering the universal APK, which works on any phone.
+
+Every APK gets its own version code, set in `android/app/build.gradle.kts`
+with the code F-Droid gave us: ten times the pubspec code, plus a digit for
+the ABI.
+
+| APK | Digit | 0.5.1 (pubspec code 501) |
+|---|---|---|
+| universal (website) | 0 | 5010 |
+| `armeabi-v7a` | 1 | 5011 |
+| `arm64-v8a` | 2 | 5012 |
+| `x86_64` | 3 | 5013 |
+
+The ABI digit comes last, so every APK of a new version outranks every APK of
+the old one, and on a single version F-Droid offers each device the highest
+code it can run. This replaces Flutter's own split numbering (ABI × 1000 +
+code), which five-digit pubspec codes would overflow. The universal APK gets
+the same ×10, so moving between the website's download and F-Droid is never a
+downgrade.
+
+F-Droid looks up each version's "what's new" by the APK's own code, so every
+version needs identical changelogs at `<code>1.txt`, `<code>2.txt` and
+`<code>3.txt`. Versions before 0.5.1 have one file named by the plain code.
+
 ## F-Droid
 
 The recipe is drafted in [fdroid/com.superdavelab.ebb.yml](fdroid/com.superdavelab.ebb.yml).
@@ -202,12 +238,18 @@ because fdroiddata wants none, so the reasoning lives here:
   same path `build_release.sh` uses, then moved back.
 - `PUB_CACHE` is inside the source, so F-Droid's scanner checks every
   package; `scandelete` removes any binary it flags.
-- One universal APK (no `--split-per-abi`), because it has to match the APK
-  on the GitHub release byte for byte.
+- One build block per ABI, each building only its own
+  (`--split-per-abi --target-platform android-arm`, `android-arm64`,
+  `android-x64`), exactly as `build_release.sh` does, and pointing its
+  `binary:` at the matching APK on the GitHub release, which it must match
+  byte for byte. `VercodeOperation` gives each block its code when F-Droid
+  picks up a new tag.
 Before changing the recipe or anything about the build, test it locally:
 `tool/fdroid_build_test.sh --ref <commit>` runs F-Droid's own build of that
-commit in the Docker image fdroiddata's CI uses, and, if `dist/release/` has
-a signed APK from the same commit, checks F-Droid's build matches it. A
+commit in the Docker image fdroiddata's CI uses, building every ABI, and, if
+`dist/release/` has
+signed APKs from the same commit, checks each of F-Droid's builds matches the
+signed APK for its ABI. A
 failure there costs ten minutes instead of a round trip through the merge
 request's pipeline.
 
@@ -250,8 +292,6 @@ update before the next SDK upgrade.
   tag-triggered signed build, like LedgerSprout's, would need the signing key
   as a repository secret. Worth it once releases are regular; until then the
   key stays on one machine.
-- **Per-processor APKs.** The script builds one universal APK, and so does
-  F-Droid's recipe, since it must match it.
 - **Generated changelogs.** The per-version files in
   `fastlane/metadata/android/en-US/changelogs/` are written by hand;
   generating them from `CHANGELOG.md` would keep the two in step.
