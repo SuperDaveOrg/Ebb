@@ -13,6 +13,7 @@ import 'package:ebb/services/notification_service.dart';
 import 'package:ebb/services/reminder_sync.dart';
 import 'package:ebb/services/settings_service.dart';
 import 'package:ebb/ui/calendar_screen.dart';
+import 'package:ebb/ui/charts_screen.dart';
 import 'package:ebb/ui/cycle_editor.dart';
 import 'package:ebb/ui/cycle_ring.dart';
 import 'package:ebb/ui/history_screen.dart';
@@ -308,6 +309,19 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
               );
               await _refresh();
             },
+          ),
+          IconButton(
+            icon: const Icon(Icons.insights_outlined),
+            tooltip: 'Charts',
+            onPressed: () => Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (_) => ChartsScreen(
+                  repository: widget.repository,
+                  settings: widget.settings,
+                  title: _hasPeople ? '${_who.whoseCap} charts' : 'Charts',
+                ),
+              ),
+            ),
           ),
           IconButton(
             icon: const Icon(Icons.settings_outlined),

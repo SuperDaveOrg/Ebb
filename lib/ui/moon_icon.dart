@@ -43,38 +43,54 @@ class _MoonPainter extends CustomPainter {
   final Color? backdrop;
 
   @override
-  void paint(Canvas canvas, Size size) {
-    final centre = size.center(Offset.zero);
-    final stroke = size.width / 9;
-    final radius = size.width / 2 - stroke / 2;
-    final disc = Rect.fromCircle(center: centre, radius: radius);
-
-    final b = backdrop;
-    if (b != null) {
-      canvas.drawCircle(centre, radius + stroke * 1.5, Paint()..color = b);
-    }
-
-    final lit = Paint()..color = color;
-    switch (phase) {
-      case MoonPhase.full:
-        canvas.drawOval(disc, lit);
-      case MoonPhase.firstQuarter:
-        canvas.drawArc(disc, -math.pi / 2, math.pi, true, lit);
-      case MoonPhase.lastQuarter:
-        canvas.drawArc(disc, math.pi / 2, math.pi, true, lit);
-      case MoonPhase.newMoon:
-        break;
-    }
-    canvas.drawOval(
-      disc,
-      Paint()
-        ..color = color
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = stroke,
-    );
-  }
+  void paint(Canvas canvas, Size size) => paintMoon(
+    canvas,
+    size.center(Offset.zero),
+    size.width,
+    phase,
+    color,
+    backdrop: backdrop,
+  );
 
   @override
   bool shouldRepaint(_MoonPainter old) =>
       old.phase != phase || old.color != color || old.backdrop != backdrop;
+}
+
+/// Draws a [size]-wide moon centred on [centre]. Shared with the charts, so
+/// a moon looks the same everywhere.
+void paintMoon(
+  Canvas canvas,
+  Offset centre,
+  double size,
+  MoonPhase phase,
+  Color color, {
+  Color? backdrop,
+}) {
+  final stroke = size / 9;
+  final radius = size / 2 - stroke / 2;
+  final disc = Rect.fromCircle(center: centre, radius: radius);
+
+  if (backdrop != null) {
+    canvas.drawCircle(centre, radius + stroke * 1.5, Paint()..color = backdrop);
+  }
+
+  final lit = Paint()..color = color;
+  switch (phase) {
+    case MoonPhase.full:
+      canvas.drawOval(disc, lit);
+    case MoonPhase.firstQuarter:
+      canvas.drawArc(disc, -math.pi / 2, math.pi, true, lit);
+    case MoonPhase.lastQuarter:
+      canvas.drawArc(disc, math.pi / 2, math.pi, true, lit);
+    case MoonPhase.newMoon:
+      break;
+  }
+  canvas.drawOval(
+    disc,
+    Paint()
+      ..color = color
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = stroke,
+  );
 }

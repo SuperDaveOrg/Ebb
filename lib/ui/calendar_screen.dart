@@ -77,14 +77,22 @@ class _CalendarScreenState extends State<CalendarScreen> {
     });
   }
 
-  /// First of each month from the first logged period to the one holding
-  /// the end of the likely window.
+  /// First of each month from the month before anything was logged to the
+  /// one holding the end of the likely window.
+  ///
+  /// The spare month at the start is room to fill history in by hand: log a
+  /// period there and the calendar reaches back another month next time.
   (List<DateTime> past, List<DateTime> ahead) get _months {
     final now = today();
     final current = DateTime(now.year, now.month);
-    final first = _cycles.isEmpty
+    final logged = [
+      ..._cycles.map((c) => c.start),
+      ..._logs.values.map((l) => dateOnly(l.date)),
+    ];
+    final earliest = logged.isEmpty
         ? current
-        : DateTime(_cycles.first.start.year, _cycles.first.start.month);
+        : logged.reduce((a, b) => a.isBefore(b) ? a : b);
+    final first = DateTime(earliest.year, earliest.month - 1);
     final latest = _prediction.latest;
     final last = latest != null && latest.isAfter(now)
         ? DateTime(latest.year, latest.month)
@@ -129,6 +137,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
     switch (result.action) {
       case _Started():
         await widget.repository.startPeriod(day);
+      case _MovedStart(:final cycle):
+        await widget.repository.updateCycle(cycle.copyWith(start: day));
       case _Ended(:final cycle):
         await widget.repository.endPeriod(cycle.id!, day);
       case _Edit(:final cycle):
@@ -338,8 +348,7 @@ class _Month extends StatelessWidget {
                       info: info[i],
                       joinLeft: col > 0 && joins(i - 1, i),
                       joinRight: col < 6 && joins(i, i + 1),
-                      hasLog: logs.containsKey(isoDate(date)),
-                      feeling: logs[isoDate(date)]?.feeling,
+                      log: logs[isoDate(date)],
                       moon: moons[isoDate(date)]?.phase,
                       onTap: () => onTap(date),
                     );
@@ -376,9 +385,8 @@ class _Cell extends StatelessWidget {
     required this.info,
     required this.joinLeft,
     required this.joinRight,
-    required this.hasLog,
+    this.log,
     this.moon,
-    this.feeling,
     required this.onTap,
   });
 
@@ -391,9 +399,8 @@ class _Cell extends StatelessWidget {
   /// reads as one shape rather than a row of beads.
   final bool joinLeft;
   final bool joinRight;
-  final bool hasLog;
+  final DayLog? log;
   final MoonPhase? moon;
-  final DayFeeling? feeling;
   final VoidCallback onTap;
 
   @override
@@ -403,6 +410,12 @@ class _Cell extends StatelessWidget {
     final isToday = isSameDay(date, today());
     final future = date.isAfter(today());
     final excluded = info.cycle?.excluded ?? false;
+    final feeling = log?.feeling;
+    final rating = log?.rating;
+    // Under the number: a pencil for a written note, otherwise a dot for a
+    // rating, otherwise nothing, so days still to rate stand out. The
+    // feeling has its own face.
+    final hasNote = log?.notes?.trim().isNotEmpty ?? false;
 
     final Color? fill = switch (info.mark) {
       DayMark.period => excluded ? colors.elapsed : colors.period,
@@ -439,9 +452,11 @@ class _Cell extends StatelessWidget {
       excludeSemantics: true,
       label:
           '${DateFormat.MMMMEEEEd().format(date)}'
-          '${isToday ? ', today' : ''}$meaning${hasLog ? ', has notes' : ''}'
+          '${isToday ? ', today' : ''}$meaning'
           '${moon == null ? '' : ', ${moon!.label.toLowerCase()}'}'
-          '${feeling == null ? '' : ', felt ${_feelingName(feeling!)}'}',
+          '${rating == null ? '' : ', rated $rating'}'
+          '${feeling == null ? '' : ', felt ${_feelingName(feeling)}'}'
+          '${hasNote ? ', has a note' : ''}',
       child: InkWell(
         onTap: onTap,
         customBorder: const CircleBorder(),
@@ -489,7 +504,12 @@ class _Cell extends StatelessWidget {
                       ),
                     ),
                   ),
-                if (hasLog)
+                if (hasNote)
+                  Positioned(
+                    bottom: 5,
+                    child: Icon(Icons.edit, size: 10, color: ink),
+                  )
+                else if (rating != null)
                   Positioned(
                     bottom: 11,
                     child: Container(
@@ -677,6 +697,12 @@ sealed class _Action {}
 
 class _Started extends _Action {}
 
+/// The period starting soon after this day really started on it.
+class _MovedStart extends _Action {
+  _MovedStart(this.cycle);
+  final Cycle cycle;
+}
+
 class _Ended extends _Action {
   _Ended(this.cycle);
   final Cycle cycle;
@@ -787,14 +813,28 @@ class _DaySheetState extends State<_DaySheet> {
     };
   }
 
-  /// Offered only when it would pass the same checks as anywhere else.
+  /// Offered only when it would pass the same checks as anywhere else, and
+  /// not where moving the next period's start here is offered instead.
   bool get _canStart {
     if (_future) return false;
     final mark = widget.info.mark;
     if (mark == DayMark.period || mark == DayMark.periodUnrecorded) {
       return false;
     }
+    if (_canMoveStart != null) return false;
     return checkCycle(Cycle(start: widget.day), widget.cycles) == null;
+  }
+
+  /// The period starting soon after this day, if its start can move here.
+  Cycle? get _canMoveStart {
+    if (_future) return null;
+    final mark = widget.info.mark;
+    if (mark == DayMark.period || mark == DayMark.periodUnrecorded) {
+      return null;
+    }
+    final next = periodStartingSoonAfter(widget.day, widget.cycles);
+    if (next == null || next.id == null) return null;
+    return canMoveStartTo(next, widget.day, widget.cycles) ? next : null;
   }
 
   /// The period this day could be the last day of, if any.
@@ -817,6 +857,7 @@ class _DaySheetState extends State<_DaySheet> {
         widget.info.mark == DayMark.period ||
         widget.info.mark == DayMark.periodUnrecorded;
     final ends = _canEnd;
+    final moves = _canMoveStart;
 
     const side = EdgeInsets.symmetric(horizontal: 24);
 
@@ -873,12 +914,25 @@ class _DaySheetState extends State<_DaySheet> {
                   ),
                 )
               else ...[
+                // Worded as things to do, not facts about the day: these are
+                // buttons, and "My period started this day" read as a record.
                 if (_canStart)
                   ListTile(
                     contentPadding: side,
                     leading: const Icon(Icons.water_drop_outlined),
-                    title: Text('${who.mine} period started this day'),
+                    title: Text('Mark as the day ${who.whose} period started'),
                     onTap: () => _done(_Started()),
+                  ),
+                if (moves != null)
+                  ListTile(
+                    contentPadding: side,
+                    leading: const Icon(Icons.water_drop_outlined),
+                    title: const Text('Make this the first day of the period'),
+                    subtitle: Text(
+                      'Moves its start from '
+                      '${DateFormat.MMMEd().format(moves.start)}',
+                    ),
+                    onTap: () => _done(_MovedStart(moves)),
                   ),
                 if (ends != null)
                   ListTile(
@@ -886,7 +940,7 @@ class _DaySheetState extends State<_DaySheet> {
                     leading: const Icon(Icons.check),
                     title: Text(
                       ends.end == null
-                          ? '${who.mine} period ended this day'
+                          ? 'Mark as the day ${who.whose} period ended'
                           : 'Make this the last day of the period',
                     ),
                     onTap: () => _done(_Ended(ends)),

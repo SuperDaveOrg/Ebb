@@ -528,7 +528,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       title: const Text('Show moon phases'),
                       subtitle: const Text(
                         'New, first quarter, full and last '
-                        'quarter, on the calendar.',
+                        'quarter, on the calendar and charts.',
                       ),
                       value: _moonPhases,
                       onChanged: (v) async {

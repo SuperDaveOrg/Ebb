@@ -49,6 +49,19 @@ class HelpScreen extends StatelessWidget {
           'it. Add a note there too, so you remember why.',
     ),
     (
+      Icons.insights_outlined,
+      'Day ratings, feelings and charts',
+      'Tap any day on the calendar to rate it from 1 to 5, and to pick a '
+          'face for how you felt. Both are optional; tap a choice again to '
+          'clear it.\n\n'
+          'Charts (the chart icon) shows each day’s rating over the dates '
+          'you choose, with periods shaded, and which feelings came during '
+          'and before periods. With moon phases turned on in Settings, the '
+          'moon is there too.\n\n'
+          'The charts show what you logged. They don’t say what it means — '
+          'that’s yours to judge.',
+    ),
+    (
       Icons.notifications_none,
       'Reminders',
       'A heads-up a few days before your period is expected, and another on '

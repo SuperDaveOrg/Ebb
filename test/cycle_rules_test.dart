@@ -95,4 +95,37 @@ void main() {
       );
     });
   });
+
+  group('the days just before a period', () {
+    test('find the period starting soon after', () {
+      // The day before April's period.
+      expect(periodStartingSoonAfter(DateTime(2026, 3, 28), existing), april);
+      // A fortnight before: the longest a period can run.
+      expect(periodStartingSoonAfter(DateTime(2026, 3, 15), existing), april);
+      // Further back is an ordinary day.
+      expect(periodStartingSoonAfter(DateTime(2026, 3, 14), existing), isNull);
+      // After the last period there is nothing soon after.
+      expect(periodStartingSoonAfter(DateTime(2026, 5, 1), existing), isNull);
+    });
+
+    test('can take the start moved back to them', () {
+      expect(
+        canMoveStartTo(april, DateTime(2026, 3, 28), existing, asOf: asOf),
+        isTrue,
+      );
+    });
+
+    test('but not onto the previous period, nor into one too long', () {
+      // March's period ends on the 5th.
+      expect(
+        canMoveStartTo(april, DateTime(2026, 3, 5), existing, asOf: asOf),
+        isFalse,
+      );
+      // Mar 18 to Apr 2 would be a 16-day period.
+      expect(
+        canMoveStartTo(april, DateTime(2026, 3, 18), existing, asOf: asOf),
+        isFalse,
+      );
+    });
+  });
 }

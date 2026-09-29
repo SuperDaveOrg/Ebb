@@ -176,19 +176,23 @@ BackupPerson _person(
   }
 
   // Ordinary days too, the way someone checking in most evenings would:
-  // a rating and a feeling on most of the last few months, so the calendar
-  // has something to show outside periods.
+  // a rating and a feeling on most days of the last fifteen months, so the
+  // calendar and charts have something to show outside periods. A rating
+  // drifts from the day before rather than jumping at random, as real ones
+  // do.
   if (detailed) {
     final everyday = Random(13);
     final logged = {for (final d in days) isoDate(d.date)};
     // Never past today, even when [until] is: Ebb can't log a future day.
     final last = until.isAfter(today()) ? today() : until;
-    for (var d = addDays(last, -120); !d.isAfter(last); d = addDays(d, 1)) {
+    var rating = 3;
+    for (var d = addDays(last, -456); !d.isAfter(last); d = addDays(d, 1)) {
+      rating = (rating + const [-1, 0, 0, 1][everyday.nextInt(4)]).clamp(1, 5);
       if (logged.contains(isoDate(d)) || everyday.nextInt(10) < 3) continue;
       days.add(
         DayLog(
           date: d,
-          rating: 2 + everyday.nextInt(4),
+          rating: rating,
           feeling: _feeling(everyday) ?? DayFeeling.named(Feeling.calm),
         ),
       );
