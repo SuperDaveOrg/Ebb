@@ -69,6 +69,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool _reminders = true;
   int _leadDays = 2;
   bool _fertileWindow = false;
+  bool _moonPhases = false;
   bool _loading = true;
   String? _version;
   late String? _name = widget.profile.name;
@@ -86,6 +87,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final reminders = await widget.settings.remindersEnabled();
     final lead = await widget.settings.leadDays();
     final fertile = await widget.settings.showFertileWindow();
+    final moon = await widget.settings.showMoonPhases();
     final version = await installedVersion();
     if (!mounted) return;
     setState(() {
@@ -93,6 +95,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       _reminders = reminders;
       _leadDays = lead;
       _fertileWindow = fertile;
+      _moonPhases = moon;
       _loading = false;
     });
   }
@@ -500,6 +503,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           setState(() => _fertileWindow = v);
                         },
                       ),
+                    SwitchListTile(
+                      secondary: const Icon(Icons.dark_mode_outlined),
+                      title: const Text('Show moon phases'),
+                      subtitle: const Text('New, first quarter, full and last '
+                          'quarter, on the calendar.'),
+                      value: _moonPhases,
+                      onChanged: (v) async {
+                        await widget.settings.setShowMoonPhases(v);
+                        setState(() => _moonPhases = v);
+                      },
+                    ),
                     if (!_who.isOwner)
                       ListTile(
                         leading: const Icon(Icons.person_remove_outlined),

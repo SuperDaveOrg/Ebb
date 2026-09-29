@@ -28,6 +28,7 @@ actually uses a period tracker.
 | Delete all data | Immediate and complete. |
 | "Your data" explainer | Plain-language screen describing where data lives. |
 | Calendar view | Added after v0.2.0 build. Provides good visualization and easy editing of past periods in a point-and-click UX |
+| Moon phases | Asked for by users. **Off by default** (Settings). New, first quarter, full and last quarter drawn in the corner of the day they fall on, locally; the day sheet gives the time. Computed on the phone (Meeus, ch. 49), accurate to under a minute. Display only: nothing suggests a link to the cycle, and nothing feeds the predictor. Drawn as seen from the northern hemisphere. |
 
 ---
 
@@ -35,8 +36,25 @@ actually uses a period tracker.
 
 ### 1. Daily logging beyond start/end
 
-The `DayLog` model exists but has no UI yet. Needs: flow intensity, symptoms,
-mood, notes, on any date.
+Flow and a note can be logged on any day from the calendar, and users like
+it. Still to do: symptoms, a day rating and mood.
+
+**Day rating** (asked for by users). One optional 1–5 "How was today?",
+shown as five faces but stored as a number, so it exports, backs up and
+charts cleanly ("days 24–28 average 2.1"). No rating is not a 3. Named for
+the day rather than "mood", since people will use it for energy and pain
+too. Needs a migration, `DayLog.isEmpty` to count it, and an optional
+`rating` in the backup format — older Ebbs would silently drop it on
+restore, which may justify a new `ebbBackup` version. 🟡
+
+**Mood** (asked for by users, as a list of emoji). Kinds of mood — anxious,
+calm, irritable, flat, energetic — aren't points on one scale, so these are
+tags rather than a rating: suggested chips, possibly with emoji, that the
+user can add to, the same as symptoms. Whether they live in `symptoms` or a
+separate `moods` list in the backup is open. 🟡
+
+The calendar cell already carries a band, today's ring, a note dot and a
+moon; mock up a busy month before giving the rating a mark there too.
 
 **Design note:** symptoms are stored as free text rather than a fixed enum, on
 purpose. A hardcoded list quietly tells the user which experiences count. A

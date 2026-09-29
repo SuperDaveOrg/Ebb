@@ -5,12 +5,14 @@ import 'package:ebb/data/cycle_repository.dart';
 import 'package:ebb/domain/calendar.dart';
 import 'package:ebb/domain/cycle_rules.dart';
 import 'package:ebb/domain/dates.dart';
+import 'package:ebb/domain/moon.dart';
 import 'package:ebb/domain/predictor.dart';
 import 'package:ebb/models/cycle.dart';
 import 'package:ebb/models/day_log.dart';
 import 'package:ebb/services/settings_service.dart';
 import 'package:ebb/ui/cycle_editor.dart';
 import 'package:ebb/ui/layout.dart';
+import 'package:ebb/ui/moon_icon.dart';
 import 'package:ebb/ui/theme.dart';
 import 'package:ebb/ui/wording.dart';
 
@@ -47,6 +49,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
   CalendarMarks _marks = CalendarMarks(const [], CyclePrediction.empty);
   Map<String, DayLog> _logs = const {};
   bool _showFertile = false;
+  bool _showMoon = false;
   bool _loading = true;
 
   @override
@@ -59,12 +62,14 @@ class _CalendarScreenState extends State<CalendarScreen> {
     final cycles = await widget.repository.allCycles();
     final logs = await widget.repository.allLogs();
     final fertile = await widget.settings.showFertileWindow();
+    final moon = await widget.settings.showMoonPhases();
     final prediction = const Predictor().predict(cycles);
     if (!mounted) return;
     setState(() {
       _cycles = cycles;
       _prediction = prediction;
       _showFertile = fertile;
+      _showMoon = moon;
       _marks = CalendarMarks(cycles, prediction, showFertile: fertile);
       _logs = {for (final l in logs) isoDate(l.date): l};
       _loading = false;
@@ -110,6 +115,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
         cycles: _cycles,
         prediction: _prediction,
         log: _logs[isoDate(day)],
+        moon: _showMoon ? moonPhasesByDay(day, day)[isoDate(day)] : null,
       ),
     );
     if (result == null) return;
@@ -195,6 +201,10 @@ class _CalendarScreenState extends State<CalendarScreen> {
   /// the present with the past a scroll away.
   Widget _monthList(BuildContext context) {
     final (past, ahead) = _months;
+    final moons = _showMoon
+        ? moonPhasesByDay(past.isEmpty ? ahead.first : past.last,
+            DateTime(ahead.last.year, ahead.last.month + 1, 0))
+        : const <String, MoonEvent>{};
     final padding = readablePadding(context,
         base: const EdgeInsets.symmetric(horizontal: 12), maxWidth: _maxWidth);
 
@@ -202,6 +212,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
           month: m,
           marks: _marks,
           logs: _logs,
+          moons: moons,
           onTap: _openDay,
         );
 
@@ -259,12 +270,14 @@ class _Month extends StatelessWidget {
     required this.month,
     required this.marks,
     required this.logs,
+    required this.moons,
     required this.onTap,
   });
 
   final DateTime month;
   final CalendarMarks marks;
   final Map<String, DayLog> logs;
+  final Map<String, MoonEvent> moons;
   final void Function(DateTime) onTap;
 
   static final _title = DateFormat.yMMMM();
@@ -305,6 +318,7 @@ class _Month extends StatelessWidget {
                   joinLeft: col > 0 && joins(i - 1, i),
                   joinRight: col < 6 && joins(i, i + 1),
                   hasLog: logs.containsKey(isoDate(date)),
+                  moon: moons[isoDate(date)]?.phase,
                   onTap: () => onTap(date),
                 );
               }),
@@ -336,6 +350,7 @@ class _Cell extends StatelessWidget {
     required this.joinLeft,
     required this.joinRight,
     required this.hasLog,
+    this.moon,
     required this.onTap,
   });
 
@@ -349,6 +364,7 @@ class _Cell extends StatelessWidget {
   final bool joinLeft;
   final bool joinRight;
   final bool hasLog;
+  final MoonPhase? moon;
   final VoidCallback onTap;
 
   @override
@@ -392,7 +408,8 @@ class _Cell extends StatelessWidget {
       button: true,
       excludeSemantics: true,
       label: '${DateFormat.MMMMEEEEd().format(date)}'
-          '${isToday ? ', today' : ''}$meaning${hasLog ? ', has notes' : ''}',
+          '${isToday ? ', today' : ''}$meaning${hasLog ? ', has notes' : ''}'
+          '${moon == null ? '' : ', ${moon!.label.toLowerCase()}'}',
       child: InkWell(
         onTap: onTap,
         customBorder: const CircleBorder(),
@@ -414,6 +431,15 @@ class _Cell extends StatelessWidget {
                       color: ink,
                       fontWeight: isToday ? FontWeight.w700 : null,
                     )),
+                // Up and to the left of the number, on the day's own
+                // circle: pinned to the cell's corner it floats between
+                // two days on a wide screen.
+                if (moon case final phase?)
+                  Transform.translate(
+                    offset: const Offset(-16, -14),
+                    child: MoonIcon(phase,
+                        size: 10, backdrop: theme.scaffoldBackgroundColor),
+                  ),
                 if (hasLog)
                   Positioned(
                     bottom: 11,
@@ -617,6 +643,7 @@ class _DaySheet extends StatefulWidget {
     required this.cycles,
     required this.prediction,
     required this.log,
+    this.moon,
   });
 
   final DateTime day;
@@ -625,6 +652,7 @@ class _DaySheet extends StatefulWidget {
   final List<Cycle> cycles;
   final CyclePrediction prediction;
   final DayLog? log;
+  final MoonEvent? moon;
 
   @override
   State<_DaySheet> createState() => _DaySheetState();
@@ -742,6 +770,22 @@ class _DaySheetState extends State<_DaySheet> {
                   child: Text(status,
                       style: theme.textTheme.bodyMedium?.copyWith(
                           color: theme.colorScheme.onSurfaceVariant)),
+                ),
+              if (widget.moon case final moon?)
+                Padding(
+                  padding: side + const EdgeInsets.only(top: 6),
+                  child: Row(
+                    children: [
+                      MoonIcon(moon.phase, size: 14),
+                      const SizedBox(width: 8),
+                      Text(
+                        '${moon.phase.label}, '
+                        '${DateFormat.jm().format(moon.at.toLocal())}',
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                            color: theme.colorScheme.onSurfaceVariant),
+                      ),
+                    ],
+                  ),
                 ),
               const SizedBox(height: 8),
               if (_future)

@@ -15,6 +15,7 @@ class SettingsService {
   String get _kLeadDays => _key('reminder_lead_days');
   String get _kReminderHour => _key('reminder_hour');
   String get _kShowFertileWindow => _key('show_fertile_window');
+  String get _kShowMoonPhases => _key('show_moon_phases');
 
   /// The primary profile keeps the original un-prefixed keys, so installs
   /// from before profiles existed keep their preferences untouched.
@@ -61,6 +62,14 @@ class SettingsService {
       (await SharedPreferences.getInstance())
           .setBool(_kShowFertileWindow, value);
 
+  /// Off by default: interesting to some, clutter to others.
+  Future<bool> showMoonPhases() async =>
+      (await SharedPreferences.getInstance()).getBool(_kShowMoonPhases) ??
+      false;
+
+  Future<void> setShowMoonPhases(bool value) async =>
+      (await SharedPreferences.getInstance()).setBool(_kShowMoonPhases, value);
+
   /// Forgets this person's preferences, when they're removed from the phone.
   Future<void> clear() async {
     final prefs = await SharedPreferences.getInstance();
@@ -69,6 +78,7 @@ class SettingsService {
       _kLeadDays,
       _kReminderHour,
       _kShowFertileWindow,
+      _kShowMoonPhases,
     ]) {
       await prefs.remove(k);
     }

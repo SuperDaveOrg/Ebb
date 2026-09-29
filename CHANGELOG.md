@@ -9,6 +9,12 @@ turns that section into the release's own when it's cut.
 
 ## [Unreleased]
 
+### Added
+- Moon phases on the calendar, if you want them: turn on Settings → Show
+  moon phases. New, first quarter, full and last quarter moons are marked
+  on the day they fall, and tapping the day shows the time. They're worked
+  out on the phone, like everything else.
+
 ## [0.5.1] - 2026-09-29
 
 ### Changed
