@@ -9,8 +9,10 @@ class DocumentService {
 
   /// Offers to save [bytes] as [suggestedName]. False if she backed out.
   Future<bool> save(String suggestedName, Uint8List bytes) async {
-    final saved = await _channel.invokeMethod<bool>(
-        'save', {'name': suggestedName, 'bytes': bytes});
+    final saved = await _channel.invokeMethod<bool>('save', {
+      'name': suggestedName,
+      'bytes': bytes,
+    });
     return saved ?? false;
   }
 

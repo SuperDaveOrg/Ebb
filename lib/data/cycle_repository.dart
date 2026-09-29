@@ -19,23 +19,31 @@ class CycleRepository {
 
   static const _mine = 'profile_id = ?';
 
-  Map<String, Object?> _owned(Map<String, Object?> row) =>
-      {...row, 'profile_id': profileId};
+  Map<String, Object?> _owned(Map<String, Object?> row) => {
+    ...row,
+    'profile_id': profileId,
+  };
 
   Future<List<Cycle>> allCycles() async {
     final db = await _db.database;
-    final rows = await db.query('cycles',
-        where: _mine, whereArgs: [profileId], orderBy: 'start_date ASC');
+    final rows = await db.query(
+      'cycles',
+      where: _mine,
+      whereArgs: [profileId],
+      orderBy: 'start_date ASC',
+    );
     return rows.map(Cycle.fromRow).toList();
   }
 
   Future<Cycle?> latestCycle() async {
     final db = await _db.database;
-    final rows = await db.query('cycles',
-        where: _mine,
-        whereArgs: [profileId],
-        orderBy: 'start_date DESC',
-        limit: 1);
+    final rows = await db.query(
+      'cycles',
+      where: _mine,
+      whereArgs: [profileId],
+      orderBy: 'start_date DESC',
+      limit: 1,
+    );
     return rows.isEmpty ? null : Cycle.fromRow(rows.first);
   }
 
@@ -52,10 +60,12 @@ class CycleRepository {
       conflictAlgorithm: ConflictAlgorithm.ignore,
     );
     if (id > 0) return id; // an ignored insert reports 0 or -1
-    final rows = await db.query('cycles',
-        columns: ['id'],
-        where: '$_mine AND start_date = ?',
-        whereArgs: [profileId, isoDate(dateOnly(start))]);
+    final rows = await db.query(
+      'cycles',
+      columns: ['id'],
+      where: '$_mine AND start_date = ?',
+      whereArgs: [profileId, isoDate(dateOnly(start))],
+    );
     return rows.first['id'] as int;
   }
 
@@ -78,22 +88,31 @@ class CycleRepository {
 
   Future<void> updateCycle(Cycle cycle) async {
     final db = await _db.database;
-    await db.update('cycles', _owned(cycle.toRow()),
-        where: 'id = ? AND $_mine', whereArgs: [cycle.id, profileId]);
+    await db.update(
+      'cycles',
+      _owned(cycle.toRow()),
+      where: 'id = ? AND $_mine',
+      whereArgs: [cycle.id, profileId],
+    );
   }
 
   Future<void> deleteCycle(int id) async {
     final db = await _db.database;
-    await db.delete('cycles',
-        where: 'id = ? AND $_mine', whereArgs: [id, profileId]);
+    await db.delete(
+      'cycles',
+      where: 'id = ? AND $_mine',
+      whereArgs: [id, profileId],
+    );
   }
 
   Future<DayLog?> logFor(DateTime date) async {
     final db = await _db.database;
-    final rows = await db.query('day_logs',
-        where: '$_mine AND log_date = ?',
-        whereArgs: [profileId, isoDate(dateOnly(date))],
-        limit: 1);
+    final rows = await db.query(
+      'day_logs',
+      where: '$_mine AND log_date = ?',
+      whereArgs: [profileId, isoDate(dateOnly(date))],
+      limit: 1,
+    );
     return rows.isEmpty ? null : DayLog.fromRow(rows.first);
   }
 
@@ -110,8 +129,12 @@ class CycleRepository {
 
   Future<List<DayLog>> allLogs() async {
     final db = await _db.database;
-    final rows = await db.query('day_logs',
-        where: _mine, whereArgs: [profileId], orderBy: 'log_date ASC');
+    final rows = await db.query(
+      'day_logs',
+      where: _mine,
+      whereArgs: [profileId],
+      orderBy: 'log_date ASC',
+    );
     return rows.map(DayLog.fromRow).toList();
   }
 
@@ -120,11 +143,17 @@ class CycleRepository {
     final db = await _db.database;
     final key = isoDate(dateOnly(log.date));
     if (log.isEmpty) {
-      await db.delete('day_logs',
-          where: '$_mine AND log_date = ?', whereArgs: [profileId, key]);
+      await db.delete(
+        'day_logs',
+        where: '$_mine AND log_date = ?',
+        whereArgs: [profileId, key],
+      );
       return;
     }
-    await db.insert('day_logs', _owned(log.toRow()),
-        conflictAlgorithm: ConflictAlgorithm.replace);
+    await db.insert(
+      'day_logs',
+      _owned(log.toRow()),
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
   }
 }

@@ -7,16 +7,16 @@ import 'package:ebb/models/cycle.dart';
 
 /// Plain-language wording for each [CycleProblem].
 String describeCycleProblem(CycleProblem problem) => switch (problem) {
-      CycleProblem.startInFuture => "The start date can't be in the future.",
-      CycleProblem.endInFuture => "The end date can't be in the future.",
-      CycleProblem.endBeforeStart => 'The end date is before the start date.',
-      CycleProblem.duplicateStart =>
-        'A period starting on that day is already recorded.',
-      CycleProblem.overlapsPrevious =>
-        'This overlaps the period before it. Check the earlier entry’s end date.',
-      CycleProblem.overlapsNext =>
-        'This overlaps the period after it. Check the end date.',
-    };
+  CycleProblem.startInFuture => "The start date can't be in the future.",
+  CycleProblem.endInFuture => "The end date can't be in the future.",
+  CycleProblem.endBeforeStart => 'The end date is before the start date.',
+  CycleProblem.duplicateStart =>
+    'A period starting on that day is already recorded.',
+  CycleProblem.overlapsPrevious =>
+    'This overlaps the period before it. Check the earlier entry’s end date.',
+  CycleProblem.overlapsNext =>
+    'This overlaps the period after it. Check the end date.',
+};
 
 /// Opens the editor for [cycle], or for a new past period when [cycle] is
 /// null. Returns the edited cycle, or null if she backed out.
@@ -37,11 +37,7 @@ Future<Cycle?> showCycleEditor(
 }
 
 class _CycleEditor extends StatefulWidget {
-  const _CycleEditor({
-    required this.initial,
-    required this.all,
-    this.onDelete,
-  });
+  const _CycleEditor({required this.initial, required this.all, this.onDelete});
 
   final Cycle? initial;
   final List<Cycle> all;
@@ -130,9 +126,7 @@ class _CycleEditorState extends State<_CycleEditor> {
     final end = _end;
 
     return Padding(
-      padding: EdgeInsets.only(
-        bottom: MediaQuery.viewInsetsOf(context).bottom,
-      ),
+      padding: EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(context).bottom),
       child: SafeArea(
         child: SingleChildScrollView(
           child: Column(
@@ -157,11 +151,13 @@ class _CycleEditorState extends State<_CycleEditor> {
                 contentPadding: const EdgeInsets.fromLTRB(24, 0, 12, 0),
                 leading: const Icon(Icons.check),
                 title: const Text('Ended'),
-                subtitle: Text(end != null
-                    ? _fmt.format(end)
-                    : _stillGoing
-                        ? 'Still going'
-                        : 'Not recorded'),
+                subtitle: Text(
+                  end != null
+                      ? _fmt.format(end)
+                      : _stillGoing
+                      ? 'Still going'
+                      : 'Not recorded',
+                ),
                 onTap: _pickEnd,
                 trailing: end == null
                     ? null
@@ -204,8 +200,9 @@ class _CycleEditorState extends State<_CycleEditor> {
                   padding: const EdgeInsets.fromLTRB(24, 8, 24, 0),
                   child: Text(
                     describeCycleProblem(problem),
-                    style: theme.textTheme.bodyMedium
-                        ?.copyWith(color: theme.colorScheme.error),
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: theme.colorScheme.error,
+                    ),
                   ),
                 ),
               Padding(
@@ -238,7 +235,8 @@ class _CycleEditorState extends State<_CycleEditor> {
                   child: Center(
                     child: TextButton.icon(
                       style: TextButton.styleFrom(
-                          foregroundColor: theme.colorScheme.error),
+                        foregroundColor: theme.colorScheme.error,
+                      ),
                       onPressed: () {
                         Navigator.of(context).pop();
                         widget.onDelete!();

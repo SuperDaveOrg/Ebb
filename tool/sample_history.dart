@@ -28,8 +28,8 @@ void main(List<String> args) {
   final rest = args.where((a) => a != '--gaps').toList();
   final out = rest.isEmpty ? 'sample-backup.json' : rest.first;
   final until = rest.length > 1 ? parseIsoDate(rest[1]) : null;
-  File(out).writeAsStringSync(
-      encodeBackup(sampleHistory(until: until, gaps: gaps)));
+  File(out)
+      .writeAsStringSync(encodeBackup(sampleHistory(until: until, gaps: gaps)));
   stdout.writeln('Wrote $out');
 }
 
@@ -39,13 +39,30 @@ void main(List<String> args) {
 Backup sampleHistory({DateTime? until, bool gaps = false}) {
   final end = dateOnly(until ?? DateTime(2026, 9, 20));
   final random = Random(42);
-  final owner = _person(const Profile(), random,
-      until: end, months: 24, meanLength: 29, spread: 2, detailed: true);
-  return Backup(exportedOn: end, people: [
-    gaps ? _unlogged(owner, until: end) : owner,
-    _person(const Profile(name: 'Sam'), random,
-        until: end, months: 8, meanLength: 32, spread: 6, detailed: false),
-  ]);
+  final owner = _person(
+    const Profile(),
+    random,
+    until: end,
+    months: 24,
+    meanLength: 29,
+    spread: 2,
+    detailed: true,
+  );
+  return Backup(
+    exportedOn: end,
+    people: [
+      gaps ? _unlogged(owner, until: end) : owner,
+      _person(
+        const Profile(name: 'Sam'),
+        random,
+        until: end,
+        months: 8,
+        meanLength: 32,
+        spread: 6,
+        detailed: false,
+      ),
+    ],
+  );
 }
 
 const _symptoms = [
@@ -74,8 +91,9 @@ BackupPerson _unlogged(BackupPerson person, {required DateTime until}) {
   final kept = person.cycles.where((c) => c.start.isBefore(cutoff)).toList();
   final yearAgo = addDays(until, -365);
   final missing = kept.firstWhere(
-      (c) => !c.excluded && c.start.isAfter(yearAgo),
-      orElse: () => kept[kept.length ~/ 2]);
+    (c) => !c.excluded && c.start.isAfter(yearAgo),
+    orElse: () => kept[kept.length ~/ 2],
+  );
   kept.remove(missing);
 
   // Each period's day notes go with it.
@@ -100,6 +118,9 @@ BackupPerson _person(
 }) {
   final cycles = <Cycle>[];
   final days = <DayLog>[];
+  // Generators of their own, so adding these didn't reshuffle the rest.
+  final ratings = Random(7);
+  final feelings = Random(11);
   var start = addDays(until, -months * 30);
 
   while (!start.isAfter(until)) {
@@ -108,27 +129,44 @@ BackupPerson _person(
     // One cycle a year thrown off by illness, marked as not counted.
     final ill = detailed && cycles.length % 12 == 7;
 
-    cycles.add(Cycle(
-      start: start,
-      // Only a period still under way on the last day is left open.
-      end: periodEnd.isAfter(until) ? null : periodEnd,
-      excluded: ill,
-      notes: ill ? 'Had flu, cycle ran long.' : null,
-    ));
+    cycles.add(
+      Cycle(
+        start: start,
+        // Only a period still under way on the last day is left open.
+        end: periodEnd.isAfter(until) ? null : periodEnd,
+        excluded: ill,
+        notes: ill ? 'Had flu, cycle ran long.' : null,
+      ),
+    );
 
     for (var d = 0; d < periodDays && detailed; d++) {
       final date = addDays(start, d);
       if (date.isAfter(until)) break;
-      days.add(DayLog(
-        date: date,
-        flow: const [Flow.heavy, Flow.heavy, Flow.medium, Flow.light, Flow.light,
-            Flow.spotting][d],
-        symptoms: [
-          for (final s in _symptoms)
-            if (random.nextInt(5) == 0) s,
-        ],
-        notes: random.nextInt(4) == 0 ? _notes[random.nextInt(_notes.length)] : null,
-      ));
+      days.add(
+        DayLog(
+          date: date,
+          flow: const [
+            Flow.heavy,
+            Flow.heavy,
+            Flow.medium,
+            Flow.light,
+            Flow.light,
+            Flow.spotting,
+          ][d],
+          symptoms: [
+            for (final s in _symptoms)
+              if (random.nextInt(5) == 0) s,
+          ],
+          notes: random.nextInt(4) == 0
+              ? _notes[random.nextInt(_notes.length)]
+              : null,
+          // Most days rated, lower early on.
+          rating: ratings.nextInt(4) == 0
+              ? null
+              : (d < 2 ? 1 : 2) + ratings.nextInt(3),
+          feeling: _feeling(feelings),
+        ),
+      );
     }
 
     final length = ill
@@ -137,5 +175,37 @@ BackupPerson _person(
     start = addDays(start, length);
   }
 
+  // Ordinary days too, the way someone checking in most evenings would:
+  // a rating and a feeling on most days of the last fifteen months, so the
+  // calendar and charts have something to show outside periods. A rating
+  // drifts from the day before rather than jumping at random, as real ones
+  // do.
+  if (detailed) {
+    final everyday = Random(13);
+    final logged = {for (final d in days) isoDate(d.date)};
+    // Never past today, even when [until] is: Ebb can't log a future day.
+    final last = until.isAfter(today()) ? today() : until;
+    var rating = 3;
+    for (var d = addDays(last, -456); !d.isAfter(last); d = addDays(d, 1)) {
+      rating = (rating + const [-1, 0, 0, 1][everyday.nextInt(4)]).clamp(1, 5);
+      if (logged.contains(isoDate(d)) || everyday.nextInt(10) < 3) continue;
+      days.add(
+        DayLog(
+          date: d,
+          rating: rating,
+          feeling: _feeling(everyday) ?? DayFeeling.named(Feeling.calm),
+        ),
+      );
+    }
+    days.sort((a, b) => a.date.compareTo(b.date));
+  }
+
   return BackupPerson(profile: profile, cycles: cycles, days: days);
 }
+
+/// Mostly a named feeling, now and then one of the extra faces.
+DayFeeling? _feeling(Random random) => switch (random.nextInt(6)) {
+  0 || 1 => null,
+  2 => DayFeeling.face(const ['😹', '👽', '🌧️', '🍫'][random.nextInt(4)]),
+  _ => DayFeeling.named(Feeling.values[random.nextInt(Feeling.values.length)]),
+};

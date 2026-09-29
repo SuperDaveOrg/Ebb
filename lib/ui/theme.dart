@@ -161,14 +161,17 @@ class EbbColors extends ThemeExtension<EbbColors> {
       Theme.of(context).extension<EbbColors>()!;
 
   @override
-  EbbColors copyWith(
-          {Color? period, Color? window, Color? track, Color? elapsed}) =>
-      EbbColors(
-        period: period ?? this.period,
-        window: window ?? this.window,
-        track: track ?? this.track,
-        elapsed: elapsed ?? this.elapsed,
-      );
+  EbbColors copyWith({
+    Color? period,
+    Color? window,
+    Color? track,
+    Color? elapsed,
+  }) => EbbColors(
+    period: period ?? this.period,
+    window: window ?? this.window,
+    track: track ?? this.track,
+    elapsed: elapsed ?? this.elapsed,
+  );
 
   @override
   EbbColors lerp(EbbColors? other, double t) => other == null
@@ -202,20 +205,19 @@ class EbbTheme {
     double? height,
     double? spacing,
     Color? color,
-  }) =>
-      TextStyle(
-        fontFamily: family,
-        fontSize: size,
-        fontWeight: FontWeight.values[((weight / 100).round() - 1).clamp(0, 8)],
-        fontVariations: [
-          FontVariation('wght', weight),
-          if (family == _serif) const FontVariation('SOFT', 100),
-          if (family == _serif) FontVariation('opsz', size.clamp(9, 144)),
-        ],
-        height: height,
-        letterSpacing: spacing,
-        color: color,
-      );
+  }) => TextStyle(
+    fontFamily: family,
+    fontSize: size,
+    fontWeight: FontWeight.values[((weight / 100).round() - 1).clamp(0, 8)],
+    fontVariations: [
+      FontVariation('wght', weight),
+      if (family == _serif) const FontVariation('SOFT', 100),
+      if (family == _serif) FontVariation('opsz', size.clamp(9, 144)),
+    ],
+    height: height,
+    letterSpacing: spacing,
+    color: color,
+  );
 
   static ThemeData _build(EbbPalette p, Brightness brightness) {
     final scheme = ColorScheme(
@@ -223,14 +225,18 @@ class EbbTheme {
       primary: p.primary,
       onPrimary: p.onPrimary,
       primaryContainer: Color.alphaBlend(
-          p.primary.withValues(alpha: 0.14), p.card),
+        p.primary.withValues(alpha: 0.14),
+        p.card,
+      ),
       onPrimaryContainer: p.primary,
       // Clay means "period" and nothing else, so tonal buttons and other
       // secondary accents take a soft navy instead.
       secondary: p.primary,
       onSecondary: p.onPrimary,
       secondaryContainer: Color.alphaBlend(
-          p.primary.withValues(alpha: 0.10), p.card),
+        p.primary.withValues(alpha: 0.10),
+        p.card,
+      ),
       onSecondaryContainer: p.primary,
       error: p.error,
       onError: brightness == Brightness.light ? Colors.white : Colors.black,
@@ -253,7 +259,14 @@ class EbbTheme {
       headlineSmall: _font(_serif, 25, 520, height: 1.2, color: p.ink),
       titleLarge: _font(_serif, 22, 560, height: 1.25, color: p.ink),
       titleMedium: _font(_sans, 16.5, 620, height: 1.3, color: p.ink),
-      titleSmall: _font(_sans, 14, 650, height: 1.3, spacing: 0.2, color: p.ink),
+      titleSmall: _font(
+        _sans,
+        14,
+        650,
+        height: 1.3,
+        spacing: 0.2,
+        color: p.ink,
+      ),
       bodyLarge: _font(_sans, 16.5, 420, height: 1.45, color: p.ink),
       bodyMedium: _font(_sans, 15, 420, height: 1.45, color: p.ink),
       bodySmall: _font(_sans, 13, 440, height: 1.4, color: p.muted),
@@ -262,7 +275,9 @@ class EbbTheme {
       labelSmall: _font(_sans, 11.5, 650, spacing: 0.6, color: p.muted),
     );
 
-    final rounded = RoundedRectangleBorder(borderRadius: BorderRadius.circular(16));
+    final rounded = RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(16),
+    );
 
     return ThemeData(
       useMaterial3: true,
@@ -275,9 +290,11 @@ class EbbTheme {
         EbbColors(
           period: p.period,
           window: Color.alphaBlend(
-              p.period.withValues(
-                  alpha: brightness == Brightness.light ? 0.38 : 0.62),
-              p.card),
+            p.period.withValues(
+              alpha: brightness == Brightness.light ? 0.38 : 0.62,
+            ),
+            p.card,
+          ),
           track: p.track,
           elapsed: p.elapsed,
         ),
@@ -304,7 +321,9 @@ class EbbTheme {
           // Tall, but not forced full-width: an infinite minimum breaks any
           // button in a Row or dialog. Buttons in a ListView still stretch.
           minimumSize: const Size(64, 54),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(18),
+          ),
           textStyle: text.labelLarge,
         ),
       ),

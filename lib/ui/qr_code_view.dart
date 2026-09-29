@@ -5,10 +5,12 @@ import 'package:qr/qr.dart';
 /// scanners expect that contrast and a dark-mode inversion would slow them.
 class QrCodeView extends StatelessWidget {
   QrCodeView({super.key, required String data})
-      : _image = QrImage(QrCode(
+    : _image = QrImage(
+        QrCode(
           payload: QrPayload.fromString(data),
           errorCorrectLevel: QrErrorCorrectLevel.medium,
-        ));
+        ),
+      );
 
   final QrImage _image;
 
@@ -44,8 +46,14 @@ class _QrPainter extends CustomPainter {
       for (var c = 0; c < n; c++) {
         if (!image.isDark(r, c)) continue;
         // Slight overlap so no hairline gaps appear between modules.
-        path.addRect(Rect.fromLTWH((c + _quiet) * module,
-            (r + _quiet) * module, module + 0.5, module + 0.5));
+        path.addRect(
+          Rect.fromLTWH(
+            (c + _quiet) * module,
+            (r + _quiet) * module,
+            module + 0.5,
+            module + 0.5,
+          ),
+        );
       }
     }
     canvas.drawPath(path, paint);

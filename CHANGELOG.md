@@ -9,6 +9,44 @@ turns that section into the release's own when it's cut.
 
 ## [Unreleased]
 
+### Added
+- Moon phases on the calendar, if you want them: turn on Settings → Show
+  moon phases. New, first quarter, full and last quarter moons are marked
+  on the day they fall, and tapping the day shows the time. They're worked
+  out on the phone, like everything else.
+- Rate how a day went, from 1 (rough) to 5 (great): tap a day on the
+  calendar and pick a number under "Rate your day, 1–5". Tap it again to
+  clear it.
+- Pick how you felt, too: one face under "How did you feel?", separate
+  from how the day went. A rough day can still be a calm one. Ten are
+  named, and More faces has fifty others — cats, an alien, a rain cloud —
+  for whatever they mean to you. The face you pick shows on the calendar,
+  tiny, at the top right of the day.
+- Charts, from the chart icon on the home screen: each day's rating over
+  whatever dates you choose, as bars or a line, with periods shaded; and
+  which feelings you picked during periods, in the days before one, and on
+  other days.
+- With moon phases turned on, the charts show them too: moons above the
+  day ratings, and feelings around full and new moons.
+
+### Changed
+- Backups now include day ratings and feelings, so they're written in a new
+  version of the backup format. An older Ebb will ask to be updated before
+  it restores one, rather than quietly dropping them. Older backups still restore
+  as before.
+- On the calendar, a pencil under the date now means the day has a note,
+  and a dot means it's rated. A day with neither is one still to rate.
+- The calendar reaches back a month before the earliest thing you've
+  logged, so a history can be filled in month by month.
+- The actions on a calendar day read as things to do: "Mark as the day your
+  period started" rather than "My period started this day", which looked
+  like a record of what happened.
+
+### Fixed
+- Tapping a day just before a logged period and choosing that the period
+  started there added a second, day-long period. It now offers "Make this
+  the first day of the period", which moves the start back instead.
+
 ## [0.5.1] - 2026-09-29
 
 ### Changed

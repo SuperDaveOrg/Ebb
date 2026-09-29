@@ -46,9 +46,9 @@ class CalendarMarks {
     CyclePrediction prediction, {
     this.showFertile = false,
     DateTime? asOf,
-  })  : _now = dateOnly(asOf ?? DateTime.now()),
-        _cycles = [...cycles]..sort((a, b) => a.start.compareTo(b.start)),
-        _prediction = prediction {
+  }) : _now = dateOnly(asOf ?? DateTime.now()),
+       _cycles = [...cycles]..sort((a, b) => a.start.compareTo(b.start)),
+       _prediction = prediction {
     final usual = prediction.periodLength ?? 5;
     for (var i = 0; i < _cycles.length; i++) {
       final c = _cycles[i];

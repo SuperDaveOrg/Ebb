@@ -148,13 +148,17 @@ class _SendScreenState extends State<SendScreen> {
   Widget _chooser(BuildContext context) {
     final theme = Theme.of(context);
     return ListView(
-      padding: readablePadding(context,
-          base: const EdgeInsets.only(bottom: 32)),
+      padding: readablePadding(
+        context,
+        base: const EdgeInsets.only(bottom: 32),
+      ),
       children: [
         Padding(
           padding: const EdgeInsets.fromLTRB(24, 8, 24, 0),
-          child: Text('What would you like to send?',
-              style: theme.textTheme.titleLarge),
+          child: Text(
+            'What would you like to send?',
+            style: theme.textTheme.titleLarge,
+          ),
         ),
         Section(
           children: [
@@ -173,9 +177,11 @@ class _SendScreenState extends State<SendScreen> {
             for (final p in widget.people)
               ListTile(
                 leading: const Icon(Icons.person_outline),
-                title: Text(p.id == EbbDatabase.primaryProfileId
-                    ? 'Just your history'
-                    : 'Just ${Who.label(p)}'),
+                title: Text(
+                  p.id == EbbDatabase.primaryProfileId
+                      ? 'Just your history'
+                      : 'Just ${Who.label(p)}',
+                ),
                 subtitle: p.id == EbbDatabase.primaryProfileId
                     ? null
                     : Text('For ${Who.label(p)}’s own phone.'),
@@ -202,14 +208,18 @@ class _SendScreenState extends State<SendScreen> {
         ),
       );
     }
-    final muted = theme.textTheme.bodySmall
-        ?.copyWith(color: theme.colorScheme.onSurfaceVariant);
+    final muted = theme.textTheme.bodySmall?.copyWith(
+      color: theme.colorScheme.onSurfaceVariant,
+    );
 
     return ListView(
       // Narrower than other screens, so a whole code fits on a landscape
       // tablet without scrolling.
-      padding: readablePadding(context,
-          base: const EdgeInsets.fromLTRB(24, 8, 24, 32), maxWidth: 480),
+      padding: readablePadding(
+        context,
+        base: const EdgeInsets.fromLTRB(24, 8, 24, 32),
+        maxWidth: 480,
+      ),
       children: [
         Text(
           'On the other phone, open Ebb, go to Settings → Receive from another '
@@ -269,7 +279,9 @@ class _SendScreenState extends State<SendScreen> {
     final periods = b.cycleCount == 1 ? '1 period' : '${b.cycleCount} periods';
     final only = _only;
     if (only == null) {
-      final people = b.people.length > 1 ? ' for ${b.people.length} people' : '';
+      final people = b.people.length > 1
+          ? ' for ${b.people.length} people'
+          : '';
       return 'Everything in Ebb: $periods$people.';
     }
     return only.id == EbbDatabase.primaryProfileId

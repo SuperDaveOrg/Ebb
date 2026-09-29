@@ -35,10 +35,11 @@ CycleProblem? checkCycle(
   if (end != null && end.isAfter(now)) return CycleProblem.endInFuture;
   if (end != null && end.isBefore(start)) return CycleProblem.endBeforeStart;
 
-  final others = existing
-      .where((c) => candidate.id == null || c.id != candidate.id)
-      .toList()
-    ..sort((a, b) => a.start.compareTo(b.start));
+  final others =
+      existing
+          .where((c) => candidate.id == null || c.id != candidate.id)
+          .toList()
+        ..sort((a, b) => a.start.compareTo(b.start));
 
   Cycle? previous;
   Cycle? next;
@@ -60,4 +61,39 @@ CycleProblem? checkCycle(
     return CycleProblem.overlapsNext;
   }
   return null;
+}
+
+/// The logged period starting soon after [day] whose start could move back
+/// to [day], or null.
+///
+/// Tapping a day just before a period usually means "it started a day
+/// earlier than I logged", not "another period started here": a second
+/// start that close would make a cycle only days long. So within
+/// [Cycle.maxPeriodDays] before a logged start, moving that start is
+/// offered instead of a new period, whenever [canMoveStartTo] allows it.
+Cycle? periodStartingSoonAfter(DateTime day, List<Cycle> cycles) {
+  final d = dateOnly(day);
+  final next = ([...cycles]..sort((a, b) => a.start.compareTo(b.start)))
+      .where((c) => c.start.isAfter(d))
+      .firstOrNull;
+  if (next == null || daysBetween(d, next.start) > Cycle.maxPeriodDays) {
+    return null;
+  }
+  return next;
+}
+
+/// Whether [cycle]'s start can move back to [day]: see
+/// [periodStartingSoonAfter].
+bool canMoveStartTo(
+  Cycle cycle,
+  DateTime day,
+  List<Cycle> cycles, {
+  DateTime? asOf,
+}) {
+  final moved = cycle.copyWith(start: dateOnly(day));
+  final end = moved.end;
+  if (end != null && daysBetween(moved.start, end) >= Cycle.maxPeriodDays) {
+    return false;
+  }
+  return checkCycle(moved, cycles, asOf: asOf) == null;
 }

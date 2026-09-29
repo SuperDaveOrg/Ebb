@@ -22,8 +22,9 @@ class Section extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(8, 22, 8, 8),
               child: Text(
                 title.toUpperCase(),
-                style: theme.textTheme.labelSmall
-                    ?.copyWith(color: theme.colorScheme.primary),
+                style: theme.textTheme.labelSmall?.copyWith(
+                  color: theme.colorScheme.primary,
+                ),
               ),
             )
           else

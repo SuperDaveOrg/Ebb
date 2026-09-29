@@ -33,5 +33,9 @@ String isoDate(DateTime d) {
 
 DateTime parseIsoDate(String s) {
   final parts = s.split('-');
-  return DateTime(int.parse(parts[0]), int.parse(parts[1]), int.parse(parts[2]));
+  return DateTime(
+    int.parse(parts[0]),
+    int.parse(parts[1]),
+    int.parse(parts[2]),
+  );
 }

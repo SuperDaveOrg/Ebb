@@ -65,14 +65,20 @@ class AboutScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: const Text('Your data')),
       body: ListView(
-        padding: readablePadding(context,
-            base: const EdgeInsets.fromLTRB(20, 8, 20, 32)),
+        padding: readablePadding(
+          context,
+          base: const EdgeInsets.fromLTRB(20, 8, 20, 32),
+        ),
         children: [
           Center(
             child: Padding(
               padding: const EdgeInsets.only(top: 8, bottom: 20),
-              child: Image.asset('assets/brand/ebb_logo_512.png',
-                  width: 96, height: 96, semanticLabel: 'Ebb'),
+              child: Image.asset(
+                'assets/brand/ebb_logo_512.png',
+                width: 96,
+                height: 96,
+                semanticLabel: 'Ebb',
+              ),
             ),
           ),
           Text(
@@ -83,8 +89,9 @@ class AboutScreen extends StatelessWidget {
           Text(
             'Ebb is built so that the question "what do they do with my data?" '
             'has a boring answer: nothing, because we never receive it.',
-            style: theme.textTheme.bodyLarge
-                ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+            style: theme.textTheme.bodyLarge?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
           ),
           const SizedBox(height: 28),
           for (final (icon, title, body) in _points) ...[
@@ -113,8 +120,9 @@ class AboutScreen extends StatelessWidget {
             'lost or wiped phone means lost history. If that matters to you, '
             'save a backup file from Settings now and then, and keep it '
             'somewhere other than this phone.',
-            style: theme.textTheme.bodySmall
-                ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
           ),
         ],
       ),

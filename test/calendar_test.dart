@@ -28,8 +28,7 @@ void main() {
     expect(mark(DateTime(2026, 2, 28)), DayMark.none);
   });
 
-  test('a period with no end logged is only estimated after its first day',
-      () {
+  test('a period with no end logged is only estimated after its first day', () {
     expect(mark(DateTime(2026, 4, 26)), DayMark.period);
     expect(mark(DateTime(2026, 4, 27)), DayMark.periodUnrecorded);
     expect(mark(DateTime(2026, 4, 30)), DayMark.periodUnrecorded);
@@ -60,8 +59,11 @@ void main() {
     expect(mark(prediction.nextStart!), DayMark.likelyStart);
     expect(mark(prediction.earliest!), DayMark.likelyStart);
     expect(mark(prediction.latest!), DayMark.likelyStart);
-    final after = DateTime(prediction.nextStart!.year,
-        prediction.nextStart!.month, prediction.nextStart!.day + 28);
+    final after = DateTime(
+      prediction.nextStart!.year,
+      prediction.nextStart!.month,
+      prediction.nextStart!.day + 28,
+    );
     expect(mark(after), DayMark.none);
   });
 

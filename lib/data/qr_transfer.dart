@@ -32,17 +32,15 @@ List<String> encodeTransfer(String backupJson, {Random? random}) {
   final total = (packed.length / qrChunkBytes).ceil();
   return [
     for (var i = 0; i < total; i++)
-      '$_magic:$id:${i + 1}/$total:${base45Encode(packed.sublist(
-            i * qrChunkBytes,
-            min((i + 1) * qrChunkBytes, packed.length),
-          ))}',
+      '$_magic:$id:${i + 1}/$total:${base45Encode(packed.sublist(i * qrChunkBytes, min((i + 1) * qrChunkBytes, packed.length)))}',
   ];
 }
 
 String _transferId(Random random) {
   const chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
   return String.fromCharCodes(
-      List.generate(4, (_) => chars.codeUnitAt(random.nextInt(chars.length))));
+    List.generate(4, (_) => chars.codeUnitAt(random.nextInt(chars.length))),
+  );
 }
 
 /// What happened to one scanned code.
@@ -79,9 +77,9 @@ class TransferReceiver {
 
   /// Which frames (1-based) are still needed.
   List<int> get missing => [
-        for (var i = 1; i <= _total; i++)
-          if (!_chunks.containsKey(i)) i,
-      ];
+    for (var i = 1; i <= _total; i++)
+      if (!_chunks.containsKey(i)) i,
+  ];
 
   FrameResult add(String text) {
     final frame = _Frame.parse(text);

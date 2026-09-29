@@ -57,8 +57,10 @@ class _HistoryScreenState extends State<HistoryScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text('Delete this cycle?'),
-        content: Text('The entry starting ${_fmt.format(cycle.start)} will be '
-            'removed. This cannot be undone.'),
+        content: Text(
+          'The entry starting ${_fmt.format(cycle.start)} will be '
+          'removed. This cannot be undone.',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
@@ -77,8 +79,12 @@ class _HistoryScreenState extends State<HistoryScreen> {
   }
 
   Future<void> _edit(Cycle cycle) async {
-    final edited = await showCycleEditor(context,
-        cycle: cycle, all: _cycles, onDelete: () => _delete(cycle));
+    final edited = await showCycleEditor(
+      context,
+      cycle: cycle,
+      all: _cycles,
+      onDelete: () => _delete(cycle),
+    );
     if (edited == null) return;
     await widget.repository.updateCycle(edited);
     await _load();
@@ -123,31 +129,31 @@ class _HistoryScreenState extends State<HistoryScreen> {
       body: _loading
           ? const Center(child: CircularProgressIndicator())
           : _cycles.isEmpty
-              ? Center(
-                  child: Padding(
-                    padding: const EdgeInsets.all(32),
-                    child: Text(
-                      'No cycles recorded yet. If you remember when recent '
-                      'periods started, adding them gives Ebb a head start.',
-                      textAlign: TextAlign.center,
-                      style: theme.textTheme.bodyLarge,
-                    ),
-                  ),
-                )
-              : ListView(
-                  // Keep the last row clear of the floating button.
-                  padding: readablePadding(context,
-                      base: const EdgeInsets.only(bottom: 96)),
-                  children: [
-                    for (final entry in years.entries)
-                      Section(
-                        title: '${entry.key}',
-                        children: [
-                          for (final i in entry.value) _row(context, i),
-                        ],
-                      ),
-                  ],
+          ? Center(
+              child: Padding(
+                padding: const EdgeInsets.all(32),
+                child: Text(
+                  'No cycles recorded yet. If you remember when recent '
+                  'periods started, adding them gives Ebb a head start.',
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.bodyLarge,
                 ),
+              ),
+            )
+          : ListView(
+              // Keep the last row clear of the floating button.
+              padding: readablePadding(
+                context,
+                base: const EdgeInsets.only(bottom: 96),
+              ),
+              children: [
+                for (final entry in years.entries)
+                  Section(
+                    title: '${entry.key}',
+                    children: [for (final i in entry.value) _row(context, i)],
+                  ),
+              ],
+            ),
     );
   }
 
@@ -170,13 +176,13 @@ class _HistoryScreenState extends State<HistoryScreen> {
     // hint: nothing is assumed about the history itself.
     final String? gap = length != null
         ? (_prediction.spansUnloggedPeriod(length)
-            ? 'A long gap. If a period here wasn’t logged, add it with '
-                '“Add past period”.'
-            : null)
+              ? 'A long gap. If a period here wasn’t logged, add it with '
+                    '“Add past period”.'
+              : null)
         : (_prediction.unloggedCycles > 0
-            ? 'Nothing logged since. If a period was missed, add it with '
-                '“Add past period”.'
-            : null);
+              ? 'Nothing logged since. If a period was missed, add it with '
+                    '“Add past period”.'
+              : null);
     final notes = cycle.notes;
 
     return InkWell(
@@ -189,8 +195,10 @@ class _HistoryScreenState extends State<HistoryScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(_day.format(cycle.start),
-                      style: theme.textTheme.titleMedium),
+                  Text(
+                    _day.format(cycle.start),
+                    style: theme.textTheme.titleMedium,
+                  ),
                   const SizedBox(height: 2),
                   Text(
                     cycle.excluded ? '$detail · not counted' : detail,
@@ -216,15 +224,18 @@ class _HistoryScreenState extends State<HistoryScreen> {
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Icon(Icons.history_toggle_off,
-                            size: 16,
-                            color: theme.colorScheme.onSurfaceVariant),
+                        Icon(
+                          Icons.history_toggle_off,
+                          size: 16,
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
                         const SizedBox(width: 6),
                         Expanded(
                           child: Text(
                             gap,
                             style: theme.textTheme.bodySmall?.copyWith(
-                                color: theme.colorScheme.onSurfaceVariant),
+                              color: theme.colorScheme.onSurfaceVariant,
+                            ),
                           ),
                         ),
                       ],
@@ -246,8 +257,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
               // "Current" only while it plausibly is; once Ebb assumes
               // periods went unlogged since, it's just the latest one logged.
               Text(
-                  _prediction.unloggedCycles > 0 ? 'Last logged' : 'Current',
-                  style: theme.textTheme.labelMedium),
+                _prediction.unloggedCycles > 0 ? 'Last logged' : 'Current',
+                style: theme.textTheme.labelMedium,
+              ),
           ],
         ),
       ),
@@ -276,31 +288,33 @@ class _CycleBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = EbbColors.of(context);
-    return LayoutBuilder(builder: (context, box) {
-      final perDay = box.maxWidth / _scaleDays;
-      final total = (cycleDays ?? periodDays).clamp(1, _scaleDays);
-      return SizedBox(
-        height: 6,
-        width: box.maxWidth,
-        child: Stack(
-          children: [
-            Container(
-              width: total * perDay,
-              decoration: BoxDecoration(
-                color: cycleDays == null ? Colors.transparent : colors.track,
-                borderRadius: BorderRadius.circular(3),
+    return LayoutBuilder(
+      builder: (context, box) {
+        final perDay = box.maxWidth / _scaleDays;
+        final total = (cycleDays ?? periodDays).clamp(1, _scaleDays);
+        return SizedBox(
+          height: 6,
+          width: box.maxWidth,
+          child: Stack(
+            children: [
+              Container(
+                width: total * perDay,
+                decoration: BoxDecoration(
+                  color: cycleDays == null ? Colors.transparent : colors.track,
+                  borderRadius: BorderRadius.circular(3),
+                ),
               ),
-            ),
-            Container(
-              width: periodDays.clamp(0, total) * perDay,
-              decoration: BoxDecoration(
-                color: excluded ? colors.elapsed : colors.period,
-                borderRadius: BorderRadius.circular(3),
+              Container(
+                width: periodDays.clamp(0, total) * perDay,
+                decoration: BoxDecoration(
+                  color: excluded ? colors.elapsed : colors.period,
+                  borderRadius: BorderRadius.circular(3),
+                ),
               ),
-            ),
-          ],
-        ),
-      );
-    });
+            ],
+          ),
+        );
+      },
+    );
   }
 }

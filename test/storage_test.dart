@@ -34,23 +34,35 @@ void main() {
   group('migrations', () {
     /// The schema exactly as version 1 shipped it.
     Future<void> createVersion1() async {
-      final v1 = await factory.openDatabase(path,
-          options: OpenDatabaseOptions(
-            version: 1,
-            onCreate: (d, _) async {
-              await d.execute('CREATE TABLE cycles (id INTEGER PRIMARY KEY '
-                  'AUTOINCREMENT, start_date TEXT NOT NULL UNIQUE, end_date '
-                  'TEXT, notes TEXT)');
-              await d.execute("CREATE TABLE day_logs (id INTEGER PRIMARY KEY "
-                  "AUTOINCREMENT, log_date TEXT NOT NULL UNIQUE, flow TEXT NOT "
-                  "NULL DEFAULT 'none', symptoms TEXT NOT NULL DEFAULT '', "
-                  "notes TEXT)");
-            },
-          ));
-      await v1.insert('cycles',
-          {'start_date': '2026-03-01', 'end_date': '2026-03-05', 'notes': 'x'});
-      await v1.insert('day_logs',
-          {'log_date': '2026-03-02', 'flow': 'heavy', 'symptoms': 'cramps'});
+      final v1 = await factory.openDatabase(
+        path,
+        options: OpenDatabaseOptions(
+          version: 1,
+          onCreate: (d, _) async {
+            await d.execute(
+              'CREATE TABLE cycles (id INTEGER PRIMARY KEY '
+              'AUTOINCREMENT, start_date TEXT NOT NULL UNIQUE, end_date '
+              'TEXT, notes TEXT)',
+            );
+            await d.execute(
+              "CREATE TABLE day_logs (id INTEGER PRIMARY KEY "
+              "AUTOINCREMENT, log_date TEXT NOT NULL UNIQUE, flow TEXT NOT "
+              "NULL DEFAULT 'none', symptoms TEXT NOT NULL DEFAULT '', "
+              "notes TEXT)",
+            );
+          },
+        ),
+      );
+      await v1.insert('cycles', {
+        'start_date': '2026-03-01',
+        'end_date': '2026-03-05',
+        'notes': 'x',
+      });
+      await v1.insert('day_logs', {
+        'log_date': '2026-03-02',
+        'flow': 'heavy',
+        'symptoms': 'cramps',
+      });
       await v1.close();
     }
 
@@ -78,8 +90,11 @@ void main() {
         return {
           for (final t in ['profiles', 'cycles', 'day_logs'])
             t: (await raw.rawQuery('PRAGMA table_info($t)'))
-                .map((c) => '${c['name']} ${c['type']} ${c['notnull']} '
-                    '${c['dflt_value']}')
+                .map(
+                  (c) =>
+                      '${c['name']} ${c['type']} ${c['notnull']} '
+                      '${c['dflt_value']}',
+                )
                 .toList(),
         };
       }
@@ -89,15 +104,17 @@ void main() {
       await File(path).delete();
 
       await createVersion1();
-      final upgraded =
-          await shape(db = EbbDatabase(path: path, factory: factory));
+      final upgraded = await shape(
+        db = EbbDatabase(path: path, factory: factory),
+      );
       expect(upgraded, fresh);
     });
   });
 
   group('profiles', () {
     test('each person has their own history', () async {
-      final second = await ProfileRepository(db: db).add(const Profile(name: 'A'));
+      final second = await ProfileRepository(db: db)
+          .add(const Profile(name: 'A'));
       final mine = CycleRepository(db: db);
       final theirs = CycleRepository(db: db, profileId: second);
 
@@ -133,8 +150,10 @@ void main() {
 
       final raw = await db.database;
       expect(await raw.query('cycles'), hasLength(1));
-      expect(() => profiles.remove(EbbDatabase.primaryProfileId),
-          throwsArgumentError);
+      expect(
+        () => profiles.remove(EbbDatabase.primaryProfileId),
+        throwsArgumentError,
+      );
     });
 
     test('delete all data leaves one blank primary profile', () async {
@@ -167,4 +186,32 @@ void main() {
     await repo.addCycle(Cycle(start: mar1, excluded: true));
     expect((await repo.allCycles()).single.excluded, isTrue);
   });
+
+  test(
+    'a rating on its own is kept, and clearing it removes the day',
+    () async {
+      final repo = CycleRepository(db: db);
+      final day = DateTime(2026, 3, 10);
+      await repo.saveLog(DayLog(date: day, rating: 4));
+      expect((await repo.logFor(day))?.rating, 4);
+
+      await repo.saveLog(DayLog(date: day));
+      expect(await repo.logFor(day), isNull);
+    },
+  );
+
+  test(
+    'a feeling on its own is kept, and clearing it removes the day',
+    () async {
+      final repo = CycleRepository(db: db);
+      final day = DateTime(2026, 3, 10);
+      await repo.saveLog(
+        DayLog(date: day, feeling: DayFeeling.named(Feeling.anxious)),
+      );
+      expect((await repo.logFor(day))?.feeling?.named, Feeling.anxious);
+
+      await repo.saveLog(DayLog(date: day));
+      expect(await repo.logFor(day), isNull);
+    },
+  );
 }

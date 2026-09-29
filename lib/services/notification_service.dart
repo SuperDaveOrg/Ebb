@@ -20,7 +20,7 @@ import 'package:ebb/models/profile.dart';
 /// prompt bought for no benefit.
 class NotificationService {
   NotificationService({FlutterLocalNotificationsPlugin? plugin})
-      : _plugin = plugin ?? FlutterLocalNotificationsPlugin();
+    : _plugin = plugin ?? FlutterLocalNotificationsPlugin();
 
   final FlutterLocalNotificationsPlugin _plugin;
 
@@ -52,8 +52,10 @@ class NotificationService {
 
   /// Asks for notification permission (Android 13+). Returns false if declined.
   Future<bool> requestPermission() async {
-    final android = _plugin.resolvePlatformSpecificImplementation<
-        AndroidFlutterLocalNotificationsPlugin>();
+    final android = _plugin
+        .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin
+        >();
     if (android == null) return false;
     return await android.requestNotificationsPermission() ?? false;
   }
@@ -111,7 +113,12 @@ class NotificationService {
     required String body,
   }) async {
     final scheduled = tz.TZDateTime(
-        tz.local, when.year, when.month, when.day, hour);
+      tz.local,
+      when.year,
+      when.month,
+      when.day,
+      hour,
+    );
     if (scheduled.isBefore(tz.TZDateTime.now(tz.local))) return;
 
     await _plugin.zonedSchedule(

@@ -9,8 +9,8 @@ import 'package:ebb/models/profile.dart';
 /// guess.
 class Who {
   Who(Profile profile)
-      : isOwner = profile.id == EbbDatabase.primaryProfileId,
-        _name = profile.name;
+    : isOwner = profile.id == EbbDatabase.primaryProfileId,
+      _name = profile.name;
 
   final bool isOwner;
   final String? _name;
@@ -18,6 +18,9 @@ class Who {
   /// For the switcher: the owner's chosen name, or "You".
   static String label(Profile p) =>
       p.name ?? (p.id == EbbDatabase.primaryProfileId ? 'You' : '');
+
+  /// The subject, mid-sentence: "you" / "Sam".
+  String get subject => isOwner ? 'you' : _name!;
 
   /// Possessive, mid-sentence: "your" / "Sam’s".
   String get whose => isOwner ? 'your' : '${_name!}’s';

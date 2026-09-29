@@ -12,7 +12,7 @@ file**, and Android's own Save picker decides where it goes.
 
 ```json
 {
-  "ebbBackup": 1,
+  "ebbBackup": 2,
   "exportedOn": "2026-09-26",
   "people": [
     {
@@ -22,7 +22,7 @@ file**, and Android's own Save picker decides where it goes.
         { "start": "2026-03-29", "excluded": true, "notes": "flu" }
       ],
       "days": [
-        { "date": "2026-03-02", "flow": "heavy", "symptoms": ["cramps"], "notes": "long day" }
+        { "date": "2026-03-02", "flow": "heavy", "symptoms": ["cramps"], "notes": "long day", "rating": 2, "feeling": "tired" }
       ]
     }
   ]
@@ -38,7 +38,7 @@ A cycle is a day in someone's life, not an instant.
 
 | Field | Type | Meaning |
 |---|---|---|
-| `ebbBackup` | integer, required | Format version. Currently `1`. |
+| `ebbBackup` | integer, required | Format version. Currently `2`; see [Versions](#versions). |
 | `exportedOn` | date, required | The day the backup was made. |
 | `people` | array, required, non-empty | One entry per person tracked on the phone. |
 
@@ -79,6 +79,8 @@ one `start` to the next.
 | `flow` | string, optional | One of `spotting`, `light`, `medium`, `heavy`. Absent means none. |
 | `symptoms` | array of strings, optional | Free text, in the user's own words. Each must be non-empty and contain no tab character. |
 | `notes` | string, optional | Free text. |
+| `rating` | integer, optional | How the day went, from `1` (rough) to `5` (great). Absent means not rated, which is not the same as `3`. Anything other than a whole number from 1 to 5 rejects the file. Version 2 and later. |
+| `feeling` | string, optional | How the person felt. Either one of the named feelings — `happy`, `calm`, `loving`, `energetic`, `tired`, `sad`, `anxious`, `irritable`, `angry`, `confused` — written as the name, never as the emoji Ebb shows for it; or any other face, written as the emoji itself (`"👽"`), which means whatever it means to that person. A face is at most 16 UTF-16 code units, with no ASCII and no whitespace; it need not be one Ebb offers, so faces added to Ebb later still restore in older versions. Names are ASCII and faces never are, so the two can't be confused. Absent means none picked. Anything else rejects the file. Version 2 and later. |
 
 ## Compatibility rules
 
@@ -88,11 +90,20 @@ one `start` to the next.
 - A reader that sees an `ebbBackup` version newer than it understands must
   refuse the file, not guess.
 - A new field that older readers can safely ignore does **not** need a new
-  version. Anything that changes the meaning of an existing field does.
+  version. Anything that changes the meaning of an existing field does, and
+  so does a new field holding something the user recorded: ignoring it would
+  lose it without a word.
 - Nothing may be dated after `exportedOn`: a backup can't record a day that
   hadn't happened when it was made.
 - Unknown values are errors, not defaults. For example, an unrecognised `flow`
   rejects the file instead of being quietly read as "none".
+
+## Versions
+
+| Version | Change |
+|---|---|
+| `1` | The first format. |
+| `2` | Added a day's `rating` and `feeling`. Older readers ignore fields they don't know, so an Ebb that only understood version 1 would have restored a file with either and silently dropped them. The version was raised so that it refuses the file instead. Ebb still reads version 1. |
 
 ## What a backup does not contain
 

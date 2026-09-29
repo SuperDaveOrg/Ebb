@@ -125,17 +125,26 @@ void main() {
 
   group('current cycle', () {
     test('day of cycle is 1-based on the first day of bleeding', () {
-      final p = predictor.predict(history(jan1, [28, 28]), asOf: DateTime(2026, 2, 26));
+      final p = predictor.predict(
+        history(jan1, [28, 28]),
+        asOf: DateTime(2026, 2, 26),
+      );
       expect(p.dayOfCycle, 1);
     });
 
     test('day of cycle counts forward from the last start', () {
-      final p = predictor.predict(history(jan1, [28, 28]), asOf: DateTime(2026, 3, 5));
+      final p = predictor.predict(
+        history(jan1, [28, 28]),
+        asOf: DateTime(2026, 3, 5),
+      );
       expect(p.dayOfCycle, 8);
     });
 
     test('days until next can go negative when a period is late', () {
-      final p = predictor.predict(history(jan1, [28, 28]), asOf: DateTime(2026, 4, 1));
+      final p = predictor.predict(
+        history(jan1, [28, 28]),
+        asOf: DateTime(2026, 4, 1),
+      );
       expect(p.daysUntilNext!, lessThan(0));
     });
   });
@@ -225,9 +234,9 @@ void main() {
   group('excluded cycles', () {
     /// Marks the cycle at [index] as excluded.
     List<Cycle> exclude(List<Cycle> cycles, int index) => [
-          for (var i = 0; i < cycles.length; i++)
-            i == index ? cycles[i].copyWith(excluded: true) : cycles[i],
-        ];
+      for (var i = 0; i < cycles.length; i++)
+        i == index ? cycles[i].copyWith(excluded: true) : cycles[i],
+    ];
 
     test('an excluded cycle does not drag the estimate', () {
       // One 60-day cycle after illness, among otherwise steady 28s.

@@ -5,12 +5,15 @@ import 'package:ebb/data/cycle_repository.dart';
 import 'package:ebb/domain/calendar.dart';
 import 'package:ebb/domain/cycle_rules.dart';
 import 'package:ebb/domain/dates.dart';
+import 'package:ebb/domain/moon.dart';
 import 'package:ebb/domain/predictor.dart';
 import 'package:ebb/models/cycle.dart';
 import 'package:ebb/models/day_log.dart';
 import 'package:ebb/services/settings_service.dart';
 import 'package:ebb/ui/cycle_editor.dart';
+import 'package:ebb/ui/face_picker.dart';
 import 'package:ebb/ui/layout.dart';
+import 'package:ebb/ui/moon_icon.dart';
 import 'package:ebb/ui/theme.dart';
 import 'package:ebb/ui/wording.dart';
 
@@ -47,6 +50,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
   CalendarMarks _marks = CalendarMarks(const [], CyclePrediction.empty);
   Map<String, DayLog> _logs = const {};
   bool _showFertile = false;
+  bool _showMoon = false;
   bool _loading = true;
 
   @override
@@ -59,35 +63,47 @@ class _CalendarScreenState extends State<CalendarScreen> {
     final cycles = await widget.repository.allCycles();
     final logs = await widget.repository.allLogs();
     final fertile = await widget.settings.showFertileWindow();
+    final moon = await widget.settings.showMoonPhases();
     final prediction = const Predictor().predict(cycles);
     if (!mounted) return;
     setState(() {
       _cycles = cycles;
       _prediction = prediction;
       _showFertile = fertile;
+      _showMoon = moon;
       _marks = CalendarMarks(cycles, prediction, showFertile: fertile);
       _logs = {for (final l in logs) isoDate(l.date): l};
       _loading = false;
     });
   }
 
-  /// First of each month from the first logged period to the one holding
-  /// the end of the likely window.
+  /// First of each month from the month before anything was logged to the
+  /// one holding the end of the likely window.
+  ///
+  /// The spare month at the start is room to fill history in by hand: log a
+  /// period there and the calendar reaches back another month next time.
   (List<DateTime> past, List<DateTime> ahead) get _months {
     final now = today();
     final current = DateTime(now.year, now.month);
-    final first = _cycles.isEmpty
+    final logged = [
+      ..._cycles.map((c) => c.start),
+      ..._logs.values.map((l) => dateOnly(l.date)),
+    ];
+    final earliest = logged.isEmpty
         ? current
-        : DateTime(_cycles.first.start.year, _cycles.first.start.month);
+        : logged.reduce((a, b) => a.isBefore(b) ? a : b);
+    final first = DateTime(earliest.year, earliest.month - 1);
     final latest = _prediction.latest;
     final last = latest != null && latest.isAfter(now)
         ? DateTime(latest.year, latest.month)
         : current;
 
     final past = <DateTime>[];
-    for (var m = DateTime(current.year, current.month - 1);
-        !m.isBefore(first);
-        m = DateTime(m.year, m.month - 1)) {
+    for (
+      var m = DateTime(current.year, current.month - 1);
+      !m.isBefore(first);
+      m = DateTime(m.year, m.month - 1)
+    ) {
       past.add(m);
     }
     final ahead = <DateTime>[];
@@ -110,6 +126,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
         cycles: _cycles,
         prediction: _prediction,
         log: _logs[isoDate(day)],
+        moon: _showMoon ? moonPhasesByDay(day, day)[isoDate(day)] : null,
       ),
     );
     if (result == null) return;
@@ -120,6 +137,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
     switch (result.action) {
       case _Started():
         await widget.repository.startPeriod(day);
+      case _MovedStart(:final cycle):
+        await widget.repository.updateCycle(cycle.copyWith(start: day));
       case _Ended(:final cycle):
         await widget.repository.endPeriod(cycle.id!, day);
       case _Edit(:final cycle):
@@ -133,8 +152,12 @@ class _CalendarScreenState extends State<CalendarScreen> {
   }
 
   Future<void> _edit(Cycle cycle) async {
-    final edited = await showCycleEditor(context,
-        cycle: cycle, all: _cycles, onDelete: () => _delete(cycle));
+    final edited = await showCycleEditor(
+      context,
+      cycle: cycle,
+      all: _cycles,
+      onDelete: () => _delete(cycle),
+    );
     if (edited == null) return;
     await widget.repository.updateCycle(edited);
     await _load();
@@ -145,8 +168,10 @@ class _CalendarScreenState extends State<CalendarScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text('Delete this cycle?'),
-        content: Text('The entry starting ${_fmt.format(cycle.start)} will be '
-            'removed. This cannot be undone.'),
+        content: Text(
+          'The entry starting ${_fmt.format(cycle.start)} will be '
+          'removed. This cannot be undone.',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
@@ -174,9 +199,11 @@ class _CalendarScreenState extends State<CalendarScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Padding(
-                  padding: readablePadding(context,
-                      base: const EdgeInsets.fromLTRB(12, 0, 12, 6),
-                      maxWidth: _maxWidth),
+                  padding: readablePadding(
+                    context,
+                    base: const EdgeInsets.fromLTRB(12, 0, 12, 6),
+                    maxWidth: _maxWidth,
+                  ),
                   child: const _WeekdayHeader(),
                 ),
                 const Divider(),
@@ -195,15 +222,25 @@ class _CalendarScreenState extends State<CalendarScreen> {
   /// the present with the past a scroll away.
   Widget _monthList(BuildContext context) {
     final (past, ahead) = _months;
-    final padding = readablePadding(context,
-        base: const EdgeInsets.symmetric(horizontal: 12), maxWidth: _maxWidth);
+    final moons = _showMoon
+        ? moonPhasesByDay(
+            past.isEmpty ? ahead.first : past.last,
+            DateTime(ahead.last.year, ahead.last.month + 1, 0),
+          )
+        : const <String, MoonEvent>{};
+    final padding = readablePadding(
+      context,
+      base: const EdgeInsets.symmetric(horizontal: 12),
+      maxWidth: _maxWidth,
+    );
 
     Widget month(DateTime m) => _Month(
-          month: m,
-          marks: _marks,
-          logs: _logs,
-          onTap: _openDay,
-        );
+      month: m,
+      marks: _marks,
+      logs: _logs,
+      moons: moons,
+      onTap: _openDay,
+    );
 
     return CustomScrollView(
       center: _thisMonth,
@@ -243,8 +280,9 @@ class _WeekdayHeader extends StatelessWidget {
             Expanded(
               child: Center(
                 child: Text(
-                    l.narrowWeekdays[(l.firstDayOfWeekIndex + i) % 7],
-                    style: style),
+                  l.narrowWeekdays[(l.firstDayOfWeekIndex + i) % 7],
+                  style: style,
+                ),
               ),
             ),
         ],
@@ -259,12 +297,14 @@ class _Month extends StatelessWidget {
     required this.month,
     required this.marks,
     required this.logs,
+    required this.moons,
     required this.onTap,
   });
 
   final DateTime month;
   final CalendarMarks marks;
   final Map<String, DayLog> logs;
+  final Map<String, MoonEvent> moons;
   final void Function(DateTime) onTap;
 
   static final _title = DateFormat.yMMMM();
@@ -291,26 +331,33 @@ class _Month extends StatelessWidget {
 
     final weeks = <Widget>[];
     for (var row = 0; row * 7 < lead + days; row++) {
-      weeks.add(Row(
-        children: [
-          for (var col = 0; col < 7; col++)
-            Expanded(
-              child: Builder(builder: (context) {
-                final i = row * 7 + col - lead;
-                if (i < 0 || i >= days) return const SizedBox(height: _Cell.height);
-                final date = DateTime(month.year, month.month, i + 1);
-                return _Cell(
-                  date: date,
-                  info: info[i],
-                  joinLeft: col > 0 && joins(i - 1, i),
-                  joinRight: col < 6 && joins(i, i + 1),
-                  hasLog: logs.containsKey(isoDate(date)),
-                  onTap: () => onTap(date),
-                );
-              }),
-            ),
-        ],
-      ));
+      weeks.add(
+        Row(
+          children: [
+            for (var col = 0; col < 7; col++)
+              Expanded(
+                child: Builder(
+                  builder: (context) {
+                    final i = row * 7 + col - lead;
+                    if (i < 0 || i >= days) {
+                      return const SizedBox(height: _Cell.height);
+                    }
+                    final date = DateTime(month.year, month.month, i + 1);
+                    return _Cell(
+                      date: date,
+                      info: info[i],
+                      joinLeft: col > 0 && joins(i - 1, i),
+                      joinRight: col < 6 && joins(i, i + 1),
+                      log: logs[isoDate(date)],
+                      moon: moons[isoDate(date)]?.phase,
+                      onTap: () => onTap(date),
+                    );
+                  },
+                ),
+              ),
+          ],
+        ),
+      );
     }
 
     return Padding(
@@ -320,7 +367,10 @@ class _Month extends StatelessWidget {
         children: [
           Padding(
             padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
-            child: Text(_title.format(month), style: theme.textTheme.titleLarge),
+            child: Text(
+              _title.format(month),
+              style: theme.textTheme.titleLarge,
+            ),
           ),
           ...weeks,
         ],
@@ -335,7 +385,8 @@ class _Cell extends StatelessWidget {
     required this.info,
     required this.joinLeft,
     required this.joinRight,
-    required this.hasLog,
+    this.log,
+    this.moon,
     required this.onTap,
   });
 
@@ -348,7 +399,8 @@ class _Cell extends StatelessWidget {
   /// reads as one shape rather than a row of beads.
   final bool joinLeft;
   final bool joinRight;
-  final bool hasLog;
+  final DayLog? log;
+  final MoonPhase? moon;
   final VoidCallback onTap;
 
   @override
@@ -358,6 +410,12 @@ class _Cell extends StatelessWidget {
     final isToday = isSameDay(date, today());
     final future = date.isAfter(today());
     final excluded = info.cycle?.excluded ?? false;
+    final feeling = log?.feeling;
+    final rating = log?.rating;
+    // Under the number: a pencil for a written note, otherwise a dot for a
+    // rating, otherwise nothing, so days still to rate stand out. The
+    // feeling has its own face.
+    final hasNote = log?.notes?.trim().isNotEmpty ?? false;
 
     final Color? fill = switch (info.mark) {
       DayMark.period => excluded ? colors.elapsed : colors.period,
@@ -371,12 +429,13 @@ class _Cell extends StatelessWidget {
 
     final onFill = info.mark == DayMark.period
         ? (ThemeData.estimateBrightnessForColor(fill!) == Brightness.dark
-            ? Colors.white
-            : Colors.black)
+              ? Colors.white
+              : Colors.black)
         : null;
     // Days still to come are quieter, except inside the likely window, where
     // muted text on the band would be hard to read.
-    final ink = onFill ??
+    final ink =
+        onFill ??
         (future && info.mark != DayMark.likelyStart
             ? theme.colorScheme.onSurfaceVariant
             : theme.colorScheme.onSurface);
@@ -391,8 +450,13 @@ class _Cell extends StatelessWidget {
     return Semantics(
       button: true,
       excludeSemantics: true,
-      label: '${DateFormat.MMMMEEEEd().format(date)}'
-          '${isToday ? ', today' : ''}$meaning${hasLog ? ', has notes' : ''}',
+      label:
+          '${DateFormat.MMMMEEEEd().format(date)}'
+          '${isToday ? ', today' : ''}$meaning'
+          '${moon == null ? '' : ', ${moon!.label.toLowerCase()}'}'
+          '${rating == null ? '' : ', rated $rating'}'
+          '${feeling == null ? '' : ', felt ${_feelingName(feeling)}'}'
+          '${hasNote ? ', has a note' : ''}',
       child: InkWell(
         onTap: onTap,
         customBorder: const CircleBorder(),
@@ -409,19 +473,52 @@ class _Cell extends StatelessWidget {
             child: Stack(
               alignment: Alignment.center,
               children: [
-                Text('${date.day}',
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: ink,
-                      fontWeight: isToday ? FontWeight.w700 : null,
-                    )),
-                if (hasLog)
+                Text(
+                  '${date.day}',
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: ink,
+                    fontWeight: isToday ? FontWeight.w700 : null,
+                  ),
+                ),
+                // Up and to the left of the number, on the day's own
+                // circle: pinned to the cell's corner it floats between
+                // two days on a wide screen.
+                if (moon case final phase?)
+                  Transform.translate(
+                    offset: const Offset(-16, -14),
+                    child: MoonIcon(
+                      phase,
+                      size: 10,
+                      backdrop: theme.scaffoldBackgroundColor,
+                    ),
+                  ),
+                // The moon's mirror image, up and to the right. Small, and
+                // drawn in its own colours, so it reads on any band.
+                if (feeling case final f?)
+                  Transform.translate(
+                    offset: const Offset(17, -14),
+                    child: ExcludeSemantics(
+                      child: Text(
+                        f.emoji,
+                        style: const TextStyle(fontSize: 11, height: 1),
+                      ),
+                    ),
+                  ),
+                if (hasNote)
+                  Positioned(
+                    bottom: 5,
+                    child: Icon(Icons.edit, size: 10, color: ink),
+                  )
+                else if (rating != null)
                   Positioned(
                     bottom: 11,
                     child: Container(
                       width: 4,
                       height: 4,
-                      decoration:
-                          BoxDecoration(color: ink, shape: BoxShape.circle),
+                      decoration: BoxDecoration(
+                        color: ink,
+                        shape: BoxShape.circle,
+                      ),
                     ),
                   ),
               ],
@@ -456,18 +553,24 @@ class _BandPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     const inset = 3.0;
     final top = (size.height - _band) / 2;
-    final r = Rect.fromLTRB(joinLeft ? 0 : inset, top,
-        joinRight ? size.width : size.width - inset, top + _band);
+    final r = Rect.fromLTRB(
+      joinLeft ? 0 : inset,
+      top,
+      joinRight ? size.width : size.width - inset,
+      top + _band,
+    );
     const rad = Radius.circular(_band / 2);
 
     final f = fill;
     if (f != null) {
       canvas.drawRRect(
-        RRect.fromRectAndCorners(r,
-            topLeft: joinLeft ? Radius.zero : rad,
-            bottomLeft: joinLeft ? Radius.zero : rad,
-            topRight: joinRight ? Radius.zero : rad,
-            bottomRight: joinRight ? Radius.zero : rad),
+        RRect.fromRectAndCorners(
+          r,
+          topLeft: joinLeft ? Radius.zero : rad,
+          bottomLeft: joinLeft ? Radius.zero : rad,
+          topRight: joinRight ? Radius.zero : rad,
+          bottomRight: joinRight ? Radius.zero : rad,
+        ),
         Paint()..color = f,
       );
     }
@@ -538,22 +641,22 @@ class _Key extends StatelessWidget {
     final colors = EbbColors.of(context);
 
     Widget entry(Widget swatch, String text) => Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            swatch,
-            const SizedBox(width: 6),
-            Text(text, style: theme.textTheme.labelMedium),
-          ],
-        );
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        swatch,
+        const SizedBox(width: 6),
+        Text(text, style: theme.textTheme.labelMedium),
+      ],
+    );
     Widget pill({Color? fill, Color? border, bool round = false}) => Container(
-          width: round ? 14 : 20,
-          height: 14,
-          decoration: BoxDecoration(
-            color: fill,
-            border: border == null ? null : Border.all(color: border, width: 1.5),
-            borderRadius: BorderRadius.circular(7),
-          ),
-        );
+      width: round ? 14 : 20,
+      height: 14,
+      decoration: BoxDecoration(
+        color: fill,
+        border: border == null ? null : Border.all(color: border, width: 1.5),
+        borderRadius: BorderRadius.circular(7),
+      ),
+    );
 
     return DecoratedBox(
       decoration: BoxDecoration(
@@ -574,10 +677,14 @@ class _Key extends StatelessWidget {
                 entry(pill(border: colors.period), 'End not logged'),
               if (showLikely) entry(pill(fill: colors.window), 'Likely start'),
               if (showFertile)
-                entry(pill(fill: theme.colorScheme.primaryContainer),
-                    'Fertile (estimate)'),
-              entry(pill(border: theme.colorScheme.primary, round: true),
-                  'Today'),
+                entry(
+                  pill(fill: theme.colorScheme.primaryContainer),
+                  'Fertile (estimate)',
+                ),
+              entry(
+                pill(border: theme.colorScheme.primary, round: true),
+                'Today',
+              ),
             ],
           ),
         ),
@@ -589,6 +696,12 @@ class _Key extends StatelessWidget {
 sealed class _Action {}
 
 class _Started extends _Action {}
+
+/// The period starting soon after this day really started on it.
+class _MovedStart extends _Action {
+  _MovedStart(this.cycle);
+  final Cycle cycle;
+}
 
 class _Ended extends _Action {
   _Ended(this.cycle);
@@ -617,6 +730,7 @@ class _DaySheet extends StatefulWidget {
     required this.cycles,
     required this.prediction,
     required this.log,
+    this.moon,
   });
 
   final DateTime day;
@@ -625,6 +739,7 @@ class _DaySheet extends StatefulWidget {
   final List<Cycle> cycles;
   final CyclePrediction prediction;
   final DayLog? log;
+  final MoonEvent? moon;
 
   @override
   State<_DaySheet> createState() => _DaySheetState();
@@ -634,6 +749,8 @@ class _DaySheetState extends State<_DaySheet> {
   static final _range = DateFormat.MMMd();
 
   late Flow _flow = widget.log?.flow ?? Flow.none;
+  late int? _rating = widget.log?.rating;
+  late DayFeeling? _feeling = widget.log?.feeling;
   late final _notes = TextEditingController(text: widget.log?.notes);
 
   @override
@@ -649,7 +766,10 @@ class _DaySheetState extends State<_DaySheet> {
     String? clean(String? s) => s == null || s.trim().isEmpty ? null : s.trim();
     final old = widget.log;
     final notes = clean(_notes.text);
-    if (_flow == (old?.flow ?? Flow.none) && notes == clean(old?.notes)) {
+    if (_flow == (old?.flow ?? Flow.none) &&
+        _rating == old?.rating &&
+        _feeling == old?.feeling &&
+        notes == clean(old?.notes)) {
       return null;
     }
     return DayLog(
@@ -658,6 +778,8 @@ class _DaySheetState extends State<_DaySheet> {
       flow: _flow,
       symptoms: old?.symptoms ?? const [],
       notes: notes,
+      rating: _rating,
+      feeling: _feeling,
     );
   }
 
@@ -673,29 +795,46 @@ class _DaySheetState extends State<_DaySheet> {
     final window = p.earliest == null
         ? ''
         : '${who.whoseCap} next period is likely to start between '
-            '${_range.format(p.earliest!)} and ${_range.format(p.latest!)}.';
+              '${_range.format(p.earliest!)} and ${_range.format(p.latest!)}.';
     return switch (info.mark) {
-      DayMark.period => 'Day $n of ${who.whose} period'
-          '${cycle!.excluded ? ', in a cycle not counted in predictions' : ''}.',
-      DayMark.periodUnrecorded => 'Day $n of ${who.whose} cycle. The end of '
-          'this period wasn’t logged, so it’s drawn at the usual length.',
+      DayMark.period =>
+        'Day $n of ${who.whose} period'
+            '${cycle!.excluded ? ', in a cycle not counted in predictions' : ''}.',
+      DayMark.periodUnrecorded =>
+        'Day $n of ${who.whose} cycle. The end of '
+            'this period wasn’t logged, so it’s drawn at the usual length.',
       DayMark.likelyStart => window,
-      DayMark.fertile => 'In the estimated fertile window. Not reliable '
-          'enough to use as contraception.',
+      DayMark.fertile =>
+        'In the estimated fertile window. Not reliable '
+            'enough to use as contraception.',
       DayMark.none when info.cycleDay != null =>
         'Day ${info.cycleDay} of ${who.whose} cycle.',
       _ => '',
     };
   }
 
-  /// Offered only when it would pass the same checks as anywhere else.
+  /// Offered only when it would pass the same checks as anywhere else, and
+  /// not where moving the next period's start here is offered instead.
   bool get _canStart {
     if (_future) return false;
     final mark = widget.info.mark;
     if (mark == DayMark.period || mark == DayMark.periodUnrecorded) {
       return false;
     }
+    if (_canMoveStart != null) return false;
     return checkCycle(Cycle(start: widget.day), widget.cycles) == null;
+  }
+
+  /// The period starting soon after this day, if its start can move here.
+  Cycle? get _canMoveStart {
+    if (_future) return null;
+    final mark = widget.info.mark;
+    if (mark == DayMark.period || mark == DayMark.periodUnrecorded) {
+      return null;
+    }
+    final next = periodStartingSoonAfter(widget.day, widget.cycles);
+    if (next == null || next.id == null) return null;
+    return canMoveStartTo(next, widget.day, widget.cycles) ? next : null;
   }
 
   /// The period this day could be the last day of, if any.
@@ -714,9 +853,11 @@ class _DaySheetState extends State<_DaySheet> {
     final who = widget.who;
     final isToday = isSameDay(widget.day, today());
     final status = _status;
-    final inPeriod = widget.info.mark == DayMark.period ||
+    final inPeriod =
+        widget.info.mark == DayMark.period ||
         widget.info.mark == DayMark.periodUnrecorded;
     final ends = _canEnd;
+    final moves = _canMoveStart;
 
     const side = EdgeInsets.symmetric(horizontal: 24);
 
@@ -739,32 +880,69 @@ class _DaySheetState extends State<_DaySheet> {
               if (status.isNotEmpty)
                 Padding(
                   padding: side + const EdgeInsets.only(top: 6),
-                  child: Text(status,
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                          color: theme.colorScheme.onSurfaceVariant)),
+                  child: Text(
+                    status,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ),
+              if (widget.moon case final moon?)
+                Padding(
+                  padding: side + const EdgeInsets.only(top: 6),
+                  child: Row(
+                    children: [
+                      MoonIcon(moon.phase, size: 14),
+                      const SizedBox(width: 8),
+                      Text(
+                        '${moon.phase.label}, '
+                        '${DateFormat.jm().format(moon.at.toLocal())}',
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               const SizedBox(height: 8),
               if (_future)
                 Padding(
                   padding: side + const EdgeInsets.only(bottom: 24, top: 8),
-                  child: Text('Days still to come can’t be logged yet.',
-                      style: theme.textTheme.bodyMedium),
+                  child: Text(
+                    'Days still to come can’t be logged yet.',
+                    style: theme.textTheme.bodyMedium,
+                  ),
                 )
               else ...[
+                // Worded as things to do, not facts about the day: these are
+                // buttons, and "My period started this day" read as a record.
                 if (_canStart)
                   ListTile(
                     contentPadding: side,
                     leading: const Icon(Icons.water_drop_outlined),
-                    title: Text('${who.mine} period started this day'),
+                    title: Text('Mark as the day ${who.whose} period started'),
                     onTap: () => _done(_Started()),
+                  ),
+                if (moves != null)
+                  ListTile(
+                    contentPadding: side,
+                    leading: const Icon(Icons.water_drop_outlined),
+                    title: const Text('Make this the first day of the period'),
+                    subtitle: Text(
+                      'Moves its start from '
+                      '${DateFormat.MMMEd().format(moves.start)}',
+                    ),
+                    onTap: () => _done(_MovedStart(moves)),
                   ),
                 if (ends != null)
                   ListTile(
                     contentPadding: side,
                     leading: const Icon(Icons.check),
-                    title: Text(ends.end == null
-                        ? '${who.mine} period ended this day'
-                        : 'Make this the last day of the period'),
+                    title: Text(
+                      ends.end == null
+                          ? 'Mark as the day ${who.whose} period ended'
+                          : 'Make this the last day of the period',
+                    ),
                     onTap: () => _done(_Ended(ends)),
                   ),
                 if (inPeriod)
@@ -777,21 +955,68 @@ class _DaySheetState extends State<_DaySheet> {
                 const Divider(height: 24),
                 Padding(
                   padding: side,
-                  child: Text('Flow', style: theme.textTheme.titleSmall),
+                  child: Text(
+                    'Rate ${who.whose} day, 1–5',
+                    style: theme.textTheme.titleSmall,
+                  ),
                 ),
                 Padding(
                   padding: side + const EdgeInsets.only(top: 8),
-                  child: Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
+                  child: DayRatingPicker(
+                    rating: _rating,
+                    onChanged: (r) => setState(() => _rating = r),
+                  ),
+                ),
+                Padding(
+                  padding: side + const EdgeInsets.only(top: 16),
+                  child: Text(
+                    'How did ${who.subject} feel?',
+                    style: theme.textTheme.titleSmall,
+                  ),
+                ),
+                Padding(
+                  padding: side + const EdgeInsets.only(top: 8),
+                  child: FeelingPicker(
+                    feeling: _feeling,
+                    onChanged: (f) => setState(() => _feeling = f),
+                  ),
+                ),
+                Padding(
+                  padding: side + const EdgeInsets.only(top: 16),
+                  child: Text('Flow', style: theme.textTheme.titleSmall),
+                ),
+                // One row, like the faces above. No checkmark: it would
+                // widen the chosen chip, and the fill already shows it.
+                Padding(
+                  padding: side + const EdgeInsets.only(top: 8),
+                  child: Row(
                     children: [
-                      for (final f in Flow.values.skip(1))
-                        ChoiceChip(
-                          label: Text(f.label),
-                          selected: _flow == f,
-                          onSelected: (on) =>
-                              setState(() => _flow = on ? f : Flow.none),
+                      for (final (i, f) in Flow.values.skip(1).indexed) ...[
+                        if (i > 0) const SizedBox(width: 8),
+                        Expanded(
+                          child: ChoiceChip(
+                            showCheckmark: false,
+                            labelPadding: EdgeInsets.zero,
+                            // Chosen the same way as the faces above.
+                            selectedColor: theme.colorScheme.primaryContainer,
+                            side: _flow == f
+                                ? BorderSide(
+                                    color: theme.colorScheme.primary,
+                                    width: 2,
+                                  )
+                                : null,
+                            label: Center(
+                              child: FittedBox(
+                                fit: BoxFit.scaleDown,
+                                child: Text(f.label),
+                              ),
+                            ),
+                            selected: _flow == f,
+                            onSelected: (on) =>
+                                setState(() => _flow = on ? f : Flow.none),
+                          ),
                         ),
+                      ],
                     ],
                   ),
                 ),
@@ -834,3 +1059,7 @@ class _DaySheetState extends State<_DaySheet> {
     );
   }
 }
+
+/// What a screen reader says for a feeling: "anxious", "smiling cat".
+String _feelingName(DayFeeling f) =>
+    (f.named?.label ?? faceName(f.emoji)).toLowerCase();

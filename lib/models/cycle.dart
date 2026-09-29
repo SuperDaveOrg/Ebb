@@ -62,23 +62,24 @@ class Cycle {
   }
 
   Map<String, Object?> toRow() => {
-        if (id != null) 'id': id,
-        'start_date': isoDate(start),
-        'end_date': end == null ? null : isoDate(end!),
-        'notes': notes,
-        'excluded': excluded ? 1 : 0,
-      };
+    if (id != null) 'id': id,
+    'start_date': isoDate(start),
+    'end_date': end == null ? null : isoDate(end!),
+    'notes': notes,
+    'excluded': excluded ? 1 : 0,
+  };
 
   factory Cycle.fromRow(Map<String, Object?> row) => Cycle(
-        id: row['id'] as int?,
-        start: parseIsoDate(row['start_date'] as String),
-        end: row['end_date'] == null
-            ? null
-            : parseIsoDate(row['end_date'] as String),
-        notes: row['notes'] as String?,
-        excluded: (row['excluded'] as int? ?? 0) != 0,
-      );
+    id: row['id'] as int?,
+    start: parseIsoDate(row['start_date'] as String),
+    end: row['end_date'] == null
+        ? null
+        : parseIsoDate(row['end_date'] as String),
+    notes: row['notes'] as String?,
+    excluded: (row['excluded'] as int? ?? 0) != 0,
+  );
 
   @override
-  String toString() => 'Cycle(${isoDate(start)} -> ${end == null ? 'ongoing' : isoDate(end!)})';
+  String toString() =>
+      'Cycle(${isoDate(start)} -> ${end == null ? 'ongoing' : isoDate(end!)})';
 }

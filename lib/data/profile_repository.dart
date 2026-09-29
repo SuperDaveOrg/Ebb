@@ -15,8 +15,11 @@ class ProfileRepository {
 
   Future<Profile> primary() async {
     final db = await _db.database;
-    final rows = await db.query('profiles',
-        where: 'id = ?', whereArgs: [EbbDatabase.primaryProfileId]);
+    final rows = await db.query(
+      'profiles',
+      where: 'id = ?',
+      whereArgs: [EbbDatabase.primaryProfileId],
+    );
     return Profile.fromRow(rows.single);
   }
 
@@ -27,8 +30,12 @@ class ProfileRepository {
 
   Future<void> rename(int id, String? name) async {
     final db = await _db.database;
-    await db.update('profiles', {'name': name},
-        where: 'id = ?', whereArgs: [id]);
+    await db.update(
+      'profiles',
+      {'name': name},
+      where: 'id = ?',
+      whereArgs: [id],
+    );
   }
 
   /// Removes the profile and, by cascade, every cycle and day log in it. The

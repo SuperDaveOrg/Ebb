@@ -10,7 +10,11 @@ import 'package:ebb/models/profile.dart';
 ///
 /// Plain, documented JSON on purpose: a backup should be readable in a text
 /// editor and importable by some other app one day, so nobody is locked in.
-const backupFormatVersion = 1;
+///
+/// Version 2 added a day's `rating` and `feeling`. It's a new version, not
+/// just new fields, so an older Ebb refuses the file instead of quietly
+/// dropping them.
+const backupFormatVersion = 2;
 
 /// One person's history within a backup.
 class BackupPerson {
@@ -74,6 +78,8 @@ String encodeBackup(Backup backup, {bool pretty = true}) {
                 if (d.flow != Flow.none) 'flow': d.flow.name,
                 if (d.symptoms.isNotEmpty) 'symptoms': d.symptoms,
                 if (d.notes != null) 'notes': d.notes,
+                if (d.rating != null) 'rating': d.rating,
+                if (d.feeling != null) 'feeling': d.feeling!.value,
               },
           ],
         },
@@ -103,8 +109,9 @@ Backup decodeBackup(String text) {
   }
   if (version > backupFormatVersion) {
     throw const BackupFormatException(
-        'This backup was made by a newer version of Ebb. Update Ebb, then try '
-        'again.');
+      'This backup was made by a newer version of Ebb. Update Ebb, then try '
+      'again.',
+    );
   }
 
   final exportedOn = _date(root['exportedOn'], 'the export date');
@@ -118,7 +125,8 @@ Backup decodeBackup(String text) {
   for (final name in people.map((p) => p.profile.name).nonNulls) {
     if (!names.add(name.toLowerCase())) {
       throw BackupFormatException(
-          'Two people in this backup are both called $name.');
+        'Two people in this backup are both called $name.',
+      );
     }
   }
   return Backup(exportedOn: exportedOn, people: people);
@@ -140,7 +148,8 @@ BackupPerson _person(Object? raw, DateTime exportedOn) {
   void notAfterExport(DateTime d) {
     if (d.isAfter(exportedOn)) {
       throw BackupFormatException(
-          '${isoDate(d)} is after the day this backup was made.');
+        '${isoDate(d)} is after the day this backup was made.',
+      );
     }
   }
 
@@ -152,19 +161,23 @@ BackupPerson _person(Object? raw, DateTime exportedOn) {
     final end = c['end'] == null ? null : _date(c['end'], 'a period end');
     if (end != null && end.isBefore(start)) {
       throw BackupFormatException(
-          'The period starting ${isoDate(start)} ends before it begins.');
+        'The period starting ${isoDate(start)} ends before it begins.',
+      );
     }
     notAfterExport(end ?? start);
     if (!starts.add(isoDate(start))) {
       throw BackupFormatException(
-          'Two periods start on ${isoDate(start)} for the same person.');
+        'Two periods start on ${isoDate(start)} for the same person.',
+      );
     }
-    cycles.add(Cycle(
-      start: start,
-      end: end,
-      excluded: _optional<bool>(c, 'excluded', 'a period entry') ?? false,
-      notes: _optional<String>(c, 'notes', 'a period entry'),
-    ));
+    cycles.add(
+      Cycle(
+        start: start,
+        end: end,
+        excluded: _optional<bool>(c, 'excluded', 'a period entry') ?? false,
+        notes: _optional<String>(c, 'notes', 'a period entry'),
+      ),
+    );
   }
 
   final days = <DayLog>[];
@@ -175,7 +188,8 @@ BackupPerson _person(Object? raw, DateTime exportedOn) {
     notAfterExport(date);
     if (!dates.add(isoDate(date))) {
       throw BackupFormatException(
-          '${isoDate(date)} appears twice for the same person.');
+        '${isoDate(date)} appears twice for the same person.',
+      );
     }
     final flowName = _optional<String>(d, 'flow', 'a day entry');
     final flow = flowName == null
@@ -192,12 +206,26 @@ BackupPerson _person(Object? raw, DateTime exportedOn) {
       symptoms.add(s);
     }
 
-    days.add(DayLog(
-      date: date,
-      flow: flow,
-      symptoms: symptoms,
-      notes: _optional<String>(d, 'notes', 'a day entry'),
-    ));
+    final rating = _optional<int>(d, 'rating', 'a day entry');
+    if (rating != null && !DayLog.isRating(rating)) {
+      throw _damaged('the rating on ${isoDate(date)}');
+    }
+    final feelingName = _optional<String>(d, 'feeling', 'a day entry');
+    final feeling = DayFeeling.parse(feelingName);
+    if (feelingName != null && feeling == null) {
+      throw _damaged('the feeling on ${isoDate(date)}');
+    }
+
+    days.add(
+      DayLog(
+        date: date,
+        flow: flow,
+        symptoms: symptoms,
+        notes: _optional<String>(d, 'notes', 'a day entry'),
+        rating: rating,
+        feeling: feeling,
+      ),
+    );
   }
 
   cycles.sort((a, b) => a.start.compareTo(b.start));
@@ -207,8 +235,9 @@ BackupPerson _person(Object? raw, DateTime exportedOn) {
     final prevEnd = cycles[i - 1].end;
     if (prevEnd != null && !prevEnd.isBefore(cycles[i].start)) {
       throw BackupFormatException(
-          'The period starting ${isoDate(cycles[i].start)} overlaps the one '
-          'before it.');
+        'The period starting ${isoDate(cycles[i].start)} overlaps the one '
+        'before it.',
+      );
     }
   }
   days.sort((a, b) => a.date.compareTo(b.date));
@@ -219,8 +248,9 @@ BackupPerson _person(Object? raw, DateTime exportedOn) {
   );
 }
 
-BackupFormatException _damaged(String what) =>
-    BackupFormatException('This backup looks damaged: $what could not be read.');
+BackupFormatException _damaged(String what) => BackupFormatException(
+  'This backup looks damaged: $what could not be read.',
+);
 
 List<Object?> _list(
   Map<String, Object?> map,
