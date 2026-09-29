@@ -45,6 +45,7 @@ class HomeScreen extends StatefulWidget {
   final NotificationService notifications;
   final void Function(Profile) onSwitch;
   final Future<void> Function() onAddPerson;
+
   /// Re-read everyone; switch to [show] if given.
   final Future<void> Function({int? show}) onPeopleChanged;
 
@@ -150,16 +151,17 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     // If the last period ended today there is no valid earlier day; allow
     // today anyway and let checkCycle explain why it doesn't fit.
     final first = firstDate.isAfter(today()) ? today() : firstDate;
-    final last =
-        lastDate == null || lastDate.isAfter(today()) ? today() : lastDate;
+    final last = lastDate == null || lastDate.isAfter(today())
+        ? today()
+        : lastDate;
     final yesterday = addDays(today(), -1);
     final picked = await showDatePicker(
       context: context,
       initialDate: yesterday.isBefore(first)
           ? first
           : yesterday.isAfter(last)
-              ? last
-              : yesterday,
+          ? last
+          : yesterday,
       firstDate: first,
       lastDate: last,
       helpText: helpText,
@@ -176,8 +178,8 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       firstDate: lastEnd != null
           ? addDays(lastEnd, 1)
           : last != null
-              ? addDays(last.start, 1)
-              : addDays(today(), -90),
+          ? addDays(last.start, 1)
+          : addDays(today(), -90),
       helpText: 'When did it start?',
     );
     if (day != null) await _startPeriod(day);
@@ -202,8 +204,11 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   }
 
   Future<void> _openPeople() async {
-    final choice = await showPeopleSheet(context,
-        people: widget.people, current: widget.profile);
+    final choice = await showPeopleSheet(
+      context,
+      people: widget.people,
+      current: widget.profile,
+    );
     switch (choice) {
       case SwitchTo(:final profile):
         if (profile.id != widget.profile.id) widget.onSwitch(profile);
@@ -250,14 +255,18 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                 borderRadius: BorderRadius.circular(8),
                 onTap: _openPeople,
                 child: Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 4,
+                    vertical: 6,
+                  ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Flexible(
-                        child: Text(Who.label(widget.profile),
-                            overflow: TextOverflow.ellipsis),
+                        child: Text(
+                          Who.label(widget.profile),
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
                       const Icon(Icons.arrow_drop_down),
                     ],
@@ -270,16 +279,18 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
             icon: const Icon(Icons.calendar_month_outlined),
             tooltip: 'Calendar',
             onPressed: () async {
-              await Navigator.of(context).push(MaterialPageRoute(
-                builder: (_) => CalendarScreen(
-                  who: _who,
-                  repository: widget.repository,
-                  settings: widget.settings,
-                  title: _hasPeople
-                      ? '${_who.whoseCap} calendar'
-                      : 'Calendar',
+              await Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => CalendarScreen(
+                    who: _who,
+                    repository: widget.repository,
+                    settings: widget.settings,
+                    title: _hasPeople
+                        ? '${_who.whoseCap} calendar'
+                        : 'Calendar',
+                  ),
                 ),
-              ));
+              );
               await _refresh();
             },
           ),
@@ -287,14 +298,14 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
             icon: const Icon(Icons.history),
             tooltip: 'History',
             onPressed: () async {
-              await Navigator.of(context).push(MaterialPageRoute(
-                builder: (_) => HistoryScreen(
-                  repository: widget.repository,
-                  title: _hasPeople
-                      ? '${_who.whoseCap} history'
-                      : 'History',
+              await Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => HistoryScreen(
+                    repository: widget.repository,
+                    title: _hasPeople ? '${_who.whoseCap} history' : 'History',
+                  ),
                 ),
-              ));
+              );
               await _refresh();
             },
           ),
@@ -371,15 +382,19 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     }
     // Centred on screen when it fits, as it does on a landscape tablet;
     // still scrollable (and pull-to-refresh) when it doesn't.
-    final padding =
-        readablePadding(context, base: base, maxWidth: wideContentWidth);
+    final padding = readablePadding(
+      context,
+      base: base,
+      maxWidth: wideContentWidth,
+    );
     return LayoutBuilder(
       builder: (context, box) => SingleChildScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
         padding: padding,
         child: ConstrainedBox(
           constraints: BoxConstraints(
-              minHeight: math.max(0, box.maxHeight - padding.vertical)),
+            minHeight: math.max(0, box.maxHeight - padding.vertical),
+          ),
           child: Center(
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -435,18 +450,20 @@ class _StatusCard extends StatelessWidget {
     final String detail;
 
     if (missed) {
-      headline = 'No period logged since '
+      headline =
+          'No period logged since '
           '${DateFormat.MMMd().format(prediction.lastStart!)}';
       detail = prediction.unloggedCycles == 1
           ? 'Ebb has assumed a period went unlogged and estimated from '
-              'there. If you remember when it started, add it to put the '
-              'estimate right.'
+                'there. If you remember when it started, add it to put the '
+                'estimate right.'
           : 'Ebb has assumed some periods went unlogged and estimated from '
-              'there. If you remember when any started, add them to put the '
-              'estimate right.';
+                'there. If you remember when any started, add them to put the '
+                'estimate right.';
     } else if (day == null) {
       headline = who.isOwner ? 'Welcome to Ebb' : 'Nothing logged yet';
-      detail = 'Log the first day of ${who.whose} next period, or add past '
+      detail =
+          'Log the first day of ${who.whose} next period, or add past '
           'periods if you remember them, and Ebb will start learning '
           '${who.isOwner ? 'your' : 'the'} rhythm. Everything stays on this '
           'phone.';
@@ -459,13 +476,13 @@ class _StatusCard extends StatelessWidget {
       detail = until == null
           ? ''
           : until > 1
-              ? 'About $until days until ${who.whose} period is expected.'
-              : until == 1
-                  ? '${who.whoseCap} period is expected tomorrow.'
-                  : until == 0
-                      ? '${who.whoseCap} period is expected today.'
-                      : '${-until} days later than expected. '
-                          'Cycles shift for all sorts of reasons.';
+          ? 'About $until days until ${who.whose} period is expected.'
+          : until == 1
+          ? '${who.whoseCap} period is expected tomorrow.'
+          : until == 0
+          ? '${who.whoseCap} period is expected today.'
+          : '${-until} days later than expected. '
+                'Cycles shift for all sorts of reasons.';
     }
 
     final p = prediction;
@@ -492,14 +509,17 @@ class _StatusCard extends StatelessWidget {
                 windowStart: p.earliest == null ? null : dayOf(p.earliest!),
                 windowEnd: p.latest == null ? null : dayOf(p.latest!),
                 inPeriod: periodInProgress,
-                label: 'of ${who.whose} ${periodInProgress ? 'period' : 'cycle'}',
+                label:
+                    'of ${who.whose} ${periodInProgress ? 'period' : 'cycle'}',
                 size: ringSize,
               ),
               const SizedBox(height: 18),
               if (detail.isNotEmpty)
-                Text(detail,
-                    textAlign: TextAlign.center,
-                    style: theme.textTheme.bodyLarge),
+                Text(
+                  detail,
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.bodyLarge,
+                ),
               const SizedBox(height: 14),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -508,7 +528,11 @@ class _StatusCard extends StatelessWidget {
                   const SizedBox(width: 18),
                   _Key(color: colors.window, text: 'Likely next'),
                   const SizedBox(width: 18),
-                  _Key(color: theme.colorScheme.primary, text: 'Today', dot: true),
+                  _Key(
+                    color: theme.colorScheme.primary,
+                    text: 'Today',
+                    dot: true,
+                  ),
                 ],
               ),
             ],
@@ -535,9 +559,11 @@ class _StatusCard extends StatelessWidget {
                 child: TextButton.icon(
                   onPressed: onAddPast,
                   icon: const Icon(Icons.add),
-                  label: Text(current == null
-                      ? 'Add past periods'
-                      : 'Add a missed period'),
+                  label: Text(
+                    current == null
+                        ? 'Add past periods'
+                        : 'Add a missed period',
+                  ),
                 ),
               ),
             ],
@@ -603,21 +629,26 @@ class _PredictionCard extends StatelessWidget {
           children: [
             Text('Next period', style: theme.textTheme.titleMedium),
             const SizedBox(height: 6),
-            Text(_fmt.format(p.nextStart!),
-                style: theme.textTheme.headlineSmall),
+            Text(
+              _fmt.format(p.nextStart!),
+              style: theme.textTheme.headlineSmall,
+            ),
             const SizedBox(height: 4),
             Text(
               'likely between ${_fmt.format(p.earliest!)} '
               'and ${_fmt.format(p.latest!)}',
-              style: theme.textTheme.bodyMedium
-                  ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
             ),
             const SizedBox(height: 14),
             _ConfidenceNote(who: who, prediction: p),
             if (showFertileWindow && p.fertileStart != null) ...[
               const Divider(height: 28),
-              Text('Estimated fertile window',
-                  style: theme.textTheme.titleSmall),
+              Text(
+                'Estimated fertile window',
+                style: theme.textTheme.titleSmall,
+              ),
               const SizedBox(height: 4),
               Text(
                 '${_fmt.format(p.fertileStart!)} – ${_fmt.format(p.fertileEnd!)}',
@@ -627,8 +658,9 @@ class _PredictionCard extends StatelessWidget {
               Text(
                 'An estimate based on cycle timing alone. Not reliable enough '
                 'to use as contraception.',
-                style: theme.textTheme.bodySmall
-                    ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
               ),
             ],
           ],
@@ -652,35 +684,32 @@ class _ConfidenceNote extends StatelessWidget {
 
     final (IconData icon, String text) = switch (p.confidence) {
       _ when p.unloggedCycles > 0 => (
-          Icons.history_toggle_off,
-          'Estimated from the last period logged, on '
-              '${DateFormat.MMMd().format(p.lastStart!)}, so it may be less '
-              'accurate than usual.',
-        ),
-      PredictionConfidence.none => (
-          Icons.help_outline,
-          'Nothing logged yet.',
-        ),
+        Icons.history_toggle_off,
+        'Estimated from the last period logged, on '
+            '${DateFormat.MMMd().format(p.lastStart!)}, so it may be less '
+            'accurate than usual.',
+      ),
+      PredictionConfidence.none => (Icons.help_outline, 'Nothing logged yet.'),
       PredictionConfidence.low => (
-          Icons.trending_up,
-          p.observedCycles == 0
-              ? 'Based on a typical 28-day cycle for now. This will get more '
+        Icons.trending_up,
+        p.observedCycles == 0
+            ? 'Based on a typical 28-day cycle for now. This will get more '
                   'accurate as you log.'
-              : 'Based on ${p.observedCycles} cycle'
+            : 'Based on ${p.observedCycles} cycle'
                   '${p.observedCycles == 1 ? '' : 's'} so far, so it may be '
                   'less accurate for now.',
-        ),
+      ),
       PredictionConfidence.moderate => (
-          Icons.show_chart,
-          p.isIrregular
-              ? '${who.whoseCap} cycles vary quite a bit, so this is a wide '
+        Icons.show_chart,
+        p.isIrregular
+            ? '${who.whoseCap} cycles vary quite a bit, so this is a wide '
                   'estimate rather than a firm date.'
-              : 'Based on ${who.whose} last ${p.observedCycles} cycles.',
-        ),
+            : 'Based on ${who.whose} last ${p.observedCycles} cycles.',
+      ),
       PredictionConfidence.good => (
-          Icons.check_circle_outline,
-          'Based on ${p.observedCycles} fairly consistent cycles.',
-        ),
+        Icons.check_circle_outline,
+        'Based on ${p.observedCycles} fairly consistent cycles.',
+      ),
     };
 
     return Row(
@@ -689,9 +718,12 @@ class _ConfidenceNote extends StatelessWidget {
         Icon(icon, size: 18, color: theme.colorScheme.onSurfaceVariant),
         const SizedBox(width: 8),
         Expanded(
-          child: Text(text,
-              style: theme.textTheme.bodySmall
-                  ?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
+          child: Text(
+            text,
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+          ),
         ),
       ],
     );

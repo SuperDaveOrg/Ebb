@@ -6,8 +6,16 @@ void main() {
   final asOf = DateTime(2026, 6, 1);
 
   // Two recorded periods: Mar 1–5 and Mar 29–Apr 2.
-  final march = Cycle(id: 1, start: DateTime(2026, 3, 1), end: DateTime(2026, 3, 5));
-  final april = Cycle(id: 2, start: DateTime(2026, 3, 29), end: DateTime(2026, 4, 2));
+  final march = Cycle(
+    id: 1,
+    start: DateTime(2026, 3, 1),
+    end: DateTime(2026, 3, 5),
+  );
+  final april = Cycle(
+    id: 2,
+    start: DateTime(2026, 3, 29),
+    end: DateTime(2026, 4, 2),
+  );
   final existing = [april, march]; // deliberately out of order
 
   CycleProblem? check(Cycle c) => checkCycle(c, existing, asOf: asOf);
@@ -22,11 +30,14 @@ void main() {
   });
 
   test('dates in the future are rejected', () {
-    expect(check(Cycle(start: DateTime(2026, 6, 2))),
-        CycleProblem.startInFuture);
     expect(
-        check(Cycle(start: DateTime(2026, 5, 30), end: DateTime(2026, 6, 2))),
-        CycleProblem.endInFuture);
+      check(Cycle(start: DateTime(2026, 6, 2))),
+      CycleProblem.startInFuture,
+    );
+    expect(
+      check(Cycle(start: DateTime(2026, 5, 30), end: DateTime(2026, 6, 2))),
+      CycleProblem.endInFuture,
+    );
   });
 
   test('today is not the future', () {
@@ -44,13 +55,17 @@ void main() {
   });
 
   test('a second period on the same start day is rejected', () {
-    expect(check(Cycle(start: DateTime(2026, 3, 1))),
-        CycleProblem.duplicateStart);
+    expect(
+      check(Cycle(start: DateTime(2026, 3, 1))),
+      CycleProblem.duplicateStart,
+    );
   });
 
   test('starting inside the previous period is rejected', () {
-    expect(check(Cycle(start: DateTime(2026, 3, 5))),
-        CycleProblem.overlapsPrevious);
+    expect(
+      check(Cycle(start: DateTime(2026, 3, 5))),
+      CycleProblem.overlapsPrevious,
+    );
     expect(check(Cycle(start: DateTime(2026, 3, 6))), isNull);
   });
 
@@ -74,8 +89,10 @@ void main() {
     });
 
     test('still cannot overlap its neighbour', () {
-      expect(check(march.copyWith(end: DateTime(2026, 3, 30))),
-          CycleProblem.overlapsNext);
+      expect(
+        check(march.copyWith(end: DateTime(2026, 3, 30))),
+        CycleProblem.overlapsNext,
+      );
     });
   });
 }

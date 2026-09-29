@@ -9,8 +9,8 @@ import 'package:ebb/models/profile.dart';
 /// guess.
 class Who {
   Who(Profile profile)
-      : isOwner = profile.id == EbbDatabase.primaryProfileId,
-        _name = profile.name;
+    : isOwner = profile.id == EbbDatabase.primaryProfileId,
+      _name = profile.name;
 
   final bool isOwner;
   final String? _name;

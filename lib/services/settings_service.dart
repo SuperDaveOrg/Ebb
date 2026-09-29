@@ -32,7 +32,10 @@ class SettingsService {
       _isOwner;
 
   Future<void> setRemindersEnabled(bool value) async =>
-      (await SharedPreferences.getInstance()).setBool(_kRemindersEnabled, value);
+      (await SharedPreferences.getInstance()).setBool(
+        _kRemindersEnabled,
+        value,
+      );
 
   /// How many days ahead of the predicted start to send a heads-up.
   Future<int> leadDays() async =>
@@ -59,8 +62,10 @@ class SettingsService {
           false);
 
   Future<void> setShowFertileWindow(bool value) async =>
-      (await SharedPreferences.getInstance())
-          .setBool(_kShowFertileWindow, value);
+      (await SharedPreferences.getInstance()).setBool(
+        _kShowFertileWindow,
+        value,
+      );
 
   /// Off by default: interesting to some, clutter to others.
   Future<bool> showMoonPhases() async =>

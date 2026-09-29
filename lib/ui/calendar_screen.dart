@@ -90,9 +90,11 @@ class _CalendarScreenState extends State<CalendarScreen> {
         : current;
 
     final past = <DateTime>[];
-    for (var m = DateTime(current.year, current.month - 1);
-        !m.isBefore(first);
-        m = DateTime(m.year, m.month - 1)) {
+    for (
+      var m = DateTime(current.year, current.month - 1);
+      !m.isBefore(first);
+      m = DateTime(m.year, m.month - 1)
+    ) {
       past.add(m);
     }
     final ahead = <DateTime>[];
@@ -139,8 +141,12 @@ class _CalendarScreenState extends State<CalendarScreen> {
   }
 
   Future<void> _edit(Cycle cycle) async {
-    final edited = await showCycleEditor(context,
-        cycle: cycle, all: _cycles, onDelete: () => _delete(cycle));
+    final edited = await showCycleEditor(
+      context,
+      cycle: cycle,
+      all: _cycles,
+      onDelete: () => _delete(cycle),
+    );
     if (edited == null) return;
     await widget.repository.updateCycle(edited);
     await _load();
@@ -151,8 +157,10 @@ class _CalendarScreenState extends State<CalendarScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text('Delete this cycle?'),
-        content: Text('The entry starting ${_fmt.format(cycle.start)} will be '
-            'removed. This cannot be undone.'),
+        content: Text(
+          'The entry starting ${_fmt.format(cycle.start)} will be '
+          'removed. This cannot be undone.',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
@@ -180,9 +188,11 @@ class _CalendarScreenState extends State<CalendarScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Padding(
-                  padding: readablePadding(context,
-                      base: const EdgeInsets.fromLTRB(12, 0, 12, 6),
-                      maxWidth: _maxWidth),
+                  padding: readablePadding(
+                    context,
+                    base: const EdgeInsets.fromLTRB(12, 0, 12, 6),
+                    maxWidth: _maxWidth,
+                  ),
                   child: const _WeekdayHeader(),
                 ),
                 const Divider(),
@@ -202,19 +212,24 @@ class _CalendarScreenState extends State<CalendarScreen> {
   Widget _monthList(BuildContext context) {
     final (past, ahead) = _months;
     final moons = _showMoon
-        ? moonPhasesByDay(past.isEmpty ? ahead.first : past.last,
-            DateTime(ahead.last.year, ahead.last.month + 1, 0))
+        ? moonPhasesByDay(
+            past.isEmpty ? ahead.first : past.last,
+            DateTime(ahead.last.year, ahead.last.month + 1, 0),
+          )
         : const <String, MoonEvent>{};
-    final padding = readablePadding(context,
-        base: const EdgeInsets.symmetric(horizontal: 12), maxWidth: _maxWidth);
+    final padding = readablePadding(
+      context,
+      base: const EdgeInsets.symmetric(horizontal: 12),
+      maxWidth: _maxWidth,
+    );
 
     Widget month(DateTime m) => _Month(
-          month: m,
-          marks: _marks,
-          logs: _logs,
-          moons: moons,
-          onTap: _openDay,
-        );
+      month: m,
+      marks: _marks,
+      logs: _logs,
+      moons: moons,
+      onTap: _openDay,
+    );
 
     return CustomScrollView(
       center: _thisMonth,
@@ -254,8 +269,9 @@ class _WeekdayHeader extends StatelessWidget {
             Expanded(
               child: Center(
                 child: Text(
-                    l.narrowWeekdays[(l.firstDayOfWeekIndex + i) % 7],
-                    style: style),
+                  l.narrowWeekdays[(l.firstDayOfWeekIndex + i) % 7],
+                  style: style,
+                ),
               ),
             ),
         ],
@@ -304,27 +320,32 @@ class _Month extends StatelessWidget {
 
     final weeks = <Widget>[];
     for (var row = 0; row * 7 < lead + days; row++) {
-      weeks.add(Row(
-        children: [
-          for (var col = 0; col < 7; col++)
-            Expanded(
-              child: Builder(builder: (context) {
-                final i = row * 7 + col - lead;
-                if (i < 0 || i >= days) return const SizedBox(height: _Cell.height);
-                final date = DateTime(month.year, month.month, i + 1);
-                return _Cell(
-                  date: date,
-                  info: info[i],
-                  joinLeft: col > 0 && joins(i - 1, i),
-                  joinRight: col < 6 && joins(i, i + 1),
-                  hasLog: logs.containsKey(isoDate(date)),
-                  moon: moons[isoDate(date)]?.phase,
-                  onTap: () => onTap(date),
-                );
-              }),
-            ),
-        ],
-      ));
+      weeks.add(
+        Row(
+          children: [
+            for (var col = 0; col < 7; col++)
+              Expanded(
+                child: Builder(
+                  builder: (context) {
+                    final i = row * 7 + col - lead;
+                    if (i < 0 || i >= days)
+                      return const SizedBox(height: _Cell.height);
+                    final date = DateTime(month.year, month.month, i + 1);
+                    return _Cell(
+                      date: date,
+                      info: info[i],
+                      joinLeft: col > 0 && joins(i - 1, i),
+                      joinRight: col < 6 && joins(i, i + 1),
+                      hasLog: logs.containsKey(isoDate(date)),
+                      moon: moons[isoDate(date)]?.phase,
+                      onTap: () => onTap(date),
+                    );
+                  },
+                ),
+              ),
+          ],
+        ),
+      );
     }
 
     return Padding(
@@ -334,7 +355,10 @@ class _Month extends StatelessWidget {
         children: [
           Padding(
             padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
-            child: Text(_title.format(month), style: theme.textTheme.titleLarge),
+            child: Text(
+              _title.format(month),
+              style: theme.textTheme.titleLarge,
+            ),
           ),
           ...weeks,
         ],
@@ -387,12 +411,13 @@ class _Cell extends StatelessWidget {
 
     final onFill = info.mark == DayMark.period
         ? (ThemeData.estimateBrightnessForColor(fill!) == Brightness.dark
-            ? Colors.white
-            : Colors.black)
+              ? Colors.white
+              : Colors.black)
         : null;
     // Days still to come are quieter, except inside the likely window, where
     // muted text on the band would be hard to read.
-    final ink = onFill ??
+    final ink =
+        onFill ??
         (future && info.mark != DayMark.likelyStart
             ? theme.colorScheme.onSurfaceVariant
             : theme.colorScheme.onSurface);
@@ -407,7 +432,8 @@ class _Cell extends StatelessWidget {
     return Semantics(
       button: true,
       excludeSemantics: true,
-      label: '${DateFormat.MMMMEEEEd().format(date)}'
+      label:
+          '${DateFormat.MMMMEEEEd().format(date)}'
           '${isToday ? ', today' : ''}$meaning${hasLog ? ', has notes' : ''}'
           '${moon == null ? '' : ', ${moon!.label.toLowerCase()}'}',
       child: InkWell(
@@ -426,19 +452,24 @@ class _Cell extends StatelessWidget {
             child: Stack(
               alignment: Alignment.center,
               children: [
-                Text('${date.day}',
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: ink,
-                      fontWeight: isToday ? FontWeight.w700 : null,
-                    )),
+                Text(
+                  '${date.day}',
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: ink,
+                    fontWeight: isToday ? FontWeight.w700 : null,
+                  ),
+                ),
                 // Up and to the left of the number, on the day's own
                 // circle: pinned to the cell's corner it floats between
                 // two days on a wide screen.
                 if (moon case final phase?)
                   Transform.translate(
                     offset: const Offset(-16, -14),
-                    child: MoonIcon(phase,
-                        size: 10, backdrop: theme.scaffoldBackgroundColor),
+                    child: MoonIcon(
+                      phase,
+                      size: 10,
+                      backdrop: theme.scaffoldBackgroundColor,
+                    ),
                   ),
                 if (hasLog)
                   Positioned(
@@ -446,8 +477,10 @@ class _Cell extends StatelessWidget {
                     child: Container(
                       width: 4,
                       height: 4,
-                      decoration:
-                          BoxDecoration(color: ink, shape: BoxShape.circle),
+                      decoration: BoxDecoration(
+                        color: ink,
+                        shape: BoxShape.circle,
+                      ),
                     ),
                   ),
               ],
@@ -482,18 +515,24 @@ class _BandPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     const inset = 3.0;
     final top = (size.height - _band) / 2;
-    final r = Rect.fromLTRB(joinLeft ? 0 : inset, top,
-        joinRight ? size.width : size.width - inset, top + _band);
+    final r = Rect.fromLTRB(
+      joinLeft ? 0 : inset,
+      top,
+      joinRight ? size.width : size.width - inset,
+      top + _band,
+    );
     const rad = Radius.circular(_band / 2);
 
     final f = fill;
     if (f != null) {
       canvas.drawRRect(
-        RRect.fromRectAndCorners(r,
-            topLeft: joinLeft ? Radius.zero : rad,
-            bottomLeft: joinLeft ? Radius.zero : rad,
-            topRight: joinRight ? Radius.zero : rad,
-            bottomRight: joinRight ? Radius.zero : rad),
+        RRect.fromRectAndCorners(
+          r,
+          topLeft: joinLeft ? Radius.zero : rad,
+          bottomLeft: joinLeft ? Radius.zero : rad,
+          topRight: joinRight ? Radius.zero : rad,
+          bottomRight: joinRight ? Radius.zero : rad,
+        ),
         Paint()..color = f,
       );
     }
@@ -564,22 +603,22 @@ class _Key extends StatelessWidget {
     final colors = EbbColors.of(context);
 
     Widget entry(Widget swatch, String text) => Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            swatch,
-            const SizedBox(width: 6),
-            Text(text, style: theme.textTheme.labelMedium),
-          ],
-        );
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        swatch,
+        const SizedBox(width: 6),
+        Text(text, style: theme.textTheme.labelMedium),
+      ],
+    );
     Widget pill({Color? fill, Color? border, bool round = false}) => Container(
-          width: round ? 14 : 20,
-          height: 14,
-          decoration: BoxDecoration(
-            color: fill,
-            border: border == null ? null : Border.all(color: border, width: 1.5),
-            borderRadius: BorderRadius.circular(7),
-          ),
-        );
+      width: round ? 14 : 20,
+      height: 14,
+      decoration: BoxDecoration(
+        color: fill,
+        border: border == null ? null : Border.all(color: border, width: 1.5),
+        borderRadius: BorderRadius.circular(7),
+      ),
+    );
 
     return DecoratedBox(
       decoration: BoxDecoration(
@@ -600,10 +639,14 @@ class _Key extends StatelessWidget {
                 entry(pill(border: colors.period), 'End not logged'),
               if (showLikely) entry(pill(fill: colors.window), 'Likely start'),
               if (showFertile)
-                entry(pill(fill: theme.colorScheme.primaryContainer),
-                    'Fertile (estimate)'),
-              entry(pill(border: theme.colorScheme.primary, round: true),
-                  'Today'),
+                entry(
+                  pill(fill: theme.colorScheme.primaryContainer),
+                  'Fertile (estimate)',
+                ),
+              entry(
+                pill(border: theme.colorScheme.primary, round: true),
+                'Today',
+              ),
             ],
           ),
         ),
@@ -701,15 +744,18 @@ class _DaySheetState extends State<_DaySheet> {
     final window = p.earliest == null
         ? ''
         : '${who.whoseCap} next period is likely to start between '
-            '${_range.format(p.earliest!)} and ${_range.format(p.latest!)}.';
+              '${_range.format(p.earliest!)} and ${_range.format(p.latest!)}.';
     return switch (info.mark) {
-      DayMark.period => 'Day $n of ${who.whose} period'
-          '${cycle!.excluded ? ', in a cycle not counted in predictions' : ''}.',
-      DayMark.periodUnrecorded => 'Day $n of ${who.whose} cycle. The end of '
-          'this period wasn’t logged, so it’s drawn at the usual length.',
+      DayMark.period =>
+        'Day $n of ${who.whose} period'
+            '${cycle!.excluded ? ', in a cycle not counted in predictions' : ''}.',
+      DayMark.periodUnrecorded =>
+        'Day $n of ${who.whose} cycle. The end of '
+            'this period wasn’t logged, so it’s drawn at the usual length.',
       DayMark.likelyStart => window,
-      DayMark.fertile => 'In the estimated fertile window. Not reliable '
-          'enough to use as contraception.',
+      DayMark.fertile =>
+        'In the estimated fertile window. Not reliable '
+            'enough to use as contraception.',
       DayMark.none when info.cycleDay != null =>
         'Day ${info.cycleDay} of ${who.whose} cycle.',
       _ => '',
@@ -742,7 +788,8 @@ class _DaySheetState extends State<_DaySheet> {
     final who = widget.who;
     final isToday = isSameDay(widget.day, today());
     final status = _status;
-    final inPeriod = widget.info.mark == DayMark.period ||
+    final inPeriod =
+        widget.info.mark == DayMark.period ||
         widget.info.mark == DayMark.periodUnrecorded;
     final ends = _canEnd;
 
@@ -767,9 +814,12 @@ class _DaySheetState extends State<_DaySheet> {
               if (status.isNotEmpty)
                 Padding(
                   padding: side + const EdgeInsets.only(top: 6),
-                  child: Text(status,
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                          color: theme.colorScheme.onSurfaceVariant)),
+                  child: Text(
+                    status,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                  ),
                 ),
               if (widget.moon case final moon?)
                 Padding(
@@ -782,7 +832,8 @@ class _DaySheetState extends State<_DaySheet> {
                         '${moon.phase.label}, '
                         '${DateFormat.jm().format(moon.at.toLocal())}',
                         style: theme.textTheme.bodyMedium?.copyWith(
-                            color: theme.colorScheme.onSurfaceVariant),
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
                       ),
                     ],
                   ),
@@ -791,8 +842,10 @@ class _DaySheetState extends State<_DaySheet> {
               if (_future)
                 Padding(
                   padding: side + const EdgeInsets.only(bottom: 24, top: 8),
-                  child: Text('Days still to come can’t be logged yet.',
-                      style: theme.textTheme.bodyMedium),
+                  child: Text(
+                    'Days still to come can’t be logged yet.',
+                    style: theme.textTheme.bodyMedium,
+                  ),
                 )
               else ...[
                 if (_canStart)
@@ -806,9 +859,11 @@ class _DaySheetState extends State<_DaySheet> {
                   ListTile(
                     contentPadding: side,
                     leading: const Icon(Icons.check),
-                    title: Text(ends.end == null
-                        ? '${who.mine} period ended this day'
-                        : 'Make this the last day of the period'),
+                    title: Text(
+                      ends.end == null
+                          ? '${who.mine} period ended this day'
+                          : 'Make this the last day of the period',
+                    ),
                     onTap: () => _done(_Ended(ends)),
                   ),
                 if (inPeriod)

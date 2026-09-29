@@ -72,9 +72,12 @@ class CycleRing extends StatelessWidget {
                 Text('DAY', style: theme.textTheme.labelSmall),
                 Text('$day', style: theme.textTheme.displayLarge),
                 const SizedBox(height: 2),
-                Text(label,
-                    style: theme.textTheme.bodyMedium
-                        ?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
+                Text(
+                  label,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
               ],
             ),
           ),
@@ -137,8 +140,12 @@ class _RingPainter extends CustomPainter {
       // Inset a hair so round caps don't overshoot the day they belong to.
       final inset = math.min(0.04, sweep / 4);
       canvas.drawArc(
-          rect, top + (from - 1) * perDay + inset, sweep - inset * 2, false,
-          paint);
+        rect,
+        top + (from - 1) * perDay + inset,
+        sweep - inset * 2,
+        false,
+        paint,
+      );
     }
 
     canvas.drawCircle(center, radius, arc(track));
@@ -150,8 +157,7 @@ class _RingPainter extends CustomPainter {
 
     final ws = windowStart, we = windowEnd;
     if (ws != null && we != null) {
-      span(ws.clamp(1, total), we.clamp(1, total),
-          arc(window));
+      span(ws.clamp(1, total), we.clamp(1, total), arc(window));
     }
 
     span(1, math.min(periodDays, total), arc(period));
@@ -162,7 +168,10 @@ class _RingPainter extends CustomPainter {
     final dot = center + Offset(math.cos(angle), math.sin(angle)) * radius;
     canvas.drawCircle(dot, _stroke * 0.95, Paint()..color = halo);
     canvas.drawCircle(
-        dot, _stroke * 0.62, Paint()..color = inPeriod ? period : progress);
+      dot,
+      _stroke * 0.62,
+      Paint()..color = inPeriod ? period : progress,
+    );
   }
 
   @override

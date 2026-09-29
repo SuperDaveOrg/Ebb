@@ -35,10 +35,11 @@ CycleProblem? checkCycle(
   if (end != null && end.isAfter(now)) return CycleProblem.endInFuture;
   if (end != null && end.isBefore(start)) return CycleProblem.endBeforeStart;
 
-  final others = existing
-      .where((c) => candidate.id == null || c.id != candidate.id)
-      .toList()
-    ..sort((a, b) => a.start.compareTo(b.start));
+  final others =
+      existing
+          .where((c) => candidate.id == null || c.id != candidate.id)
+          .toList()
+        ..sort((a, b) => a.start.compareTo(b.start));
 
   Cycle? previous;
   Cycle? next;

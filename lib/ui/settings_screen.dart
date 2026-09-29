@@ -50,8 +50,8 @@ class SettingsScreen extends StatefulWidget {
     required this.notifications,
     BackupService? backups,
     DocumentService? documents,
-  })  : backups = backups ?? BackupService(),
-        documents = documents ?? DocumentService();
+  }) : backups = backups ?? BackupService(),
+       documents = documents ?? DocumentService();
 
   /// Whose settings the per-person section shows.
   final Profile profile;
@@ -105,10 +105,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
       final granted = await widget.notifications.requestPermission();
       if (!granted) {
         if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text('Notifications are turned off for Ebb in system '
-              'settings.'),
-        ));
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Notifications are turned off for Ebb in system '
+              'settings.',
+            ),
+          ),
+        );
         return;
       }
     }
@@ -136,15 +140,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
     final bytes = utf8.encode(encodeBackup(backup));
     try {
-      final saved = await widget.documents
-          .save('ebb-backup-${isoDate(today())}.json', bytes);
+      final saved = await widget.documents.save(
+        'ebb-backup-${isoDate(today())}.json',
+        bytes,
+      );
       if (saved) {
         _say('Backup saved. Keep a copy somewhere other than this phone.');
       }
     } on PlatformException catch (e) {
-      _say(e.code == 'no_picker'
-          ? _noPicker
-          : "The backup couldn't be saved there. Try another location.");
+      _say(
+        e.code == 'no_picker'
+            ? _noPicker
+            : "The backup couldn't be saved there. Try another location.",
+      );
     }
   }
 
@@ -180,20 +188,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Future<void> _receive() async {
-    final backup = await Navigator.of(context).push<Backup>(
-      MaterialPageRoute(builder: (_) => const ReceiveScreen()),
-    );
+    final backup = await Navigator.of(context)
+        .push<Backup>(MaterialPageRoute(builder: (_) => const ReceiveScreen()));
     if (backup != null) await _confirmAndRestore(backup);
   }
 
   Future<void> _send() async {
-    final removed = await Navigator.of(context).push<bool>(MaterialPageRoute(
-      builder: (_) => SendScreen(
-        people: widget.people,
-        notifications: widget.notifications,
-        backups: widget.backups,
+    final removed = await Navigator.of(context).push<bool>(
+      MaterialPageRoute(
+        builder: (_) => SendScreen(
+          people: widget.people,
+          notifications: widget.notifications,
+          backups: widget.backups,
+        ),
       ),
-    ));
+    );
     // Someone was handed over and removed — possibly the person whose
     // settings these are.
     if (removed == true && mounted) Navigator.of(context).pop();
@@ -207,7 +216,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   /// replaces everything, after confirmation.
   Future<void> _confirmAndRestore(Backup backup) async {
     final current = await widget.backups.snapshot();
-    final phoneIsEmpty = current.people.length == 1 &&
+    final phoneIsEmpty =
+        current.people.length == 1 &&
         current.cycleCount == 0 &&
         current.dayCount == 0;
     if (!mounted) return;
@@ -320,14 +330,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text('Replace what’s in Ebb?'),
-        content: Text([
-          'Saved ${DateFormat.yMMMd().format(backup.exportedOn)}, with '
-              '${_periods(backup.cycleCount)}'
-              '${backup.people.length > 1 ? ' for ${backup.people.length} people' : ''}.',
-          if (current.cycleCount > 0 || current.dayCount > 0)
-            'It replaces everything in Ebb now, including '
-                '${_periods(current.cycleCount)} on this phone.',
-        ].join('\n\n')),
+        content: Text(
+          [
+            'Saved ${DateFormat.yMMMd().format(backup.exportedOn)}, with '
+                '${_periods(backup.cycleCount)}'
+                '${backup.people.length > 1 ? ' for ${backup.people.length} people' : ''}.',
+            if (current.cycleCount > 0 || current.dayCount > 0)
+              'It replaces everything in Ebb now, including '
+                  '${_periods(current.cycleCount)} on this phone.',
+          ].join('\n\n'),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
@@ -428,23 +440,25 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Widget build(BuildContext context) {
     final error = Theme.of(context).colorScheme.error;
     final label = Who.label(widget.profile);
-    void open(Widget screen) => Navigator.of(context)
-        .push(MaterialPageRoute(builder: (_) => screen));
+    void open(Widget screen) =>
+        Navigator.of(context).push(MaterialPageRoute(builder: (_) => screen));
 
     return Scaffold(
       appBar: AppBar(title: const Text('Settings')),
       body: _loading
           ? const Center(child: CircularProgressIndicator())
           : ListView(
-              padding: readablePadding(context,
-                  base: const EdgeInsets.only(bottom: 32)),
+              padding: readablePadding(
+                context,
+                base: const EdgeInsets.only(bottom: 32),
+              ),
               children: [
                 Section(
                   title: !_hasPeople
                       ? 'Your cycle'
                       : _who.isOwner
-                          ? 'Your settings'
-                          : 'Settings for $label',
+                      ? 'Your settings'
+                      : 'Settings for $label',
                   children: [
                     if (_hasPeople)
                       ListTile(
@@ -457,7 +471,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       secondary: const Icon(Icons.notifications_none),
                       title: const Text('Reminders'),
                       subtitle: Text(
-                          'A heads-up before ${_who.whose} period is expected.'),
+                        'A heads-up before ${_who.whose} period is expected.',
+                      ),
                       value: _reminders,
                       onChanged: _setReminders,
                     ),
@@ -465,9 +480,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       enabled: _reminders,
                       leading: const Icon(Icons.schedule),
                       title: const Text('Remind me'),
-                      subtitle: Text(_leadDays == 1
-                          ? '1 day ahead'
-                          : '$_leadDays days ahead'),
+                      subtitle: Text(
+                        _leadDays == 1
+                            ? '1 day ahead'
+                            : '$_leadDays days ahead',
+                      ),
                       trailing: DropdownButton<int>(
                         value: _leadDays,
                         underline: const SizedBox.shrink(),
@@ -480,9 +497,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               }
                             : null,
                         items: const [1, 2, 3, 5, 7]
-                            .map((d) => DropdownMenuItem(
+                            .map(
+                              (d) => DropdownMenuItem(
                                 value: d,
-                                child: Text('$d day${d == 1 ? '' : 's'}')))
+                                child: Text('$d day${d == 1 ? '' : 's'}'),
+                              ),
+                            )
                             .toList(),
                       ),
                     ),
@@ -506,8 +526,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     SwitchListTile(
                       secondary: const Icon(Icons.dark_mode_outlined),
                       title: const Text('Show moon phases'),
-                      subtitle: const Text('New, first quarter, full and last '
-                          'quarter, on the calendar.'),
+                      subtitle: const Text(
+                        'New, first quarter, full and last '
+                        'quarter, on the calendar.',
+                      ),
                       value: _moonPhases,
                       onChanged: (v) async {
                         await widget.settings.setShowMoonPhases(v);
@@ -528,11 +550,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ListTile(
                       leading: const Icon(Icons.person_add_alt),
                       title: Text(
-                          _hasPeople ? 'Add someone' : 'Track someone else too'),
+                        _hasPeople ? 'Add someone' : 'Track someone else too',
+                      ),
                       subtitle: _hasPeople
                           ? null
                           : const Text(
-                              'For example, a child who’s just starting.'),
+                              'For example, a child who’s just starting.',
+                            ),
                       onTap: () =>
                           Navigator.of(context).pop(const AddPersonAction()),
                     ),
@@ -545,8 +569,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       leading: const Icon(Icons.save_alt),
                       title: const Text('Back up to a file'),
                       subtitle: Text(
-                          'Save ${_hasPeople ? 'everyone’s' : 'your'} '
-                          'history to a file, wherever you choose.'),
+                        'Save ${_hasPeople ? 'everyone’s' : 'your'} '
+                        'history to a file, wherever you choose.',
+                      ),
                       onTap: _backUp,
                     ),
                     ListTile(
@@ -559,15 +584,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       leading: const Icon(Icons.qr_code_2),
                       title: const Text('Send to another phone'),
                       subtitle: Text(
-                          'Show ${_hasPeople ? 'everyone’s' : 'your'} '
-                          'history as codes for another phone to scan.'),
+                        'Show ${_hasPeople ? 'everyone’s' : 'your'} '
+                        'history as codes for another phone to scan.',
+                      ),
                       onTap: _send,
                     ),
                     ListTile(
                       leading: const Icon(Icons.qr_code_scanner),
                       title: const Text('Receive from another phone'),
                       subtitle: const Text(
-                          'Scan the codes. Replaces what is in Ebb now.'),
+                        'Scan the codes. Replaces what is in Ebb now.',
+                      ),
                       onTap: _receive,
                     ),
                   ],
@@ -578,15 +605,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ListTile(
                       leading: const Icon(Icons.help_outline),
                       title: const Text('How Ebb works'),
-                      subtitle:
-                          const Text('Logging, estimates, backups and more.'),
+                      subtitle: const Text(
+                        'Logging, estimates, backups and more.',
+                      ),
                       onTap: () => open(const HelpScreen()),
                     ),
                     ListTile(
                       leading: const Icon(Icons.lock_outline),
                       title: const Text('Your data'),
-                      subtitle:
-                          const Text('Where it lives and who can see it.'),
+                      subtitle: const Text(
+                        'Where it lives and who can see it.',
+                      ),
                       onTap: () => open(const AboutScreen()),
                     ),
                     ListTile(
@@ -599,8 +628,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ListTile(
                       leading: const Icon(Icons.feedback_outlined),
                       title: const Text('Send feedback'),
-                      subtitle:
-                          const Text('A form on the website, in your browser.'),
+                      subtitle: const Text(
+                        'A form on the website, in your browser.',
+                      ),
                       trailing: const Icon(Icons.open_in_new),
                       onTap: () => _openLink(feedbackUri),
                     ),
@@ -609,9 +639,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 Section(
                   children: [
                     ListTile(
-                      leading: Icon(Icons.delete_forever_outlined, color: error),
-                      title: Text('Delete all data',
-                          style: TextStyle(color: error)),
+                      leading: Icon(
+                        Icons.delete_forever_outlined,
+                        color: error,
+                      ),
+                      title: Text(
+                        'Delete all data',
+                        style: TextStyle(color: error),
+                      ),
                       onTap: _eraseEverything,
                     ),
                   ],

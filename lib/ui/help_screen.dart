@@ -123,8 +123,10 @@ class HelpScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: const Text('How Ebb works')),
       body: ListView(
-        padding: readablePadding(context,
-            base: const EdgeInsets.only(bottom: 32)),
+        padding: readablePadding(
+          context,
+          base: const EdgeInsets.only(bottom: 32),
+        ),
         children: [
           for (final (icon, title, body) in _topics)
             ExpansionTile(
@@ -140,9 +142,8 @@ class HelpScreen extends StatelessWidget {
             leading: const Icon(Icons.lock_outline),
             title: const Text('Where your data lives'),
             subtitle: const Text('Your data, and who can see it.'),
-            onTap: () => Navigator.of(context).push(
-              MaterialPageRoute(builder: (_) => const AboutScreen()),
-            ),
+            onTap: () => Navigator.of(context)
+                .push(MaterialPageRoute(builder: (_) => const AboutScreen())),
           ),
         ],
       ),

@@ -16,24 +16,27 @@ void main() {
   final mar1 = DateTime(2026, 3, 1);
 
   group('file format', () {
-    final sample = Backup(exportedOn: DateTime(2026, 9, 26), people: [
-      BackupPerson(
-        profile: const Profile(),
-        cycles: [
-          Cycle(start: mar1, end: DateTime(2026, 3, 5)),
-          Cycle(start: DateTime(2026, 3, 29), excluded: true, notes: 'flu'),
-        ],
-        days: [
-          DayLog(
-            date: DateTime(2026, 3, 2),
-            flow: Flow.heavy,
-            symptoms: const ['cramps', 'tired, a bit'],
-            notes: 'long day',
-          ),
-        ],
-      ),
-      const BackupPerson(profile: Profile(name: 'Sam')),
-    ]);
+    final sample = Backup(
+      exportedOn: DateTime(2026, 9, 26),
+      people: [
+        BackupPerson(
+          profile: const Profile(),
+          cycles: [
+            Cycle(start: mar1, end: DateTime(2026, 3, 5)),
+            Cycle(start: DateTime(2026, 3, 29), excluded: true, notes: 'flu'),
+          ],
+          days: [
+            DayLog(
+              date: DateTime(2026, 3, 2),
+              flow: Flow.heavy,
+              symptoms: const ['cramps', 'tired, a bit'],
+              notes: 'long day',
+            ),
+          ],
+        ),
+        const BackupPerson(profile: Profile(name: 'Sam')),
+      ],
+    );
 
     test('round-trips everything', () {
       final back = decodeBackup(encodeBackup(sample));
@@ -59,17 +62,26 @@ void main() {
       expect(cycle, {'start': '2026-03-01', 'end': '2026-03-05'});
     });
 
-    String file(Object? people, {Object? version = 1}) => jsonEncode(
-        {'ebbBackup': version, 'exportedOn': '2026-09-26', 'people': people});
+    String file(Object? people, {Object? version = 1}) => jsonEncode({
+      'ebbBackup': version,
+      'exportedOn': '2026-09-26',
+      'people': people,
+    });
 
-    String withCycles(List<Map<String, Object?>> cycles) =>
-        file([{'name': null, 'cycles': cycles}]);
+    String withCycles(List<Map<String, Object?>> cycles) => file([
+      {'name': null, 'cycles': cycles},
+    ]);
 
     void rejects(String text, Matcher message) => expect(
-          () => decodeBackup(text),
-          throwsA(isA<BackupFormatException>()
-              .having((e) => e.message, 'message', message)),
-        );
+      () => decodeBackup(text),
+      throwsA(
+        isA<BackupFormatException>().having(
+          (e) => e.message,
+          'message',
+          message,
+        ),
+      ),
+    );
 
     test('rejects files that are not Ebb backups', () {
       rejects('not json', contains("isn't an Ebb backup"));
@@ -82,24 +94,55 @@ void main() {
     });
 
     test('rejects impossible and malformed dates', () {
-      rejects(withCycles([{'start': '2026-02-30'}]), contains('damaged'));
-      rejects(withCycles([{'start': '2026-3-1'}]), contains('damaged'));
-      rejects(withCycles([{'start': 20260301}]), contains('damaged'));
+      rejects(
+        withCycles([
+          {'start': '2026-02-30'},
+        ]),
+        contains('damaged'),
+      );
+      rejects(
+        withCycles([
+          {'start': '2026-3-1'},
+        ]),
+        contains('damaged'),
+      );
+      rejects(
+        withCycles([
+          {'start': 20260301},
+        ]),
+        contains('damaged'),
+      );
     });
 
     test('rejects contradictory periods', () {
-      rejects(withCycles([{'start': '2026-03-05', 'end': '2026-03-01'}]),
-          contains('ends before it begins'));
-      rejects(withCycles([{'start': '2026-03-01'}, {'start': '2026-03-01'}]),
-          contains('Two periods start'));
+      rejects(
+        withCycles([
+          {'start': '2026-03-05', 'end': '2026-03-01'},
+        ]),
+        contains('ends before it begins'),
+      );
+      rejects(
+        withCycles([
+          {'start': '2026-03-01'},
+          {'start': '2026-03-01'},
+        ]),
+        contains('Two periods start'),
+      );
     });
 
     test('rejects an unknown flow rather than silently dropping it', () {
       rejects(
-          file([
-            {'name': null, 'cycles': [], 'days': [{'date': '2026-03-01', 'flow': 'torrential'}]}
-          ]),
-          contains('flow'));
+        file([
+          {
+            'name': null,
+            'cycles': [],
+            'days': [
+              {'date': '2026-03-01', 'flow': 'torrential'},
+            ],
+          },
+        ]),
+        contains('flow'),
+      );
     });
 
     test('a file written by an earlier build still restores', () {
@@ -118,22 +161,39 @@ void main() {
 
     test('rejects overlapping periods', () {
       rejects(
-          withCycles([
-            {'start': '2026-03-01', 'end': '2026-03-05'},
-            {'start': '2026-03-05'},
-          ]),
-          contains('overlaps'));
+        withCycles([
+          {'start': '2026-03-01', 'end': '2026-03-05'},
+          {'start': '2026-03-05'},
+        ]),
+        contains('overlaps'),
+      );
     });
 
     test('rejects anything dated after the backup was made', () {
-      rejects(withCycles([{'start': '2026-09-27'}]), contains('after the day'));
-      rejects(withCycles([{'start': '2026-09-20', 'end': '2026-09-27'}]),
-          contains('after the day'));
       rejects(
-          file([
-            {'name': null, 'cycles': [], 'days': [{'date': '2026-09-27'}]}
-          ]),
-          contains('after the day'));
+        withCycles([
+          {'start': '2026-09-27'},
+        ]),
+        contains('after the day'),
+      );
+      rejects(
+        withCycles([
+          {'start': '2026-09-20', 'end': '2026-09-27'},
+        ]),
+        contains('after the day'),
+      );
+      rejects(
+        file([
+          {
+            'name': null,
+            'cycles': [],
+            'days': [
+              {'date': '2026-09-27'},
+            ],
+          },
+        ]),
+        contains('after the day'),
+      );
     });
 
     test('rejects names Ebb could not have written', () {
@@ -141,8 +201,10 @@ void main() {
       for (final bad in ['', '   ', ' Sam', 'x' * 31, 7]) {
         rejects(file([named(null), named(bad)]), contains('a name'));
       }
-      rejects(file([named(null), named('Sam'), named('sam')]),
-          contains('both called'));
+      rejects(
+        file([named(null), named('Sam'), named('sam')]),
+        contains('both called'),
+      );
     });
   });
 
@@ -161,42 +223,71 @@ void main() {
       await dir.delete(recursive: true);
     });
 
-    test('backing up and restoring onto an empty phone loses nothing',
-        () async {
-      final sam = await ProfileRepository(db: db).add(const Profile(name: 'Sam'));
-      final mine = CycleRepository(db: db);
-      await mine.addCycle(Cycle(start: mar1, end: DateTime(2026, 3, 5)));
-      await mine.addCycle(Cycle(start: DateTime(2026, 3, 29), excluded: true));
-      await mine.saveLog(DayLog(
-          date: DateTime(2026, 3, 2), flow: Flow.light, symptoms: const ['a']));
-      await CycleRepository(db: db, profileId: sam).startPeriod(mar1);
+    test(
+      'backing up and restoring onto an empty phone loses nothing',
+      () async {
+        final sam = await ProfileRepository(db: db)
+            .add(const Profile(name: 'Sam'));
+        final mine = CycleRepository(db: db);
+        await mine.addCycle(Cycle(start: mar1, end: DateTime(2026, 3, 5)));
+        await mine.addCycle(
+          Cycle(start: DateTime(2026, 3, 29), excluded: true),
+        );
+        await mine.saveLog(
+          DayLog(
+            date: DateTime(2026, 3, 2),
+            flow: Flow.light,
+            symptoms: const ['a'],
+          ),
+        );
+        await CycleRepository(db: db, profileId: sam).startPeriod(mar1);
 
-      final text = encodeBackup(await BackupService(db: db).snapshot());
-      await db.deleteAllData();
-      await BackupService(db: db).restore(decodeBackup(text));
+        final text = encodeBackup(await BackupService(db: db).snapshot());
+        await db.deleteAllData();
+        await BackupService(db: db).restore(decodeBackup(text));
 
-      expect(encodeBackup(await BackupService(db: db).snapshot()), text);
-      final profiles = await ProfileRepository(db: db).all();
-      expect(profiles.map((p) => (p.id, p.name)),
-          [(EbbDatabase.primaryProfileId, null), (2, 'Sam')]);
-    });
+        expect(encodeBackup(await BackupService(db: db).snapshot()), text);
+        final profiles = await ProfileRepository(db: db).all();
+        expect(profiles.map((p) => (p.id, p.name)), [
+          (EbbDatabase.primaryProfileId, null),
+          (2, 'Sam'),
+        ]);
+      },
+    );
 
     test('anyone unnamed after the owner gets a placeholder name', () {
-      Backup people(List<String?> names) => Backup(exportedOn: mar1, people: [
-            for (final n in names) BackupPerson(profile: Profile(name: n)),
-          ]);
-      expect(BackupService.restoredNames(people([null, null, null])),
-          [null, 'Person 2', 'Person 3']);
+      Backup people(List<String?> names) => Backup(
+        exportedOn: mar1,
+        people: [
+          for (final n in names) BackupPerson(profile: Profile(name: n)),
+        ],
+      );
+      expect(BackupService.restoredNames(people([null, null, null])), [
+        null,
+        'Person 2',
+        'Person 3',
+      ]);
       // Placeholders never collide with a real name, whatever its case.
-      expect(BackupService.restoredNames(people([null, null, 'person 2'])),
-          [null, 'Person 3', 'person 2']);
+      expect(BackupService.restoredNames(people([null, null, 'person 2'])), [
+        null,
+        'Person 3',
+        'person 2',
+      ]);
     });
 
     test('a restored person without a name is given one', () async {
-      await BackupService(db: db).restore(Backup(exportedOn: mar1, people: [
-        BackupPerson(profile: const Profile(), cycles: [Cycle(start: mar1)]),
-        const BackupPerson(profile: Profile()),
-      ]));
+      await BackupService(db: db).restore(
+        Backup(
+          exportedOn: mar1,
+          people: [
+            BackupPerson(
+              profile: const Profile(),
+              cycles: [Cycle(start: mar1)],
+            ),
+            const BackupPerson(profile: Profile()),
+          ],
+        ),
+      );
       final profiles = await ProfileRepository(db: db).all();
       expect(profiles.map((p) => p.name), [null, 'Person 2']);
     });
@@ -211,10 +302,17 @@ void main() {
 
     test('restore replaces what was there', () async {
       await CycleRepository(db: db).startPeriod(DateTime(2025, 1, 1));
-      await BackupService(db: db).restore(Backup(
-        exportedOn: mar1,
-        people: [BackupPerson(profile: const Profile(), cycles: [Cycle(start: mar1)])],
-      ));
+      await BackupService(db: db).restore(
+        Backup(
+          exportedOn: mar1,
+          people: [
+            BackupPerson(
+              profile: const Profile(),
+              cycles: [Cycle(start: mar1)],
+            ),
+          ],
+        ),
+      );
       final cycles = await CycleRepository(db: db).allCycles();
       expect(cycles.map((c) => c.start), [mar1]);
     });
@@ -223,14 +321,23 @@ void main() {
       await CycleRepository(db: db).startPeriod(DateTime(2025, 1, 1));
       // Built by hand to get past the decoder: a duplicate start trips the
       // database's UNIQUE constraint after the old data has been cleared.
-      final broken = Backup(exportedOn: mar1, people: [
-        BackupPerson(
-          profile: const Profile(),
-          cycles: [Cycle(start: mar1), Cycle(start: mar1)],
-        ),
-      ]);
+      final broken = Backup(
+        exportedOn: mar1,
+        people: [
+          BackupPerson(
+            profile: const Profile(),
+            cycles: [
+              Cycle(start: mar1),
+              Cycle(start: mar1),
+            ],
+          ),
+        ],
+      );
 
-      await expectLater(BackupService(db: db).restore(broken), throwsA(anything));
+      await expectLater(
+        BackupService(db: db).restore(broken),
+        throwsA(anything),
+      );
       final cycles = await CycleRepository(db: db).allCycles();
       expect(cycles.map((c) => c.start), [DateTime(2025, 1, 1)]);
     });
@@ -246,34 +353,41 @@ void main() {
     EbbDatabase phone(String name) =>
         EbbDatabase(path: '${dir.path}/$name.db', factory: databaseFactoryFfi);
 
-    test('one person travels alone and becomes the owner of their own phone',
-        () async {
-      final parents = phone('parent');
-      final sam = await ProfileRepository(db: parents)
-          .add(const Profile(name: 'Sam'));
-      await CycleRepository(db: parents).startPeriod(DateTime(2026, 1, 1));
-      await CycleRepository(db: parents, profileId: sam)
-          .addCycle(Cycle(start: mar1, end: DateTime(2026, 3, 4)));
+    test(
+      'one person travels alone and becomes the owner of their own phone',
+      () async {
+        final parents = phone('parent');
+        final sam = await ProfileRepository(db: parents)
+            .add(const Profile(name: 'Sam'));
+        await CycleRepository(db: parents).startPeriod(DateTime(2026, 1, 1));
+        await CycleRepository(
+          db: parents,
+          profileId: sam,
+        ).addCycle(Cycle(start: mar1, end: DateTime(2026, 3, 4)));
 
-      final sent = await BackupService(db: parents).snapshot(onlyProfileId: sam);
-      expect(sent.people.single.profile.name, 'Sam');
-      expect(sent.cycleCount, 1);
+        final sent = await BackupService(db: parents)
+            .snapshot(onlyProfileId: sam);
+        expect(sent.people.single.profile.name, 'Sam');
+        expect(sent.cycleCount, 1);
 
-      final samsPhone = phone('sam');
-      expect(await BackupService(db: samsPhone).isEmpty(), isTrue);
-      await BackupService(db: samsPhone)
-          .restore(decodeBackup(encodeBackup(sent, pretty: false)));
+        final samsPhone = phone('sam');
+        expect(await BackupService(db: samsPhone).isEmpty(), isTrue);
+        await BackupService(db: samsPhone)
+            .restore(decodeBackup(encodeBackup(sent, pretty: false)));
 
-      // On Sam's phone, Sam is the owner.
-      final owner = await ProfileRepository(db: samsPhone).primary();
-      expect(owner.name, 'Sam');
-      expect((await CycleRepository(db: samsPhone).allCycles()).single.start,
-          mar1);
-      expect(await ProfileRepository(db: samsPhone).all(), hasLength(1));
+        // On Sam's phone, Sam is the owner.
+        final owner = await ProfileRepository(db: samsPhone).primary();
+        expect(owner.name, 'Sam');
+        expect(
+          (await CycleRepository(db: samsPhone).allCycles()).single.start,
+          mar1,
+        );
+        expect(await ProfileRepository(db: samsPhone).all(), hasLength(1));
 
-      await parents.close();
-      await samsPhone.close();
-    });
+        await parents.close();
+        await samsPhone.close();
+      },
+    );
 
     test('adding someone received leaves everyone here untouched', () async {
       final db = phone('shared');
@@ -290,8 +404,10 @@ void main() {
 
       final people = await ProfileRepository(db: db).all();
       expect(people.map((p) => p.name), [null, 'Robin']);
-      expect((await CycleRepository(db: db).allCycles()).single.start,
-          DateTime(2026, 1, 1));
+      expect(
+        (await CycleRepository(db: db).allCycles()).single.start,
+        DateTime(2026, 1, 1),
+      );
       final robin = CycleRepository(db: db, profileId: id);
       expect((await robin.allCycles()).single.start, mar1);
       expect((await robin.logFor(mar1))!.flow, Flow.light);

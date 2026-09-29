@@ -70,7 +70,8 @@ class EbbDatabase {
   Future<void> _upgrade(Database db, int oldVersion, int newVersion) async {
     if (oldVersion < 2) {
       await db.execute(
-          'ALTER TABLE cycles ADD COLUMN excluded INTEGER NOT NULL DEFAULT 0');
+        'ALTER TABLE cycles ADD COLUMN excluded INTEGER NOT NULL DEFAULT 0',
+      );
     }
     if (oldVersion < 3) await _addProfiles(db);
   }

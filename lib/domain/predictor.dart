@@ -183,7 +183,9 @@ class Predictor {
       cycleLength: cycleLength,
       periodLength: periodLength,
       variability: variability,
-      dayOfCycle: now.isBefore(lastStart) ? null : daysBetween(lastStart, now) + 1,
+      dayOfCycle: now.isBefore(lastStart)
+          ? null
+          : daysBetween(lastStart, now) + 1,
       daysUntilNext: daysBetween(now, nextStart),
       ovulation: ovulation,
       fertileStart: addDays(ovulation, -5),
@@ -212,14 +214,16 @@ class Predictor {
     if (intervals.isEmpty) return priorCycleLength;
     final n = intervals.length;
     final m = _median(intervals);
-    return ((n * m + shrinkageWeight * priorCycleLength) / (n + shrinkageWeight))
+    return ((n * m + shrinkageWeight * priorCycleLength) /
+            (n + shrinkageWeight))
         .round();
   }
 
   double _estimateVariability(List<int> intervals) {
     if (intervals.length < 3) return priorVariability;
     final mean = intervals.reduce((a, b) => a + b) / intervals.length;
-    final variance = intervals
+    final variance =
+        intervals
             .map((v) => math.pow(v - mean, 2).toDouble())
             .reduce((a, b) => a + b) /
         (intervals.length - 1);
@@ -238,7 +242,8 @@ class Predictor {
   }
 
   PredictionConfidence _confidence(int n, double variability) {
-    if (n >= historyWindow && variability <= 4) return PredictionConfidence.good;
+    if (n >= historyWindow && variability <= 4)
+      return PredictionConfidence.good;
     if (n >= 3) return PredictionConfidence.moderate;
     return PredictionConfidence.low;
   }

@@ -18,12 +18,16 @@ void main() async {
   final people = await ProfileRepository().all();
   final lastId = await SettingsService.lastActiveProfile();
 
-  runApp(EbbApp(
-    notifications: notifications,
-    people: people,
-    initial: people.firstWhere((p) => p.id == lastId,
-        orElse: () => people.first),
-  ));
+  runApp(
+    EbbApp(
+      notifications: notifications,
+      people: people,
+      initial: people.firstWhere(
+        (p) => p.id == lastId,
+        orElse: () => people.first,
+      ),
+    ),
+  );
 }
 
 /// Holds whose cycle is on screen. With one person — the usual case — that
@@ -61,9 +65,11 @@ class _EbbAppState extends State<EbbApp> {
   /// owner if the person on screen no longer exists.
   Future<void> _reloadPeople({int? show}) async {
     final people = await _profiles.all();
-    final current = people.firstWhere((p) => p.id == (show ?? _current.id),
-        orElse: () => people.firstWhere(
-            (p) => p.id == EbbDatabase.primaryProfileId));
+    final current = people.firstWhere(
+      (p) => p.id == (show ?? _current.id),
+      orElse: () =>
+          people.firstWhere((p) => p.id == EbbDatabase.primaryProfileId),
+    );
     setState(() => _people = people);
     _switchTo(current);
   }
@@ -74,7 +80,8 @@ class _EbbAppState extends State<EbbApp> {
       context,
       title: 'Track someone else',
       others: _people,
-      hint: 'Just something to tell people apart — a first name, a '
+      hint:
+          'Just something to tell people apart — a first name, a '
           'nickname or an initial.',
     );
     if (name == null || name.isEmpty) return;

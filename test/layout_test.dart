@@ -6,14 +6,18 @@ import 'package:flutter_test/flutter_test.dart';
 Future<(EdgeInsets, bool)> measure(WidgetTester tester, double width) async {
   late EdgeInsets padding;
   late bool wide;
-  await tester.pumpWidget(MediaQuery(
-    data: MediaQueryData(size: Size(width, 900)),
-    child: Builder(builder: (context) {
-      padding = readablePadding(context, base: const EdgeInsets.all(16));
-      wide = isWide(context);
-      return const SizedBox();
-    }),
-  ));
+  await tester.pumpWidget(
+    MediaQuery(
+      data: MediaQueryData(size: Size(width, 900)),
+      child: Builder(
+        builder: (context) {
+          padding = readablePadding(context, base: const EdgeInsets.all(16));
+          wide = isWide(context);
+          return const SizedBox();
+        },
+      ),
+    ),
+  );
   return (padding, wide);
 }
 
@@ -35,8 +39,9 @@ void main() {
     expect(wide, isTrue);
   });
 
-  testWidgets('tablet portrait gets the column but not two panes',
-      (tester) async {
+  testWidgets('tablet portrait gets the column but not two panes', (
+    tester,
+  ) async {
     final (padding, wide) = await measure(tester, 800);
     expect(padding.left, 76);
     expect(wide, isFalse);

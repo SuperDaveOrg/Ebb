@@ -56,13 +56,13 @@ class DayLog {
   }
 
   Map<String, Object?> toRow() => {
-        if (id != null) 'id': id,
-        'log_date': isoDate(date),
-        'flow': flow.name,
-        // Tab-separated: symptom text is user-authored and may contain commas.
-        'symptoms': symptoms.join('\t'),
-        'notes': notes,
-      };
+    if (id != null) 'id': id,
+    'log_date': isoDate(date),
+    'flow': flow.name,
+    // Tab-separated: symptom text is user-authored and may contain commas.
+    'symptoms': symptoms.join('\t'),
+    'notes': notes,
+  };
 
   factory DayLog.fromRow(Map<String, Object?> row) {
     final raw = (row['symptoms'] as String?) ?? '';

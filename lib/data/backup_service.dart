@@ -19,11 +19,13 @@ class BackupService {
     final people = <BackupPerson>[];
     for (final profile in profiles) {
       final repo = CycleRepository(db: _db, profileId: profile.id!);
-      people.add(BackupPerson(
-        profile: profile,
-        cycles: await repo.allCycles(),
-        days: await repo.allLogs(),
-      ));
+      people.add(
+        BackupPerson(
+          profile: profile,
+          cycles: await repo.allCycles(),
+          days: await repo.allLogs(),
+        ),
+      );
     }
     return Backup(exportedOn: today(), people: people);
   }
@@ -44,18 +46,26 @@ class BackupService {
         final profileId = EbbDatabase.primaryProfileId + i;
         // resetAll left a blank primary profile; the rest are new.
         if (profileId == EbbDatabase.primaryProfileId) {
-          await txn.update('profiles', {'name': names[i]},
-              where: 'id = ?', whereArgs: [profileId]);
+          await txn.update(
+            'profiles',
+            {'name': names[i]},
+            where: 'id = ?',
+            whereArgs: [profileId],
+          );
         } else {
           await txn.insert('profiles', {'id': profileId, 'name': names[i]});
         }
         for (final c in person.cycles) {
-          await txn.insert('cycles',
-              {...c.toRow()..remove('id'), 'profile_id': profileId});
+          await txn.insert('cycles', {
+            ...c.toRow()..remove('id'),
+            'profile_id': profileId,
+          });
         }
         for (final d in person.days) {
-          await txn.insert('day_logs',
-              {...d.toRow()..remove('id'), 'profile_id': profileId});
+          await txn.insert('day_logs', {
+            ...d.toRow()..remove('id'),
+            'profile_id': profileId,
+          });
         }
       }
     });
@@ -93,12 +103,16 @@ class BackupService {
     return db.transaction((txn) async {
       final profileId = await txn.insert('profiles', {'name': name});
       for (final c in person.cycles) {
-        await txn.insert(
-            'cycles', {...c.toRow()..remove('id'), 'profile_id': profileId});
+        await txn.insert('cycles', {
+          ...c.toRow()..remove('id'),
+          'profile_id': profileId,
+        });
       }
       for (final d in person.days) {
-        await txn.insert(
-            'day_logs', {...d.toRow()..remove('id'), 'profile_id': profileId});
+        await txn.insert('day_logs', {
+          ...d.toRow()..remove('id'),
+          'profile_id': profileId,
+        });
       }
       return profileId;
     });

@@ -33,17 +33,21 @@ EdgeInsets readablePadding(
 
 /// Centres a non-scrolling [child] at a readable width.
 class Readable extends StatelessWidget {
-  const Readable({super.key, required this.child, this.maxWidth = readableWidth});
+  const Readable({
+    super.key,
+    required this.child,
+    this.maxWidth = readableWidth,
+  });
 
   final Widget child;
   final double maxWidth;
 
   @override
   Widget build(BuildContext context) => Align(
-        alignment: Alignment.topCenter,
-        child: ConstrainedBox(
-          constraints: BoxConstraints(maxWidth: maxWidth),
-          child: child,
-        ),
-      );
+    alignment: Alignment.topCenter,
+    child: ConstrainedBox(
+      constraints: BoxConstraints(maxWidth: maxWidth),
+      child: child,
+    ),
+  );
 }

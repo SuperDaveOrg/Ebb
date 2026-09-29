@@ -13,7 +13,10 @@ void main() {
     setUp(() => SharedPreferences.setMockInitialValues({}));
 
     test('reminders are on for the owner and off for anyone added', () async {
-      expect(await SettingsService(profileId: owner).remindersEnabled(), isTrue);
+      expect(
+        await SettingsService(profileId: owner).remindersEnabled(),
+        isTrue,
+      );
       expect(await SettingsService(profileId: sam).remindersEnabled(), isFalse);
     });
 

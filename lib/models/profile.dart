@@ -12,13 +12,8 @@ class Profile {
   /// Longest name the app accepts: it only has to tell people apart.
   static const maxNameLength = 30;
 
-  Map<String, Object?> toRow() => {
-        if (id != null) 'id': id,
-        'name': name,
-      };
+  Map<String, Object?> toRow() => {if (id != null) 'id': id, 'name': name};
 
-  factory Profile.fromRow(Map<String, Object?> row) => Profile(
-        id: row['id'] as int?,
-        name: row['name'] as String?,
-      );
+  factory Profile.fromRow(Map<String, Object?> row) =>
+      Profile(id: row['id'] as int?, name: row['name'] as String?);
 }

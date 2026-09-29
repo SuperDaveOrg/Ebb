@@ -62,12 +62,14 @@ class _NameDialogState extends State<_NameDialog> {
   /// Why the name can't be used, or null if it can.
   String? get _problem {
     if (_name.isEmpty) return widget.optional ? null : '';
-    final taken = widget.others.any((p) =>
-        Who.label(p).toLowerCase() == _name.toLowerCase() ||
-        // "You" is how the owner appears when unnamed.
-        (p.id == EbbDatabase.primaryProfileId &&
-            p.name == null &&
-            _name.toLowerCase() == 'you'));
+    final taken = widget.others.any(
+      (p) =>
+          Who.label(p).toLowerCase() == _name.toLowerCase() ||
+          // "You" is how the owner appears when unnamed.
+          (p.id == EbbDatabase.primaryProfileId &&
+              p.name == null &&
+              _name.toLowerCase() == 'you'),
+    );
     return taken ? 'That name is already used on this phone.' : null;
   }
 
@@ -139,9 +141,11 @@ Future<PeopleChoice?> showPeopleSheet(
           for (final p in people)
             ListTile(
               contentPadding: const EdgeInsets.symmetric(horizontal: 24),
-              leading: Icon(p.id == current.id
-                  ? Icons.radio_button_checked
-                  : Icons.radio_button_unchecked),
+              leading: Icon(
+                p.id == current.id
+                    ? Icons.radio_button_checked
+                    : Icons.radio_button_unchecked,
+              ),
               title: Text(Who.label(p)),
               onTap: () => Navigator.of(ctx).pop(SwitchTo(p)),
             ),
