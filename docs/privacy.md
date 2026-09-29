@@ -65,6 +65,7 @@ literally true. These are fine:
 | No analytics or crash reporting SDKs | Those are exactly the channels that leak health data to third parties. |
 | Local-only notifications | Push would require a server that knows the user's cycle dates. |
 | Explicit user-initiated export | The user can move their own data; we just never do it for them. Backups go through Android's own Save picker, so they choose where. |
+| Links to the website | Settings → Website and Send feedback hand the address to the phone's browser, only when tapped. Ebb itself still can't use the network, and nothing from the app goes with the link. The feedback form is part of the website: only what the user types there is sent. |
 | QR phone-to-phone transfer | Moves history without a network: one screen, one camera. Costs `CAMERA`, requested only when the user taps Receive; frames are read and discarded. |
 | Unused plugin permissions stripped | Camera and image plugins merge in audio, storage and network-state permissions Ebb never uses. They're removed in the manifest so the list reads as exactly what the app does. |
 

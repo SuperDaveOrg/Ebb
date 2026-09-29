@@ -9,6 +9,10 @@ turns that section into the release's own when it's cut.
 
 ## [Unreleased]
 
+### Added
+- Settings → About has links to Ebb's website and its feedback form. They
+  open in your browser; Ebb itself still has no internet permission.
+
 ## [0.4.0] - 2026-09-28
 
 ### Changed

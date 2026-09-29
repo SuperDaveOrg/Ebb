@@ -167,6 +167,12 @@ APK only if its own build matches byte for byte. What makes that work:
   into the build directory.
 - `android/app/build.gradle.kts` leaves out AGP's VCS info and the
   dependency-metadata signing block, which F-Droid rejects.
+- F-Droid deletes the `signingConfigs` block and the `signingConfig =` line
+  from `build.gradle.kts` before building, one whole line at a time, so its
+  APK comes out unsigned. Keep that line a single line (the choice of key is
+  made in `releaseSigning` above it): split over several lines, the leftover
+  pieces stop the file compiling, which is how Ebb's first F-Droid build
+  failed.
 - `android/reproducible.cmake` drops the linker build ID from native plugin
   code (the QR scanner's zxing-cpp).
 
@@ -186,6 +192,25 @@ apksigcopier compare dist/release/ebb-X.Y.Z.apk other-build.apk && echo match
 ## F-Droid
 
 The recipe is drafted in [fdroid/com.superdavelab.ebb.yml](fdroid/com.superdavelab.ebb.yml).
+It follows fdroiddata's `templates/build-flutter.yml` and has no comments,
+because fdroiddata wants none, so the reasoning lives here:
+
+- Flutter comes from F-Droid's `flutter` srclib, checked out at the version
+  pinned in `.github/workflows/ci.yml`. Bumping Flutter there is enough;
+  F-Droid follows on the next release.
+- The source is moved to `/tmp/ebb-build` for `pub get` and the build, the
+  same path `build_release.sh` uses, then moved back.
+- `PUB_CACHE` is inside the source, so F-Droid's scanner checks every
+  package; `scandelete` removes any binary it flags.
+- One universal APK (no `--split-per-abi`), because it has to match the APK
+  on the GitHub release byte for byte.
+Before changing the recipe or anything about the build, test it locally:
+`tool/fdroid_build_test.sh --ref <commit>` runs F-Droid's own build of that
+commit in the Docker image fdroiddata's CI uses, and, if `dist/release/` has
+a signed APK from the same commit, checks F-Droid's build matches it. A
+failure there costs ten minutes instead of a round trip through the merge
+request's pipeline.
+
 To submit: fork https://gitlab.com/fdroid/fdroiddata, add it as
 `metadata/com.superdavelab.ebb.yml` with the version fields set to a real
 release, and open a merge request. After that, F-Droid finds new versions

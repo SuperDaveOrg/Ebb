@@ -1,0 +1,1 @@
+• Settings has links to Ebb's website and its feedback form. They open in your browser; Ebb itself still has no internet permission.
