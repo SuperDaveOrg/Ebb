@@ -54,7 +54,7 @@ class EbbPalette {
 
   // Three candidates, chosen between by eye. Each has a dark twin.
 
-  /// The SuperDaveLab family: LedgerDock's navy and cream, with clay for
+  /// The SuperDaveLab family: GridDock's navy and cream, with clay for
   /// the period. The logo's teal lives in the icon, not the UI.
   static const tide = EbbPalette(
     name: 'Tide',

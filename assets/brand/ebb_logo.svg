@@ -4,7 +4,7 @@
   <defs>
     <clipPath id="badge"><circle cx="256" cy="256" r="232"/></clipPath>
   </defs>
-  <!-- Badge, as LedgerDock -->
+  <!-- Badge, as GridDock -->
   <circle cx="256" cy="256" r="236" fill="#F5F1EA" stroke="#D3CCC1" stroke-width="8"/>
   <g clip-path="url(#badge)">
     <!-- The cycle: an open ring, clockwise from the gap. The elapsed-days colour from the in-app ring (EbbPalette.elapsed). -->
