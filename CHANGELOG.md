@@ -14,6 +14,20 @@ turns that section into the release's own when it's cut.
   moon phases. New, first quarter, full and last quarter moons are marked
   on the day they fall, and tapping the day shows the time. They're worked
   out on the phone, like everything else.
+- Rate how a day went, from 1 (rough) to 5 (great): tap a day on the
+  calendar and pick a number under "Rate your day, 1–5". Tap it again to
+  clear it.
+- Pick how you felt, too: one face under "How did you feel?", separate
+  from how the day went. A rough day can still be a calm one. Ten are
+  named, and More faces has fifty others — cats, an alien, a rain cloud —
+  for whatever they mean to you. The face you pick shows on the calendar,
+  tiny, at the top right of the day.
+
+### Changed
+- Backups now include day ratings and feelings, so they're written in a new
+  version of the backup format. An older Ebb will ask to be updated before
+  it restores one, rather than quietly dropping them. Older backups still restore
+  as before.
 
 ## [0.5.1] - 2026-09-29
 

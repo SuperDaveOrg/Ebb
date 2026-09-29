@@ -186,4 +186,32 @@ void main() {
     await repo.addCycle(Cycle(start: mar1, excluded: true));
     expect((await repo.allCycles()).single.excluded, isTrue);
   });
+
+  test(
+    'a rating on its own is kept, and clearing it removes the day',
+    () async {
+      final repo = CycleRepository(db: db);
+      final day = DateTime(2026, 3, 10);
+      await repo.saveLog(DayLog(date: day, rating: 4));
+      expect((await repo.logFor(day))?.rating, 4);
+
+      await repo.saveLog(DayLog(date: day));
+      expect(await repo.logFor(day), isNull);
+    },
+  );
+
+  test(
+    'a feeling on its own is kept, and clearing it removes the day',
+    () async {
+      final repo = CycleRepository(db: db);
+      final day = DateTime(2026, 3, 10);
+      await repo.saveLog(
+        DayLog(date: day, feeling: DayFeeling.named(Feeling.anxious)),
+      );
+      expect((await repo.logFor(day))?.feeling?.named, Feeling.anxious);
+
+      await repo.saveLog(DayLog(date: day));
+      expect(await repo.logFor(day), isNull);
+    },
+  );
 }

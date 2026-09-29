@@ -14,7 +14,7 @@ class EbbDatabase {
   static final EbbDatabase instance = EbbDatabase();
 
   static const _fileName = 'ebb.db';
-  static const version = 3;
+  static const version = 5;
 
   /// The profile every install starts with. It always exists, which lets the
   /// UI stay single-person until it needs to be otherwise.
@@ -74,6 +74,14 @@ class EbbDatabase {
       );
     }
     if (oldVersion < 3) await _addProfiles(db);
+    // Version 4: how the day went, 1 to 5. Null when not rated.
+    if (oldVersion < 4) {
+      await db.execute('ALTER TABLE day_logs ADD COLUMN rating INTEGER');
+    }
+    // Version 5: how she felt, as a Feeling name. Null when not picked.
+    if (oldVersion < 5) {
+      await db.execute('ALTER TABLE day_logs ADD COLUMN feeling TEXT');
+    }
   }
 
   /// Version 3: every cycle and day log belongs to a profile, so one phone

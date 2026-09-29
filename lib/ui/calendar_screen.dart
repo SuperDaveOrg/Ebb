@@ -11,6 +11,7 @@ import 'package:ebb/models/cycle.dart';
 import 'package:ebb/models/day_log.dart';
 import 'package:ebb/services/settings_service.dart';
 import 'package:ebb/ui/cycle_editor.dart';
+import 'package:ebb/ui/face_picker.dart';
 import 'package:ebb/ui/layout.dart';
 import 'package:ebb/ui/moon_icon.dart';
 import 'package:ebb/ui/theme.dart';
@@ -338,6 +339,7 @@ class _Month extends StatelessWidget {
                       joinLeft: col > 0 && joins(i - 1, i),
                       joinRight: col < 6 && joins(i, i + 1),
                       hasLog: logs.containsKey(isoDate(date)),
+                      feeling: logs[isoDate(date)]?.feeling,
                       moon: moons[isoDate(date)]?.phase,
                       onTap: () => onTap(date),
                     );
@@ -376,6 +378,7 @@ class _Cell extends StatelessWidget {
     required this.joinRight,
     required this.hasLog,
     this.moon,
+    this.feeling,
     required this.onTap,
   });
 
@@ -390,6 +393,7 @@ class _Cell extends StatelessWidget {
   final bool joinRight;
   final bool hasLog;
   final MoonPhase? moon;
+  final DayFeeling? feeling;
   final VoidCallback onTap;
 
   @override
@@ -436,7 +440,8 @@ class _Cell extends StatelessWidget {
       label:
           '${DateFormat.MMMMEEEEd().format(date)}'
           '${isToday ? ', today' : ''}$meaning${hasLog ? ', has notes' : ''}'
-          '${moon == null ? '' : ', ${moon!.label.toLowerCase()}'}',
+          '${moon == null ? '' : ', ${moon!.label.toLowerCase()}'}'
+          '${feeling == null ? '' : ', felt ${_feelingName(feeling!)}'}',
       child: InkWell(
         onTap: onTap,
         customBorder: const CircleBorder(),
@@ -470,6 +475,18 @@ class _Cell extends StatelessWidget {
                       phase,
                       size: 10,
                       backdrop: theme.scaffoldBackgroundColor,
+                    ),
+                  ),
+                // The moon's mirror image, up and to the right. Small, and
+                // drawn in its own colours, so it reads on any band.
+                if (feeling case final f?)
+                  Transform.translate(
+                    offset: const Offset(17, -14),
+                    child: ExcludeSemantics(
+                      child: Text(
+                        f.emoji,
+                        style: const TextStyle(fontSize: 11, height: 1),
+                      ),
                     ),
                   ),
                 if (hasLog)
@@ -706,6 +723,8 @@ class _DaySheetState extends State<_DaySheet> {
   static final _range = DateFormat.MMMd();
 
   late Flow _flow = widget.log?.flow ?? Flow.none;
+  late int? _rating = widget.log?.rating;
+  late DayFeeling? _feeling = widget.log?.feeling;
   late final _notes = TextEditingController(text: widget.log?.notes);
 
   @override
@@ -721,7 +740,10 @@ class _DaySheetState extends State<_DaySheet> {
     String? clean(String? s) => s == null || s.trim().isEmpty ? null : s.trim();
     final old = widget.log;
     final notes = clean(_notes.text);
-    if (_flow == (old?.flow ?? Flow.none) && notes == clean(old?.notes)) {
+    if (_flow == (old?.flow ?? Flow.none) &&
+        _rating == old?.rating &&
+        _feeling == old?.feeling &&
+        notes == clean(old?.notes)) {
       return null;
     }
     return DayLog(
@@ -730,6 +752,8 @@ class _DaySheetState extends State<_DaySheet> {
       flow: _flow,
       symptoms: old?.symptoms ?? const [],
       notes: notes,
+      rating: _rating,
+      feeling: _feeling,
     );
   }
 
@@ -877,21 +901,68 @@ class _DaySheetState extends State<_DaySheet> {
                 const Divider(height: 24),
                 Padding(
                   padding: side,
-                  child: Text('Flow', style: theme.textTheme.titleSmall),
+                  child: Text(
+                    'Rate ${who.whose} day, 1–5',
+                    style: theme.textTheme.titleSmall,
+                  ),
                 ),
                 Padding(
                   padding: side + const EdgeInsets.only(top: 8),
-                  child: Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
+                  child: DayRatingPicker(
+                    rating: _rating,
+                    onChanged: (r) => setState(() => _rating = r),
+                  ),
+                ),
+                Padding(
+                  padding: side + const EdgeInsets.only(top: 16),
+                  child: Text(
+                    'How did ${who.subject} feel?',
+                    style: theme.textTheme.titleSmall,
+                  ),
+                ),
+                Padding(
+                  padding: side + const EdgeInsets.only(top: 8),
+                  child: FeelingPicker(
+                    feeling: _feeling,
+                    onChanged: (f) => setState(() => _feeling = f),
+                  ),
+                ),
+                Padding(
+                  padding: side + const EdgeInsets.only(top: 16),
+                  child: Text('Flow', style: theme.textTheme.titleSmall),
+                ),
+                // One row, like the faces above. No checkmark: it would
+                // widen the chosen chip, and the fill already shows it.
+                Padding(
+                  padding: side + const EdgeInsets.only(top: 8),
+                  child: Row(
                     children: [
-                      for (final f in Flow.values.skip(1))
-                        ChoiceChip(
-                          label: Text(f.label),
-                          selected: _flow == f,
-                          onSelected: (on) =>
-                              setState(() => _flow = on ? f : Flow.none),
+                      for (final (i, f) in Flow.values.skip(1).indexed) ...[
+                        if (i > 0) const SizedBox(width: 8),
+                        Expanded(
+                          child: ChoiceChip(
+                            showCheckmark: false,
+                            labelPadding: EdgeInsets.zero,
+                            // Chosen the same way as the faces above.
+                            selectedColor: theme.colorScheme.primaryContainer,
+                            side: _flow == f
+                                ? BorderSide(
+                                    color: theme.colorScheme.primary,
+                                    width: 2,
+                                  )
+                                : null,
+                            label: Center(
+                              child: FittedBox(
+                                fit: BoxFit.scaleDown,
+                                child: Text(f.label),
+                              ),
+                            ),
+                            selected: _flow == f,
+                            onSelected: (on) =>
+                                setState(() => _flow = on ? f : Flow.none),
+                          ),
                         ),
+                      ],
                     ],
                   ),
                 ),
@@ -934,3 +1005,7 @@ class _DaySheetState extends State<_DaySheet> {
     );
   }
 }
+
+/// What a screen reader says for a feeling: "anxious", "smiling cat".
+String _feelingName(DayFeeling f) =>
+    (f.named?.label ?? faceName(f.emoji)).toLowerCase();

@@ -28,6 +28,8 @@ actually uses a period tracker.
 | Delete all data | Immediate and complete. |
 | "Your data" explainer | Plain-language screen describing where data lives. |
 | Calendar view | Added after v0.2.0 build. Provides good visualization and easy editing of past periods in a point-and-click UX |
+| Day rating | Asked for by users. An optional "Rate your day, 1–5" on any past day, picked as a number with "Rough" and "Great" at the ends, and stored as the number so it can be charted later. Numbers rather than faces, so a face always means a feeling, on the sheet and on the calendar. No rating is not a 3; tapping the chosen number clears it. Added in backup format version 2, so an older Ebb refuses the file instead of dropping ratings. Not shown on the calendar. |
+| "How did you feel?" | Asked for by users, separately from the day rating. One face per day. Ten named feelings first (happy, calm, loving, energetic, tired, sad, anxious, irritable, angry, confused), stored by name (`"anxious"`) since their meaning is shared. **More faces** opens a curated fifty — cats, an alien, a storm cloud, chocolate — stored as the emoji itself, because they mean whatever they mean to her. The chosen face shows tiny at the top right of the day on the calendar, mirroring the moon. The list can grow without a format change. Kinds of feeling rather than a scale, so never averaged. Worded as a feeling, never "mood". |
 | Moon phases | Asked for by users. **Off by default** (Settings). New, first quarter, full and last quarter drawn in the corner of the day they fall on, locally; the day sheet gives the time. Computed on the phone (Meeus, ch. 49), accurate to under a minute. Display only: nothing suggests a link to the cycle, and nothing feeds the predictor. Drawn as seen from the northern hemisphere. |
 
 ---
@@ -36,25 +38,12 @@ actually uses a period tracker.
 
 ### 1. Daily logging beyond start/end
 
-Flow and a note can be logged on any day from the calendar, and users like
-it. Still to do: symptoms, a day rating and mood.
-
-**Day rating** (asked for by users). One optional 1–5 "How was today?",
-shown as five faces but stored as a number, so it exports, backs up and
-charts cleanly ("days 24–28 average 2.1"). No rating is not a 3. Named for
-the day rather than "mood", since people will use it for energy and pain
-too. Needs a migration, `DayLog.isEmpty` to count it, and an optional
-`rating` in the backup format — older Ebbs would silently drop it on
-restore, which may justify a new `ebbBackup` version. 🟡
-
-**Mood** (asked for by users, as a list of emoji). Kinds of mood — anxious,
-calm, irritable, flat, energetic — aren't points on one scale, so these are
-tags rather than a rating: suggested chips, possibly with emoji, that the
-user can add to, the same as symptoms. Whether they live in `symptoms` or a
-separate `moods` list in the backup is open. 🟡
+Flow, a note, a day rating and a feeling can be logged on any day from the
+calendar, and users like it. Still to do: symptoms.
 
 The calendar cell already carries a band, today's ring, a note dot and a
-moon; mock up a busy month before giving the rating a mark there too.
+moon, and now a feeling; mock up a busy month before giving the rating a
+mark there too.
 
 **Design note:** symptoms are stored as free text rather than a fixed enum, on
 purpose. A hardcoded list quietly tells the user which experiences count. A

@@ -118,6 +118,9 @@ BackupPerson _person(
 }) {
   final cycles = <Cycle>[];
   final days = <DayLog>[];
+  // Generators of their own, so adding these didn't reshuffle the rest.
+  final ratings = Random(7);
+  final feelings = Random(11);
   var start = addDays(until, -months * 30);
 
   while (!start.isAfter(until)) {
@@ -157,6 +160,11 @@ BackupPerson _person(
           notes: random.nextInt(4) == 0
               ? _notes[random.nextInt(_notes.length)]
               : null,
+          // Most days rated, lower early on.
+          rating: ratings.nextInt(4) == 0
+              ? null
+              : (d < 2 ? 1 : 2) + ratings.nextInt(3),
+          feeling: _feeling(feelings),
         ),
       );
     }
@@ -167,5 +175,33 @@ BackupPerson _person(
     start = addDays(start, length);
   }
 
+  // Ordinary days too, the way someone checking in most evenings would:
+  // a rating and a feeling on most of the last few months, so the calendar
+  // has something to show outside periods.
+  if (detailed) {
+    final everyday = Random(13);
+    final logged = {for (final d in days) isoDate(d.date)};
+    // Never past today, even when [until] is: Ebb can't log a future day.
+    final last = until.isAfter(today()) ? today() : until;
+    for (var d = addDays(last, -120); !d.isAfter(last); d = addDays(d, 1)) {
+      if (logged.contains(isoDate(d)) || everyday.nextInt(10) < 3) continue;
+      days.add(
+        DayLog(
+          date: d,
+          rating: 2 + everyday.nextInt(4),
+          feeling: _feeling(everyday) ?? DayFeeling.named(Feeling.calm),
+        ),
+      );
+    }
+    days.sort((a, b) => a.date.compareTo(b.date));
+  }
+
   return BackupPerson(profile: profile, cycles: cycles, days: days);
 }
+
+/// Mostly a named feeling, now and then one of the extra faces.
+DayFeeling? _feeling(Random random) => switch (random.nextInt(6)) {
+  0 || 1 => null,
+  2 => DayFeeling.face(const ['😹', '👽', '🌧️', '🍫'][random.nextInt(4)]),
+  _ => DayFeeling.named(Feeling.values[random.nextInt(Feeling.values.length)]),
+};

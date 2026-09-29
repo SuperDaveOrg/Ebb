@@ -31,6 +31,8 @@ void main() {
               flow: Flow.heavy,
               symptoms: const ['cramps', 'tired, a bit'],
               notes: 'long day',
+              rating: 2,
+              feeling: DayFeeling.named(Feeling.tired),
             ),
           ],
         ),
@@ -53,16 +55,18 @@ void main() {
       expect(day.flow, Flow.heavy);
       expect(day.symptoms, ['cramps', 'tired, a bit']);
       expect(day.notes, 'long day');
+      expect(day.rating, 2);
+      expect(day.feeling, DayFeeling.named(Feeling.tired));
     });
 
     test('is readable, documented JSON', () {
       final json = jsonDecode(encodeBackup(sample)) as Map<String, Object?>;
-      expect(json['ebbBackup'], 1);
+      expect(json['ebbBackup'], 2);
       final cycle = ((json['people'] as List)[0] as Map)['cycles'][0] as Map;
       expect(cycle, {'start': '2026-03-01', 'end': '2026-03-05'});
     });
 
-    String file(Object? people, {Object? version = 1}) => jsonEncode({
+    String file(Object? people, {Object? version = 2}) => jsonEncode({
       'ebbBackup': version,
       'exportedOn': '2026-09-26',
       'people': people,
@@ -90,7 +94,7 @@ void main() {
     });
 
     test('refuses a newer format rather than half-reading it', () {
-      rejects(file([], version: 2), contains('newer version'));
+      rejects(file([], version: 3), contains('newer version'));
     });
 
     test('rejects impossible and malformed dates', () {
@@ -143,6 +147,94 @@ void main() {
         ]),
         contains('flow'),
       );
+    });
+
+    String withDay(Map<String, Object?> day, {int version = 2}) => file([
+      {
+        'name': null,
+        'cycles': [],
+        'days': [
+          {'date': '2026-03-01', ...day},
+        ],
+      },
+    ], version: version);
+
+    test('rejects a rating outside 1 to 5', () {
+      for (final bad in [0, 6, -1, 2.5, '3', true]) {
+        rejects(withDay({'rating': bad}), contains('damaged'));
+      }
+      expect(
+        decodeBackup(withDay({'rating': 5})).people.single.days.single.rating,
+        5,
+      );
+    });
+
+    test('reads a named feeling or a face, and nothing else', () {
+      DayFeeling? read(Object value) =>
+          decodeBackup(withDay({'feeling': value}))
+              .people
+              .single
+              .days
+              .single
+              .feeling;
+
+      expect(read('calm')?.named, Feeling.calm);
+      // Faces are kept as the emoji, including ones not in Ebb's own list.
+      expect(read('👽'), DayFeeling.face('👽'));
+      expect(read('🦖')?.emoji, '🦖');
+
+      rejects(withDay({'feeling': 'smug'}), contains('feeling'));
+      rejects(withDay({'feeling': 'Calm'}), contains('feeling'));
+      rejects(withDay({'feeling': '👽 ok'}), contains('feeling'));
+      rejects(withDay({'feeling': ''}), contains('feeling'));
+      rejects(withDay({'feeling': '👽' * 9}), contains('feeling'));
+      rejects(withDay({'feeling': 3}), contains('damaged'));
+    });
+
+    test('stores a feeling by name, not by its face', () {
+      final json = encodeBackup(
+        Backup(
+          exportedOn: DateTime(2026, 9, 26),
+          people: [
+            BackupPerson(
+              profile: const Profile(),
+              days: [
+                DayLog(date: mar1, feeling: DayFeeling.named(Feeling.happy)),
+              ],
+            ),
+          ],
+        ),
+      );
+      expect(json, contains('"feeling": "happy"'));
+    });
+
+    test('stores any other face as the emoji', () {
+      final back = decodeBackup(
+        encodeBackup(
+          Backup(
+            exportedOn: DateTime(2026, 9, 26),
+            people: [
+              BackupPerson(
+                profile: const Profile(),
+                days: [DayLog(date: mar1, feeling: DayFeeling.face('😹'))],
+              ),
+            ],
+          ),
+        ),
+      );
+      final feeling = back.people.single.days.single.feeling!;
+      expect(feeling.named, isNull);
+      expect(feeling.emoji, '😹');
+    });
+
+    test('still reads version 1, which had no ratings', () {
+      final day = decodeBackup(withDay({'flow': 'light'}, version: 1))
+          .people
+          .single
+          .days
+          .single;
+      expect(day.flow, Flow.light);
+      expect(day.rating, isNull);
     });
 
     test('a file written by an earlier build still restores', () {

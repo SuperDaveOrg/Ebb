@@ -10,7 +10,11 @@ import 'package:ebb/models/profile.dart';
 ///
 /// Plain, documented JSON on purpose: a backup should be readable in a text
 /// editor and importable by some other app one day, so nobody is locked in.
-const backupFormatVersion = 1;
+///
+/// Version 2 added a day's `rating` and `feeling`. It's a new version, not
+/// just new fields, so an older Ebb refuses the file instead of quietly
+/// dropping them.
+const backupFormatVersion = 2;
 
 /// One person's history within a backup.
 class BackupPerson {
@@ -74,6 +78,8 @@ String encodeBackup(Backup backup, {bool pretty = true}) {
                 if (d.flow != Flow.none) 'flow': d.flow.name,
                 if (d.symptoms.isNotEmpty) 'symptoms': d.symptoms,
                 if (d.notes != null) 'notes': d.notes,
+                if (d.rating != null) 'rating': d.rating,
+                if (d.feeling != null) 'feeling': d.feeling!.value,
               },
           ],
         },
@@ -200,12 +206,24 @@ BackupPerson _person(Object? raw, DateTime exportedOn) {
       symptoms.add(s);
     }
 
+    final rating = _optional<int>(d, 'rating', 'a day entry');
+    if (rating != null && !DayLog.isRating(rating)) {
+      throw _damaged('the rating on ${isoDate(date)}');
+    }
+    final feelingName = _optional<String>(d, 'feeling', 'a day entry');
+    final feeling = DayFeeling.parse(feelingName);
+    if (feelingName != null && feeling == null) {
+      throw _damaged('the feeling on ${isoDate(date)}');
+    }
+
     days.add(
       DayLog(
         date: date,
         flow: flow,
         symptoms: symptoms,
         notes: _optional<String>(d, 'notes', 'a day entry'),
+        rating: rating,
+        feeling: feeling,
       ),
     );
   }

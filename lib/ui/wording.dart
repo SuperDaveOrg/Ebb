@@ -19,6 +19,9 @@ class Who {
   static String label(Profile p) =>
       p.name ?? (p.id == EbbDatabase.primaryProfileId ? 'You' : '');
 
+  /// The subject, mid-sentence: "you" / "Sam".
+  String get subject => isOwner ? 'you' : _name!;
+
   /// Possessive, mid-sentence: "your" / "Sam’s".
   String get whose => isOwner ? 'your' : '${_name!}’s';
 
