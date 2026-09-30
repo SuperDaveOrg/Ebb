@@ -45,6 +45,52 @@ List<TimelineDay> ratingTimeline(
   ];
 }
 
+/// A run of period days within a range, for the group view's lanes.
+class PeriodRun {
+  const PeriodRun(this.start, this.end, {this.estimated = false});
+
+  final DateTime start;
+  final DateTime end;
+
+  /// Drawn from the usual length because no end was logged, as the calendar
+  /// shows it: an estimate, never passed off as a record.
+  final bool estimated;
+}
+
+/// The runs of period days between [from] and [to], cut at the range's
+/// edges. Logged and estimated days make separate runs.
+List<PeriodRun> periodRuns(
+  CalendarMarks marks, {
+  required DateTime from,
+  required DateTime to,
+}) {
+  final runs = <PeriodRun>[];
+  DateTime? start;
+  bool? estimated;
+  DateTime? last;
+  void close() {
+    if (start != null) {
+      runs.add(PeriodRun(start!, last!, estimated: estimated!));
+    }
+    start = null;
+  }
+
+  for (var d = dateOnly(from); !d.isAfter(to); d = addDays(d, 1)) {
+    final mark = marks.on(d).mark;
+    final isEstimate = mark == DayMark.periodUnrecorded;
+    if (mark != DayMark.period && !isEstimate) {
+      close();
+      continue;
+    }
+    if (start != null && estimated != isEstimate) close();
+    start ??= d;
+    estimated = isEstimate;
+    last = d;
+  }
+  close();
+  return runs;
+}
+
 /// One group of days, and how often each feeling was picked on them.
 class FeelingGroup {
   const FeelingGroup(this.title, this.detail, this.days, this.counts);

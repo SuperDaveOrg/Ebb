@@ -155,9 +155,6 @@ class _TimelinePainter extends CustomPainter {
   final Color period;
   final TextStyle label;
 
-  static final _month = DateFormat.MMM();
-  static final _monthYear = DateFormat.yMMM();
-
   @override
   void paint(Canvas canvas, Size size) {
     final plot = Rect.fromLTRB(0, top, size.width - 4, size.height - 22);
@@ -247,15 +244,7 @@ class _TimelinePainter extends CustomPainter {
 
     final m = moons;
     if (m != null) {
-      // All four phases while they have room, then new and full moons, then
-      // full moons alone, then none: never a smear of overlapping moons.
-      const room = 14.0;
-      final shown = switch (slot) {
-        _ when slot * 29.53 / 4 >= room => MoonPhase.values.toSet(),
-        _ when slot * 29.53 / 2 >= room => {MoonPhase.newMoon, MoonPhase.full},
-        _ when slot * 29.53 >= room => {MoonPhase.full},
-        _ => const <MoonPhase>{},
-      };
+      final shown = _phasesWithRoom(slot);
       for (var i = 0; i < days.length; i++) {
         final e = m[isoDate(days[i].date)];
         if (e == null || !shown.contains(e.phase)) continue;
@@ -269,33 +258,17 @@ class _TimelinePainter extends CustomPainter {
       }
     }
 
-    // A tick on every month; a name on every month there's room for,
-    // keeping to calendar steps (quarters, halves) so they read naturally.
-    // The year goes on the first name and wherever it changes.
-    const labelRoom = 56.0;
-    final step = [
-      1,
-      2,
-      3,
-      4,
-      6,
-      12,
-    ].firstWhere((n) => n * 30.4 * slot >= labelRoom, orElse: () => 12);
-    int? year;
-    for (var i = 0; i < days.length; i++) {
-      final d = days[i].date;
-      if (d.day != 1) continue;
-      final x = plot.left + i * slot;
-      canvas.drawLine(
-        Offset(x, plot.bottom),
-        Offset(x, plot.bottom + 4),
-        gridPaint,
-      );
-      if ((d.month - 1) % step != 0) continue;
-      final name = d.year != year ? _monthYear.format(d) : _month.format(d);
-      _text(canvas, name, label, Offset(x + 3, size.height - 10), left: true);
-      year = d.year;
-    }
+    _paintMonths(
+      canvas,
+      first: days.first.date,
+      count: days.length,
+      left: plot.left,
+      slot: slot,
+      axis: plot.bottom,
+      labelY: size.height - 10,
+      label: label,
+      grid: gridPaint,
+    );
   }
 
   @override
@@ -308,4 +281,262 @@ class _TimelinePainter extends CustomPainter {
       old.grid != grid ||
       old.period != period ||
       old.label != label;
+}
+
+/// The phases there's room to draw when each day is [slot] wide: all four,
+/// then new and full moons, then full moons alone, then none — never a
+/// smear of overlapping moons.
+Set<MoonPhase> _phasesWithRoom(double slot) {
+  const room = 14.0;
+  return switch (slot) {
+    _ when slot * 29.53 / 4 >= room => MoonPhase.values.toSet(),
+    _ when slot * 29.53 / 2 >= room => {MoonPhase.newMoon, MoonPhase.full},
+    _ when slot * 29.53 >= room => {MoonPhase.full},
+    _ => const <MoonPhase>{},
+  };
+}
+
+final _month = DateFormat.MMM();
+final _monthYear = DateFormat.yMMM();
+
+/// A tick on every month; a name on every month there's room for, keeping
+/// to calendar steps (quarters, halves) so they read naturally. The year
+/// goes on the first name and wherever it changes.
+void _paintMonths(
+  Canvas canvas, {
+  required DateTime first,
+  required int count,
+  required double left,
+  required double slot,
+  required double axis,
+  required double labelY,
+  required TextStyle label,
+  required Paint grid,
+}) {
+  const labelRoom = 56.0;
+  final step = [
+    1,
+    2,
+    3,
+    4,
+    6,
+    12,
+  ].firstWhere((n) => n * 30.4 * slot >= labelRoom, orElse: () => 12);
+  int? year;
+  for (var i = 0; i < count; i++) {
+    final d = addDays(first, i);
+    if (d.day != 1) continue;
+    final x = left + i * slot;
+    canvas.drawLine(Offset(x, axis), Offset(x, axis + 4), grid);
+    if ((d.month - 1) % step != 0) continue;
+    final name = d.year != year ? _monthYear.format(d) : _month.format(d);
+    _text(canvas, name, label, Offset(x + 3, labelY), left: true);
+    year = d.year;
+  }
+}
+
+/// One member's lane on the group view.
+class GroupLane {
+  const GroupLane(this.name, this.runs);
+
+  final String name;
+  final List<PeriodRun> runs;
+}
+
+/// Everyone in a group side by side: one lane each, periods as bars over the
+/// same days, and — for comparing with the moon — the moon's phases along the
+/// top with a faint line down through every lane at each full and new moon.
+///
+/// Only lays the lanes out. It measures nothing between them: whether
+/// anyone's periods keep time with anyone else's, or with the moon, is for
+/// the people looking to judge.
+class GroupLanesChart extends StatelessWidget {
+  const GroupLanesChart({
+    super.key,
+    required this.from,
+    required this.to,
+    required this.lanes,
+    required this.moons,
+  });
+
+  final DateTime from;
+  final DateTime to;
+  final List<GroupLane> lanes;
+
+  /// Phases by [isoDate].
+  final Map<String, MoonEvent> moons;
+
+  static const _nameWidth = 76.0;
+  static const _laneHeight = 34.0;
+  static const _top = 22.0;
+  static const _bottom = 24.0;
+
+  String get _summary {
+    final fmt = DateFormat.MMMd();
+    final each = [
+      for (final l in lanes)
+        '${l.name}: ${l.runs.isEmpty ? 'no period days' : [for (final r in l.runs) '${fmt.format(r.start)} to ${fmt.format(r.end)}${r.estimated ? ', estimated' : ''}'].join('; ')}',
+    ];
+    return 'Periods from ${fmt.format(from)} to ${fmt.format(to)}. '
+        '${each.join('. ')}.';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colors = EbbColors.of(context);
+    return Semantics(
+      label: _summary,
+      excludeSemantics: true,
+      child: SizedBox(
+        width: double.infinity,
+        height: _top + lanes.length * _laneHeight + _bottom,
+        child: CustomPaint(
+          painter: _LanesPainter(
+            from: from,
+            days: daysBetween(from, to) + 1,
+            lanes: lanes,
+            moons: moons,
+            name: theme.textTheme.labelMedium!.copyWith(
+              color: theme.colorScheme.onSurface,
+            ),
+            label: _labelStyle(theme),
+            grid: colors.track,
+            period: colors.period,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _LanesPainter extends CustomPainter {
+  _LanesPainter({
+    required this.from,
+    required this.days,
+    required this.lanes,
+    required this.moons,
+    required this.name,
+    required this.label,
+    required this.grid,
+    required this.period,
+  });
+
+  final DateTime from;
+  final int days;
+  final List<GroupLane> lanes;
+  final Map<String, MoonEvent> moons;
+  final TextStyle name;
+  final TextStyle label;
+  final Color grid;
+  final Color period;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    const top = GroupLanesChart._top, laneH = GroupLanesChart._laneHeight;
+    final plot = Rect.fromLTRB(
+      GroupLanesChart._nameWidth,
+      top,
+      size.width - 4,
+      top + lanes.length * laneH,
+    );
+    final slot = plot.width / days;
+    double x(DateTime d) => plot.left + daysBetween(from, d) * slot;
+
+    final gridPaint = Paint()
+      ..color = grid
+      ..strokeWidth = 1;
+
+    // Moons along the top, and full and new moons carried down through the
+    // lanes so a start near one lines up by eye.
+    final shown = _phasesWithRoom(slot);
+    final guide = Paint()
+      ..color = label.color!.withValues(alpha: 0.28)
+      ..strokeWidth = 1;
+    for (var i = 0; i < days; i++) {
+      final e = moons[isoDate(addDays(from, i))];
+      if (e == null || !shown.contains(e.phase)) continue;
+      final cx = plot.left + (i + 0.5) * slot;
+      paintMoon(canvas, Offset(cx, top / 2), 10, e.phase, label.color!);
+      // Solid down from a full moon, dashed from a new one, so the two can
+      // be told apart without looking back up at the moons.
+      if (e.phase == MoonPhase.full) {
+        canvas.drawLine(Offset(cx, plot.top), Offset(cx, plot.bottom), guide);
+      } else if (e.phase == MoonPhase.newMoon) {
+        for (var y = plot.top; y < plot.bottom; y += 6) {
+          canvas.drawLine(
+            Offset(cx, y),
+            Offset(cx, math.min(y + 3, plot.bottom)),
+            guide,
+          );
+        }
+      }
+    }
+
+    final fill = Paint()..color = period;
+    final outline = Paint()
+      ..color = period
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.5;
+    const barH = 14.0;
+    for (final (i, lane) in lanes.indexed) {
+      final laneTop = plot.top + i * laneH;
+      final mid = laneTop + laneH / 2;
+
+      final tp = TextPainter(
+        text: TextSpan(text: lane.name, style: name),
+        textDirection: TextDirection.ltr,
+        maxLines: 1,
+        ellipsis: '…',
+      )..layout(maxWidth: GroupLanesChart._nameWidth - 10);
+      tp.paint(canvas, Offset(0, mid - tp.height / 2));
+
+      canvas.drawLine(
+        Offset(plot.left, laneTop + laneH),
+        Offset(plot.right, laneTop + laneH),
+        gridPaint,
+      );
+
+      for (final run in lane.runs) {
+        final rect = RRect.fromRectAndRadius(
+          Rect.fromLTRB(
+            x(run.start),
+            mid - barH / 2,
+            // At least a sliver, so a one-day period still shows at a year's
+            // width.
+            math.max(x(run.start) + 2, x(run.end) + slot),
+            mid + barH / 2,
+          ),
+          const Radius.circular(barH / 2),
+        );
+        canvas.drawRRect(
+          run.estimated ? rect.deflate(0.75) : rect,
+          run.estimated ? outline : fill,
+        );
+      }
+    }
+
+    _paintMonths(
+      canvas,
+      first: from,
+      count: days,
+      left: plot.left,
+      slot: slot,
+      axis: plot.bottom,
+      labelY: size.height - 10,
+      label: label,
+      grid: gridPaint,
+    );
+  }
+
+  @override
+  bool shouldRepaint(_LanesPainter old) =>
+      old.from != from ||
+      old.days != days ||
+      old.lanes != lanes ||
+      old.moons != moons ||
+      old.name != name ||
+      old.label != label ||
+      old.grid != grid ||
+      old.period != period;
 }

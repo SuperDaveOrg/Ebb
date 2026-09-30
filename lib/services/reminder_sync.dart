@@ -25,7 +25,9 @@ Future<void> syncAllReminders(
     await notifications.syncReminders(
       predictor.predict(cycles),
       profile: profile,
-      enabled: await settings.remindersEnabled(),
+      // A shared copy is someone else's history: her reminders are on her
+      // own phone, and a copy here only grows staler until she re-sends.
+      enabled: !profile.isSharedCopy && await settings.remindersEnabled(),
       leadDays: await settings.leadDays(),
       hour: await settings.reminderHour(),
     );

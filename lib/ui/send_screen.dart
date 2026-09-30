@@ -17,9 +17,12 @@ import 'package:ebb/ui/wording.dart';
 /// Shows history as a series of QR codes for another phone running Ebb to
 /// scan. Nothing is sent anywhere; the other phone reads the screen.
 ///
-/// With more than one person on the phone it first asks what to send:
+/// With more than one person on the phone it first asks who to send:
 /// everyone (moving to a new phone) or one person (handing their history to
-/// their own phone). Pops with true if someone was removed afterwards.
+/// their own phone, or sharing it with a group). Sending one person — or
+/// the only person, on a phone with just one — then asks how much: how far
+/// back, and whether daily entries go too. Everything is the default, so a
+/// handover sends it all. Pops with true if someone was removed afterwards.
 class SendScreen extends StatefulWidget {
   SendScreen({
     super.key,
@@ -42,7 +45,11 @@ class _SendScreenState extends State<SendScreen> {
 
   /// Who is being sent: null for everyone. Unset until chosen.
   Profile? _only;
-  bool _chosen = false;
+  _Stage _stage = _Stage.who;
+
+  /// How much of one person to send.
+  SendSpan _span = SendSpan.everything;
+  bool _periodsOnly = false;
 
   Backup? _backup;
   List<String> _frames = const [];
@@ -53,16 +60,39 @@ class _SendScreenState extends State<SendScreen> {
   @override
   void initState() {
     super.initState();
-    // One person on the phone: nothing to choose.
-    if (widget.people.length == 1) _choose(null);
+    // One person on the phone: nobody to choose, only how much.
+    if (widget.people.length == 1) {
+      _only = widget.people.single;
+      _stage = _Stage.what;
+    }
   }
 
-  Future<void> _choose(Profile? only) async {
+  /// Everyone, straight to the codes; one person, on to how much.
+  void _choose(Profile? only) {
+    if (only == null) {
+      _send(null);
+    } else {
+      setState(() {
+        _only = only;
+        _stage = _Stage.what;
+      });
+    }
+  }
+
+  Future<void> _send(Profile? only) async {
     setState(() {
       _only = only;
-      _chosen = true;
+      _stage = _Stage.codes;
     });
-    final backup = await widget.backups.snapshot(onlyProfileId: only?.id);
+    var backup = await widget.backups.snapshot(onlyProfileId: only?.id);
+    if (only != null) {
+      backup = Backup(
+        exportedOn: backup.exportedOn,
+        people: [
+          backup.people.single.trimmed(span: _span, periodsOnly: _periodsOnly),
+        ],
+      );
+    }
     if (!mounted) return;
     setState(() {
       _backup = backup;
@@ -141,7 +171,18 @@ class _SendScreenState extends State<SendScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Send to another phone')),
-      body: !_chosen ? _chooser(context) : _codes(context),
+      // From "how much", back goes to "who" when there was a choice of who.
+      body: PopScope(
+        canPop: _stage != _Stage.what || widget.people.length == 1,
+        onPopInvokedWithResult: (didPop, _) {
+          if (!didPop) setState(() => _stage = _Stage.who);
+        },
+        child: switch (_stage) {
+          _Stage.who => _chooser(context),
+          _Stage.what => _howMuch(context),
+          _Stage.codes => _codes(context),
+        },
+      ),
     );
   }
 
@@ -174,7 +215,9 @@ class _SendScreenState extends State<SendScreen> {
         Section(
           title: 'Just one person',
           children: [
-            for (final p in widget.people)
+            // A shared copy is someone else's history from her phone. It
+            // isn't this phone's to pass on: she sends her own.
+            for (final p in widget.people.where((p) => !p.isSharedCopy))
               ListTile(
                 leading: const Icon(Icons.person_outline),
                 title: Text(
@@ -189,6 +232,103 @@ class _SendScreenState extends State<SendScreen> {
                 onTap: () => _choose(p),
               ),
           ],
+        ),
+        if (widget.people.any((p) => p.isSharedCopy))
+          Padding(
+            padding: const EdgeInsets.fromLTRB(24, 12, 24, 0),
+            child: Text(
+              'People imported from other phones aren’t offered here: each '
+              'person shares only their own history.',
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+
+  /// How much of one person's history to send.
+  Widget _howMuch(BuildContext context) {
+    final theme = Theme.of(context);
+    final only = _only!;
+    final whose = only.id == EbbDatabase.primaryProfileId
+        ? 'your'
+        : Who(only).whose;
+
+    Widget choice({
+      required bool selected,
+      required String title,
+      String? subtitle,
+      required VoidCallback onTap,
+    }) => ListTile(
+      leading: Icon(
+        selected ? Icons.radio_button_checked : Icons.radio_button_unchecked,
+        color: selected ? theme.colorScheme.primary : null,
+      ),
+      title: Text(title),
+      subtitle: subtitle == null ? null : Text(subtitle),
+      selected: selected,
+      onTap: onTap,
+    );
+
+    return ListView(
+      padding: readablePadding(
+        context,
+        base: const EdgeInsets.only(bottom: 32),
+      ),
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(24, 8, 24, 0),
+          child: Text(
+            'How much of $whose history?',
+            style: theme.textTheme.titleLarge,
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(24, 8, 24, 0),
+          child: Text(
+            'Sending everything suits a new phone. Sharing with a group, you '
+            'might send less. Nothing is removed from this phone.',
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+          ),
+        ),
+        Section(
+          title: 'How far back',
+          children: [
+            for (final span in SendSpan.values)
+              choice(
+                selected: _span == span,
+                title: span.label,
+                onTap: () => setState(() => _span = span),
+              ),
+          ],
+        ),
+        Section(
+          title: 'What to include',
+          children: [
+            choice(
+              selected: !_periodsOnly,
+              title: 'Periods and daily entries',
+              subtitle: 'Notes, ratings, feelings and flow too.',
+              onTap: () => setState(() => _periodsOnly = false),
+            ),
+            choice(
+              selected: _periodsOnly,
+              title: 'Periods only',
+              subtitle: 'Just when each period started and ended.',
+              onTap: () => setState(() => _periodsOnly = true),
+            ),
+          ],
+        ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 24, 16, 0),
+          child: FilledButton(
+            onPressed: () => _send(only),
+            child: const Text('Show the codes'),
+          ),
         ),
       ],
     );
@@ -284,8 +424,17 @@ class _SendScreenState extends State<SendScreen> {
           : '';
       return 'Everything in Ebb: $periods$people.';
     }
-    return only.id == EbbDatabase.primaryProfileId
-        ? 'Your history: $periods.'
-        : '${Who.label(only)}’s history: $periods.';
+    final whose = only.id == EbbDatabase.primaryProfileId
+        ? 'Your'
+        : '${Who.label(only)}’s';
+    final what = _periodsOnly ? 'periods' : 'history';
+    final when = switch (_span) {
+      SendSpan.everything => '',
+      SendSpan.latest => ', latest period only',
+      _ => ' from ${_span.label.toLowerCase()}',
+    };
+    return '$whose $what$when: $periods.';
   }
 }
+
+enum _Stage { who, what, codes }

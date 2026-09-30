@@ -130,6 +130,80 @@ histories, so today moving between them means replacing one with the other.
 - **Age and tone.** Copy written for an adult may not suit a twelve-year-old
   with a parent reading along. Worth asking a parent who'd actually do this. 🟡
 
+## Groups (advanced) — in progress on `feature/groups`
+
+Asked for by users: some clubs of women track their cycles together and
+compare them with each other and with the moon. Groups let someone gather
+the people on her phone under a name ("Moon circle") and see them side by
+side.
+
+**Decided:**
+
+- **An advanced option, off by default.** Parents tracking children are
+  still the main reason for more than one person, and *Track someone else
+  too* doesn't change at all. Until groups are turned on, nothing about
+  them appears anywhere.
+- **Each woman keeps her own history on her own phone and shares only
+  herself.** A group on your phone is a set of people you've received with
+  **Send → one person**. There is still no network: copies are brought up to
+  date when members meet and scan each other's codes. One phone tracking a
+  whole club works too (groups are only labels), but it isn't what the
+  design is for: adults should hold and correct their own records.
+- **Received people are read-only copies**, marked with whose phone they
+  came from and when. Re-sending offers "Update Sam" alongside the existing
+  choices, matched by a stable id that travels with each person. The copy is
+  never edited here, so it can't quietly drift from the original.
+- **No sending a whole group.** That would pass on other women's data
+  without them. Each member shares only herself.
+- **No "sync" scores.** Menstrual synchrony, like a lunar link, isn't
+  supported by the evidence. The group view shows the lanes; members judge
+  for themselves.
+- A person can be in more than one group. Deleting a group never deletes
+  its people; removing a person from the phone still deletes her data here,
+  as it does now.
+
+**Plan:**
+
+1. ✅ **Groups as labels.** `groups` and `group_members` tables; Settings →
+   Advanced → Groups switch; create, rename and delete groups and choose
+   who's in them; the switcher lists people under their groups; groups and
+   person ids in the backup (joining format version 2 if it hasn't shipped
+   yet, otherwise version 3).
+2. ✅ **The group view.** "See … together" from the switcher. One lane per
+   member over the chosen range (6 months by default), periods as bars and
+   estimated ones outlined, moons along the top with solid lines down from
+   full moons and dashed ones from new moons. The moon always shows here,
+   whatever each person's own setting: it's what groups are for.
+   `dart run tool/sample_history.dart --circle` (and `run_emulator.sh
+   --sample`) writes a six-person circle to try it with.
+3. ✅ **Updating a shared person.** Every person has a lasting random id
+   (migration 7), carried in backups and transfers. Receiving someone
+   already here offers "Update Sam", never a second Sam. A group has two
+   kinds of member. **Added** people are tracked on this phone and logged
+   for here (a parent's children, or an organiser keeping everyone's
+   records): Manage groups → the group → **Add someone new**, or tick
+   someone already here. **Imported** people keep tracking on their own
+   phone and provide it to the group, read-only: **Import from their
+   phone** scans them in as a **shared copy** straight into that group (or
+   updates them, and adds them to it, if they're already here). There's no
+   shared copy outside a group: taking one out of her
+   last group, or deleting that group, removes her copy after saying so.
+   Settings → Receive stays for handovers and moving phones. A shared
+   copy is read-only everywhere
+   (no logging on home, days open read-only in the calendar, no History
+   edits), no reminders, labelled "Shared from Sam's phone on …", and left
+   out of Send → one person so no one relays another's history. "Add as
+   someone new" still works as before, for handing a child's history
+   over.
+
+**Sending less (built):** sending one person, or the only person on a
+phone, now asks how much: everything, the last year, 6 or 3 months, or just
+the latest period; and periods with daily entries, or periods only (no day
+entries, no notes on periods). Everything is the default, so a handover to
+a child's own phone sends it all; someone sharing with a circle chooses
+less. An update replaces the copy with exactly what was sent, so sending
+less next time shrinks the copy too.
+
 ---
 
 ## Multi-device and desktop

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 
 import 'package:ebb/data/cycle_repository.dart';
 import 'package:ebb/domain/calendar.dart';
@@ -11,22 +10,10 @@ import 'package:ebb/models/cycle.dart';
 import 'package:ebb/models/day_log.dart';
 import 'package:ebb/services/settings_service.dart';
 import 'package:ebb/ui/charts.dart';
+import 'package:ebb/ui/date_span.dart';
 import 'package:ebb/ui/face_picker.dart';
 import 'package:ebb/ui/layout.dart';
 import 'package:ebb/ui/section.dart';
-
-/// Which days the charts draw on.
-enum _Range {
-  months3('Last 3 months', 91),
-  months6('Last 6 months', 182),
-  year('Last year', 365),
-  all('Everything', null),
-  custom('Choose dates…', null);
-
-  const _Range(this.label, this.days);
-  final String label;
-  final int? days;
-}
 
 /// How feelings are grouped.
 enum _FeelingsBy { periods, moon }
@@ -59,8 +46,7 @@ class _ChartsScreenState extends State<ChartsScreen> {
   bool _showMoon = false;
   bool _loading = true;
 
-  _Range _range = _Range.months3;
-  DateTimeRange? _custom;
+  DateSpan _span = const DateSpan(SpanChoice.months3);
   TimelineStyle _style = TimelineStyle.bars;
   _FeelingsBy _feelingsBy = _FeelingsBy.periods;
 
@@ -94,45 +80,11 @@ class _ChartsScreenState extends State<ChartsScreen> {
     return dates.reduce((a, b) => a.isBefore(b) ? a : b);
   }
 
-  (DateTime, DateTime) get _span {
-    final now = today();
-    final custom = _custom;
-    return switch (_range) {
-      _Range.custom when custom != null => (
-        dateOnly(custom.start),
-        dateOnly(custom.end),
-      ),
-      _Range.all => (_earliest, now),
-      _ => (addDays(now, -((_range.days ?? 91) - 1)), now),
-    };
-  }
-
-  Future<void> _pick(_Range range) async {
-    if (range != _Range.custom) {
-      setState(() => _range = range);
-      return;
-    }
-    final (from, to) = _span;
-    final picked = await showDateRangePicker(
-      context: context,
-      firstDate: _earliest.isBefore(DateTime(2000))
-          ? _earliest
-          : DateTime(2000),
-      lastDate: today(),
-      initialDateRange: DateTimeRange(start: from, end: to),
-    );
-    if (picked == null || !mounted) return;
-    setState(() {
-      _custom = picked;
-      _range = _Range.custom;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     if (!_showMoon) _feelingsBy = _FeelingsBy.periods;
 
-    final (from, to) = _span;
+    final (from, to) = _span.resolve(_earliest);
     final logs = [
       for (final l in _logs)
         if (!l.date.isBefore(from) && !dateOnly(l.date).isAfter(to)) l,
@@ -149,44 +101,21 @@ class _ChartsScreenState extends State<ChartsScreen> {
                 base: const EdgeInsets.only(bottom: 32),
               ),
               children: [
-                _rangePicker(context, from, to),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: DateSpanButton(
+                      span: _span,
+                      earliest: _earliest,
+                      onChanged: (s) => setState(() => _span = s),
+                    ),
+                  ),
+                ),
                 _timeline(context, logs, marks, from, to),
                 _feelings(context, logs, marks),
               ],
             ),
-    );
-  }
-
-  /// One button naming the range, opening a menu of the others.
-  Widget _rangePicker(BuildContext context, DateTime from, DateTime to) {
-    final fmt = from.year == to.year ? DateFormat.MMMd() : DateFormat.yMMMd();
-    final label = _range == _Range.custom
-        ? '${fmt.format(from)} – ${fmt.format(to)}'
-        : _range.label;
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-      child: Align(
-        alignment: Alignment.centerLeft,
-        child: MenuAnchor(
-          menuChildren: [
-            for (final r in _Range.values)
-              MenuItemButton(
-                leadingIcon: Icon(_range == r ? Icons.check : null, size: 20),
-                // Choosing dates again stays possible while they're chosen.
-                onPressed: () => _pick(r),
-                child: Text(r.label),
-              ),
-          ],
-          builder: (context, menu, _) => OutlinedButton.icon(
-            onPressed: () => menu.isOpen ? menu.close() : menu.open(),
-            icon: const Icon(Icons.date_range_outlined),
-            label: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [Text(label), const Icon(Icons.arrow_drop_down)],
-            ),
-          ),
-        ),
-      ),
     );
   }
 

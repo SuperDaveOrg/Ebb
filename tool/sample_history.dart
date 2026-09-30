@@ -1,7 +1,7 @@
 /// Writes an entirely fictional history as an Ebb backup file, for testing
 /// restore and QR transfer without real data ever appearing on a screen.
 ///
-///     dart run tool/sample_history.dart [--gaps] [out.json] [YYYY-MM-DD]
+///     dart run tool/sample_history.dart [--gaps|--circle] [out.json] [YYYY-MM-DD]
 ///
 /// Deterministic: the same seed and end date always produce the same file,
 /// so screen captures made from it stay reproducible. The end date defaults
@@ -12,6 +12,10 @@
 /// logged: one about a year back, and nothing for the last two months. With
 /// today as the end date, that shows the estimate rolling forward and
 /// History pointing out both gaps.
+///
+/// --circle writes a phone set up for the advanced groups option instead:
+/// the owner and five others, all in a group called "Moon circle", for
+/// seeing the group view with more than a couple of lanes.
 library;
 
 import 'dart:io';
@@ -25,11 +29,17 @@ import 'package:ebb/models/profile.dart';
 
 void main(List<String> args) {
   final gaps = args.contains('--gaps');
-  final rest = args.where((a) => a != '--gaps').toList();
+  final circle = args.contains('--circle');
+  final rest = args.where((a) => !a.startsWith('--')).toList();
   final out = rest.isEmpty ? 'sample-backup.json' : rest.first;
   final until = rest.length > 1 ? parseIsoDate(rest[1]) : null;
-  File(out)
-      .writeAsStringSync(encodeBackup(sampleHistory(until: until, gaps: gaps)));
+  File(out).writeAsStringSync(
+    encodeBackup(
+      circle
+          ? sampleCircle(until: until)
+          : sampleHistory(until: until, gaps: gaps),
+    ),
+  );
   stdout.writeln('Wrote $out');
 }
 
@@ -209,3 +219,53 @@ DayFeeling? _feeling(Random random) => switch (random.nextInt(6)) {
   2 => DayFeeling.face(const ['😹', '👽', '🌧️', '🍫'][random.nextInt(4)]),
   _ => DayFeeling.named(Feeling.values[random.nextInt(Feeling.values.length)]),
 };
+
+/// The owner and five others with a year or so each, in one group. Only the
+/// owner has daily notes; the rest are periods alone. Three are tracked on
+/// this phone and two are imported from their own, a few weeks stale.
+Backup sampleCircle({DateTime? until}) {
+  final end = dateOnly(until ?? DateTime(2026, 9, 20));
+  final random = Random(99);
+  // The last number, when there is one, makes her imported from her own
+  // phone that many days ago, with nothing known here after it.
+  final others = [
+    ('Ana', 27, 2, null),
+    ('Bea', 30, 3, null),
+    ('Cleo', 28, 1, null),
+    ('Dana', 33, 5, 23),
+    ('Esme', 26, 2, 9),
+  ];
+  return Backup(
+    exportedOn: end,
+    people: [
+      _person(
+        const Profile(),
+        random,
+        until: end,
+        months: 14,
+        meanLength: 29,
+        spread: 2,
+        detailed: true,
+      ),
+      for (final (name, length, spread, importedAgo) in others)
+        _person(
+          Profile(
+            name: name,
+            sharedOn: importedAgo == null ? null : addDays(end, -importedAgo),
+          ),
+          random,
+          until: importedAgo == null ? end : addDays(end, -importedAgo),
+          months: 10 + random.nextInt(5),
+          meanLength: length,
+          spread: spread,
+          detailed: false,
+        ),
+    ],
+    groups: [
+      BackupGroup(
+        name: 'Moon circle',
+        members: [for (var i = 0; i <= others.length; i++) i],
+      ),
+    ],
+  );
+}
