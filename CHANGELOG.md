@@ -9,6 +9,8 @@ turns that section into the release's own when it's cut.
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-09-29
+
 ### Added
 - Moon phases on the calendar, if you want them: turn on Settings → Show
   moon phases. New, first quarter, full and last quarter moons are marked
@@ -28,7 +30,6 @@ turns that section into the release's own when it's cut.
   other days.
 - With moon phases turned on, the charts show them too: moons above the
   day ratings, and feelings around full and new moons.
-
 - Groups, for circles and clubs that track together: turn on Settings →
   Advanced → Groups, then gather people under a name. Someone can be in
   more than one group, and deleting a group never deletes anyone. With
@@ -37,8 +38,8 @@ turns that section into the release's own when it's cut.
   bars over the dates you choose, with the moon along the top and lines
   down from each full and new moon. Off by default, and nothing changes for
   anyone who doesn't turn it on.
-- Receiving someone who's already on the phone now offers to update her
-  instead of adding her twice.
+- Receiving someone who's already on the phone now offers to update them
+  instead of adding them twice.
 - A group's members can be added (tracked on this phone, and logged for
   here) or imported from their own phone: read-only here, with no
   reminders, still theirs, and brought up to date when they send it
