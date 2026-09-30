@@ -1,0 +1,6 @@
+• Rate each day from 1 to 5, and pick a face for how you felt. Both show on the calendar.
+• Charts: day ratings over any dates, and which feelings came around your periods.
+• Moon phases on the calendar and charts, if you want them.
+• Groups, for circles that track together: see everyone side by side with the moon. Off unless you turn it on in Settings → Advanced.
+• Send just part of your history to another phone.
+• Backups use a newer format: update Ebb on both phones before moving between them.
