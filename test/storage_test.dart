@@ -88,7 +88,13 @@ void main() {
       Future<Map<String, List<String>>> shape(EbbDatabase d) async {
         final raw = await d.database;
         return {
-          for (final t in ['profiles', 'cycles', 'day_logs'])
+          for (final t in [
+            'profiles',
+            'cycles',
+            'day_logs',
+            'person_groups',
+            'group_members',
+          ])
             t: (await raw.rawQuery('PRAGMA table_info($t)'))
                 .map(
                   (c) =>

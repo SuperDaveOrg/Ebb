@@ -1,6 +1,8 @@
 import 'package:path/path.dart' as p;
 import 'package:sqflite/sqflite.dart';
 
+import 'package:ebb/models/profile.dart';
+
 /// The on-device SQLite database.
 ///
 /// This file is the whole of Ebb's storage. There is no server, no account,
@@ -14,7 +16,7 @@ class EbbDatabase {
   static final EbbDatabase instance = EbbDatabase();
 
   static const _fileName = 'ebb.db';
-  static const version = 5;
+  static const version = 7;
 
   /// The profile every install starts with. It always exists, which lets the
   /// UI stay single-person until it needs to be otherwise.
@@ -82,6 +84,9 @@ class EbbDatabase {
     if (oldVersion < 5) {
       await db.execute('ALTER TABLE day_logs ADD COLUMN feeling TEXT');
     }
+    // Version 6: named groups of people, for the advanced groups option.
+    if (oldVersion < 6) await _addGroups(db);
+    if (oldVersion < 7) await _addPersonIds(db);
   }
 
   /// Version 3: every cycle and day log belongs to a profile, so one phone
@@ -139,6 +144,41 @@ class EbbDatabase {
     // queries need; the old single-column indexes went with their tables.
   }
 
+  /// Version 6: groups, and who is in each. Membership goes with the person
+  /// or the group, whichever is deleted first; people never go with a group.
+  Future<void> _addGroups(Database db) async {
+    await db.execute('''
+      CREATE TABLE person_groups (
+        id   INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL UNIQUE COLLATE NOCASE
+      )
+    ''');
+    await db.execute('''
+      CREATE TABLE group_members (
+        group_id   INTEGER NOT NULL REFERENCES person_groups(id) ON DELETE CASCADE,
+        profile_id INTEGER NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+        PRIMARY KEY (group_id, profile_id)
+      )
+    ''');
+  }
+
+  /// Version 7: a lasting id for each person, so the same person sent again
+  /// is recognised; and, for read-only copies from someone else's phone, the
+  /// day she sent it.
+  Future<void> _addPersonIds(Database db) async {
+    await db.execute('ALTER TABLE profiles ADD COLUMN uid TEXT');
+    await db.execute('ALTER TABLE profiles ADD COLUMN shared_on TEXT');
+    for (final row in await db.query('profiles', columns: ['id'])) {
+      await db.update(
+        'profiles',
+        {'uid': Profile.newUid()},
+        where: 'id = ?',
+        whereArgs: [row['id']],
+      );
+    }
+    await db.execute('CREATE UNIQUE INDEX idx_profiles_uid ON profiles(uid)');
+  }
+
   /// Used by the "delete everything" action in Settings. Her data, her call.
   ///
   /// Profiles go too — a name is personal data — and the primary profile is
@@ -151,10 +191,12 @@ class EbbDatabase {
   /// Empties every table and leaves only a blank primary profile. Shared with
   /// restore, which rebuilds from a backup inside the same transaction.
   static Future<void> resetAll(Transaction txn) async {
+    await txn.delete('group_members');
+    await txn.delete('person_groups');
     await txn.delete('day_logs');
     await txn.delete('cycles');
     await txn.delete('profiles');
-    await txn.insert('profiles', {'id': primaryProfileId, 'name': null});
+    await txn.insert('profiles', const Profile(id: primaryProfileId).toRow());
   }
 
   Future<void> close() async {

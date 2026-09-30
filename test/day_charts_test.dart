@@ -42,6 +42,41 @@ void main() {
     expect(days.map((d) => d.rating).nonNulls, [2]);
   });
 
+  group('periodRuns', () {
+    test('finds each period, cut at the edges of the range', () {
+      final runs = periodRuns(
+        marks,
+        from: DateTime(2026, 2, 3),
+        to: DateTime(2026, 3, 30),
+      );
+      expect(runs.map((r) => (r.start, r.end, r.estimated)), [
+        (DateTime(2026, 2, 3), DateTime(2026, 2, 5), false),
+        (DateTime(2026, 3, 1), DateTime(2026, 3, 5), false),
+        (DateTime(2026, 3, 29), DateTime(2026, 3, 30), false),
+      ]);
+    });
+
+    test('keeps an estimated tail apart from the logged start', () {
+      final open = [
+        ...cycles.take(3),
+        Cycle(id: 4, start: DateTime(2026, 4, 26)),
+      ];
+      final runs = periodRuns(
+        CalendarMarks(
+          open,
+          const Predictor().predict(open, asOf: asOf),
+          asOf: asOf,
+        ),
+        from: DateTime(2026, 4, 20),
+        to: DateTime(2026, 5, 10),
+      );
+      expect(runs.map((r) => (r.start, r.end, r.estimated)), [
+        (DateTime(2026, 4, 26), DateTime(2026, 4, 26), false),
+        (DateTime(2026, 4, 27), DateTime(2026, 4, 30), true),
+      ]);
+    });
+  });
+
   group('feelingsAroundPeriods', () {
     final logs = [
       felt(3, 2, Feeling.tired), // during cycle 2's period

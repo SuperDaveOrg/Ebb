@@ -104,11 +104,24 @@ class SettingsService {
   static Future<void> forgetEveryone() async {
     await forgetOthers();
     await SettingsService().clear();
-    await (await SharedPreferences.getInstance()).remove(_kActiveProfile);
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_kActiveProfile);
+    await prefs.remove(_kGroupsEnabled);
   }
 
   static const _othersPrefix = 'profile_';
   static const _kActiveProfile = 'active_profile_id';
+  static const _kGroupsEnabled = 'groups_enabled';
+
+  /// Whether the advanced groups option is on. Phone-wide, and off by
+  /// default: most people with more than one person here are a parent and
+  /// children, who have no use for it. Turning it off hides groups without
+  /// deleting them.
+  static Future<bool> groupsEnabled() async =>
+      (await SharedPreferences.getInstance()).getBool(_kGroupsEnabled) ?? false;
+
+  static Future<void> setGroupsEnabled(bool value) async =>
+      (await SharedPreferences.getInstance()).setBool(_kGroupsEnabled, value);
 
   /// Whose cycle the app showed last. A phone-wide setting, not a person's.
   static Future<int?> lastActiveProfile() async =>

@@ -41,6 +41,7 @@ A cycle is a day in someone's life, not an instant.
 | `ebbBackup` | integer, required | Format version. Currently `2`; see [Versions](#versions). |
 | `exportedOn` | date, required | The day the backup was made. |
 | `people` | array, required, non-empty | One entry per person tracked on the phone. |
+| `groups` | array, optional | Named groups of people, from the advanced groups option. Absent when there are none. Version 2 and later. |
 
 ### Person
 
@@ -49,6 +50,8 @@ A cycle is a day in someone's life, not an instant.
 | `name` | string or null | Null for the phone's owner. A name only appears when one phone tracks more than one person. 1–30 characters, no leading or trailing spaces, and no two people in a file may share one (ignoring case). |
 | `cycles` | array, required | Recorded periods, oldest first. |
 | `days` | array, optional | Daily notes, oldest first. |
+| `id` | string, optional | A lasting id for the person, 1–64 letters, digits, `_` or `-`, unique within the file. Carried so that when the same person is sent again, the receiving phone can offer to update her rather than add her twice. Ebb makes one for everyone; a person without one is given a new one on restore. Version 2 and later. |
+| `sharedOn` | date, optional | Present when this person is a read-only copy of someone's history from her own phone (the groups option): the day it was sent. Not after `exportedOn`. Ignored for the first person, who is the phone's owner and never a copy. Version 2 and later. |
 
 The first person is the phone's owner and becomes the person the app shows
 after a restore. Anyone after the first is always called by name in Ebb, so
@@ -82,6 +85,18 @@ one `start` to the next.
 | `rating` | integer, optional | How the day went, from `1` (rough) to `5` (great). Absent means not rated, which is not the same as `3`. Anything other than a whole number from 1 to 5 rejects the file. Version 2 and later. |
 | `feeling` | string, optional | How the person felt. Either one of the named feelings — `happy`, `calm`, `loving`, `energetic`, `tired`, `sad`, `anxious`, `irritable`, `angry`, `confused` — written as the name, never as the emoji Ebb shows for it; or any other face, written as the emoji itself (`"👽"`), which means whatever it means to that person. A face is at most 16 UTF-16 code units, with no ASCII and no whitespace; it need not be one Ebb offers, so faces added to Ebb later still restore in older versions. Names are ASCII and faces never are, so the two can't be confused. Absent means none picked. Anything else rejects the file. Version 2 and later. |
 
+### Group
+
+| Field | Type | Meaning |
+|---|---|---|
+| `name` | string, required | 1–30 characters, no leading or trailing spaces. No two groups in a file may share one (ignoring case). |
+| `members` | array of integers, required | The people in the group, each given by its place in `people` (0 for the first). Each must be a place that exists, at most once. May be empty. |
+
+A group is only a label: a person can be in several, or in none. A backup
+of one person, which is what Ebb sends to her own phone, never includes
+groups; they're the arrangement on the sending phone, not part of her
+history.
+
 ## Compatibility rules
 
 - **Readers must reject the whole file** rather than import part of it. Ebb
@@ -103,7 +118,7 @@ one `start` to the next.
 | Version | Change |
 |---|---|
 | `1` | The first format. |
-| `2` | Added a day's `rating` and `feeling`. Older readers ignore fields they don't know, so an Ebb that only understood version 1 would have restored a file with either and silently dropped them. The version was raised so that it refuses the file instead. Ebb still reads version 1. |
+| `2` | Added a day's `rating` and `feeling`, `groups`, and a person's `id` and `sharedOn`. Older readers ignore fields they don't know, so an Ebb that only understood version 1 would have restored a file with either and silently dropped them. The version was raised so that it refuses the file instead. Ebb still reads version 1. |
 
 ## What a backup does not contain
 

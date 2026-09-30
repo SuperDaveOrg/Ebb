@@ -4,10 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import 'package:ebb/data/cycle_repository.dart';
+import 'package:ebb/data/group_repository.dart';
 import 'package:ebb/domain/cycle_rules.dart';
 import 'package:ebb/domain/dates.dart';
 import 'package:ebb/domain/predictor.dart';
 import 'package:ebb/models/cycle.dart';
+import 'package:ebb/models/person_group.dart';
 import 'package:ebb/models/profile.dart';
 import 'package:ebb/services/notification_service.dart';
 import 'package:ebb/services/reminder_sync.dart';
@@ -16,6 +18,7 @@ import 'package:ebb/ui/calendar_screen.dart';
 import 'package:ebb/ui/charts_screen.dart';
 import 'package:ebb/ui/cycle_editor.dart';
 import 'package:ebb/ui/cycle_ring.dart';
+import 'package:ebb/ui/group_screen.dart';
 import 'package:ebb/ui/history_screen.dart';
 import 'package:ebb/ui/layout.dart';
 import 'package:ebb/ui/people.dart';
@@ -85,6 +88,9 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   Who get _who => Who(widget.profile);
 
   bool get _hasPeople => widget.people.length > 1;
+
+  /// A read-only copy of someone's history from her own phone.
+  bool get _copy => widget.profile.isSharedCopy;
 
   Future<void> _refresh() async {
     final cycles = await widget.repository.allCycles();
@@ -205,16 +211,28 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   }
 
   Future<void> _openPeople() async {
+    final groups = await SettingsService.groupsEnabled()
+        ? await GroupRepository().all()
+        : const <PersonGroup>[];
+    if (!mounted) return;
     final choice = await showPeopleSheet(
       context,
       people: widget.people,
       current: widget.profile,
+      groups: groups,
     );
     switch (choice) {
       case SwitchTo(:final profile):
         if (profile.id != widget.profile.id) widget.onSwitch(profile);
       case AddSomeone():
         await widget.onAddPerson();
+      case SeeGroup(:final group):
+        if (!mounted) return;
+        await Navigator.of(context).push(
+          MaterialPageRoute<void>(
+            builder: (_) => GroupScreen(groupId: group.id!),
+          ),
+        );
       case null:
         break;
     }
@@ -289,6 +307,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                     title: _hasPeople
                         ? '${_who.whoseCap} calendar'
                         : 'Calendar',
+                    readOnly: _copy,
                   ),
                 ),
               );
@@ -304,6 +323,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                   builder: (_) => HistoryScreen(
                     repository: widget.repository,
                     title: _hasPeople ? '${_who.whoseCap} history' : 'History',
+                    readOnly: _copy,
                   ),
                 ),
               );
@@ -347,7 +367,9 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       current: _current,
       prediction: _prediction,
       periodInProgress: _periodInProgress,
-      onAddPast: _cycles.isEmpty || _assumesMissed ? _addPastPeriod : null,
+      onAddPast: !_copy && (_cycles.isEmpty || _assumesMissed)
+          ? _addPastPeriod
+          : null,
       ringSize: wide ? 320 : (width >= 600 ? 288 : 248),
     );
     final details = <Widget>[
@@ -359,7 +381,9 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         ),
         const SizedBox(height: 20),
       ],
-      if (_periodInProgress) ...[
+      if (_copy)
+        _SharedCopyNote(who: _who, sharedOn: widget.profile.sharedOn!)
+      else if (_periodInProgress) ...[
         FilledButton.tonalIcon(
           onPressed: _endPeriod,
           icon: const Icon(Icons.check),
@@ -425,6 +449,44 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
               ],
             ),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Takes the place of the logging buttons for a shared copy, saying whose
+/// it is and how old: everything on screen is as of the day she sent it.
+class _SharedCopyNote extends StatelessWidget {
+  const _SharedCopyNote({required this.who, required this.sharedOn});
+
+  final Who who;
+  final DateTime sharedOn;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Icon(
+              Icons.lock_clock_outlined,
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                'Imported from ${who.whose} phone on '
+                '${DateFormat.yMMMd().format(sharedOn)}. It can’t be changed '
+                'here, and is brought up to date when ${who.subject} sends '
+                'it again.',
+                style: theme.textTheme.bodyMedium,
+              ),
+            ),
+          ],
         ),
       ),
     );

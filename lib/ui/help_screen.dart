@@ -49,6 +49,28 @@ class HelpScreen extends StatelessWidget {
           'it. Add a note there too, so you remember why.',
     ),
     (
+      Icons.groups_outlined,
+      'Groups',
+      'For circles and clubs that track together. Turn them on in Settings '
+          '→ Advanced, then make a group and choose who’s in it. “See … '
+          'together” in the list of people shows everyone side by side, with '
+          'the moon.\n\n'
+          'A group can have two kinds of member. Someone added to it is '
+          'tracked on this phone, and you log for them here. Someone '
+          'imported keeps tracking on their own phone and provides their '
+          'history to the group: it stays theirs, and can’t be changed on '
+          'anyone else’s phone.\n\n'
+          'To be imported, send just your history (Settings → Send to '
+          'another phone) — as much or as little as you like, with or without '
+          'your daily notes. The other phone imports it from the group: '
+          'Manage groups → the group → Import from their phone. Importing '
+          'you again brings it up to date.\n\n'
+          'Imported history belongs to its group. Taking someone imported out '
+          'of their last group, or deleting that group, takes their history '
+          'off the phone too. And it can’t be sent on: only your own history '
+          'can.',
+    ),
+    (
       Icons.insights_outlined,
       'Day ratings, feelings and charts',
       'Tap any day on the calendar to rate it from 1 to 5, and to pick a '

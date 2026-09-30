@@ -17,6 +17,7 @@ import 'package:ebb/services/notification_service.dart';
 import 'package:ebb/services/person_removal.dart';
 import 'package:ebb/services/settings_service.dart';
 import 'package:ebb/ui/about_screen.dart';
+import 'package:ebb/ui/groups_screen.dart';
 import 'package:ebb/ui/help_screen.dart';
 import 'package:ebb/ui/layout.dart';
 import 'package:ebb/ui/people.dart';
@@ -70,6 +71,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   int _leadDays = 2;
   bool _fertileWindow = false;
   bool _moonPhases = false;
+  bool _groups = false;
   bool _loading = true;
   String? _version;
   late String? _name = widget.profile.name;
@@ -88,6 +90,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final lead = await widget.settings.leadDays();
     final fertile = await widget.settings.showFertileWindow();
     final moon = await widget.settings.showMoonPhases();
+    final groups = await SettingsService.groupsEnabled();
     final version = await installedVersion();
     if (!mounted) return;
     setState(() {
@@ -96,6 +99,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       _leadDays = lead;
       _fertileWindow = fertile;
       _moonPhases = moon;
+      _groups = groups;
       _loading = false;
     });
   }
@@ -223,9 +227,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
     if (!mounted) return;
 
     if (backup.people.length == 1 && !phoneIsEmpty) {
-      switch (await _askAddOrReplace(backup)) {
+      final person = backup.people.single;
+      // Someone already here, sent again: update her, never add her twice.
+      final known = await widget.backups.personWithUid(person.profile.uid);
+      if (!mounted) return;
+      // Shared copies aren't made here: they belong to a group, and come in
+      // through its "Import from their phone".
+      final choice = known != null
+          ? await _askUpdateOrReplace(backup, known)
+          : await _askAddOrReplace(backup);
+      switch (choice) {
         case _Incoming.add:
-          await _addAsSomeoneNew(backup.people.single);
+          await _addAsSomeoneNew(person);
+        case _Incoming.update:
+          await _update(known!, person, sentOn: backup.exportedOn);
         case _Incoming.replace:
           await _replaceWith(backup, current: current);
         case null:
@@ -261,6 +276,55 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
 
     await _replaceWith(backup, current: current, confirm: true);
+  }
+
+  Future<_Incoming?> _askUpdateOrReplace(Backup backup, Profile known) {
+    final who = Who(known);
+    final label = known.id == EbbDatabase.primaryProfileId
+        ? 'your history'
+        : Who.label(known);
+    final sent = DateFormat.yMMMd().format(backup.exportedOn);
+    return showDialog<_Incoming>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text('Update $label?'),
+        actionsOverflowDirection: VerticalDirection.up,
+        content: Text(
+          known.isSharedCopy
+              ? 'This is ${who.whose} history again, sent $sent: '
+                    '${_periods(backup.cycleCount)}. It replaces the copy '
+                    'on this phone.'
+              : 'This is ${who.whose} history, sent $sent: '
+                    '${_periods(backup.cycleCount)}. It replaces what’s on '
+                    'this phone for ${known.name ?? 'you'}, '
+                    'including anything logged here since.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(_Incoming.replace),
+            child: const Text('Replace everything'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(ctx).pop(_Incoming.update),
+            child: Text('Update $label'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _update(
+    Profile known,
+    BackupPerson person, {
+    required DateTime sentOn,
+  }) async {
+    await widget.backups.updatePerson(known.id!, person, sentOn: sentOn);
+    _say('${Who.label(known)} updated.');
+    if (mounted) Navigator.of(context).pop(ShowPersonAction(known.id!));
   }
 
   Future<_Incoming?> _askAddOrReplace(Backup backup) {
@@ -320,6 +384,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
     // reminders; the home screen reschedules everyone's when Settings closes.
     await SettingsService.forgetOthers();
     await widget.notifications.cancelAll();
+    // Groups came with the backup, so they were in use: show them.
+    if (backup.groups.isNotEmpty) await SettingsService.setGroupsEnabled(true);
     _say('Done. Ebb has been updated.');
     // The person on screen may not exist in the restored data.
     if (mounted) Navigator.of(context).pop();
@@ -467,45 +533,48 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         subtitle: Text(_name ?? 'You'),
                         onTap: _rename,
                       ),
-                    SwitchListTile(
-                      secondary: const Icon(Icons.notifications_none),
-                      title: const Text('Reminders'),
-                      subtitle: Text(
-                        'A heads-up before ${_who.whose} period is expected.',
+                    // A shared copy's reminders are on her own phone.
+                    if (!widget.profile.isSharedCopy) ...[
+                      SwitchListTile(
+                        secondary: const Icon(Icons.notifications_none),
+                        title: const Text('Reminders'),
+                        subtitle: Text(
+                          'A heads-up before ${_who.whose} period is expected.',
+                        ),
+                        value: _reminders,
+                        onChanged: _setReminders,
                       ),
-                      value: _reminders,
-                      onChanged: _setReminders,
-                    ),
-                    ListTile(
-                      enabled: _reminders,
-                      leading: const Icon(Icons.schedule),
-                      title: const Text('Remind me'),
-                      subtitle: Text(
-                        _leadDays == 1
-                            ? '1 day ahead'
-                            : '$_leadDays days ahead',
+                      ListTile(
+                        enabled: _reminders,
+                        leading: const Icon(Icons.schedule),
+                        title: const Text('Remind me'),
+                        subtitle: Text(
+                          _leadDays == 1
+                              ? '1 day ahead'
+                              : '$_leadDays days ahead',
+                        ),
+                        trailing: DropdownButton<int>(
+                          value: _leadDays,
+                          underline: const SizedBox.shrink(),
+                          borderRadius: BorderRadius.circular(16),
+                          onChanged: _reminders
+                              ? (v) async {
+                                  if (v == null) return;
+                                  await widget.settings.setLeadDays(v);
+                                  setState(() => _leadDays = v);
+                                }
+                              : null,
+                          items: const [1, 2, 3, 5, 7]
+                              .map(
+                                (d) => DropdownMenuItem(
+                                  value: d,
+                                  child: Text('$d day${d == 1 ? '' : 's'}'),
+                                ),
+                              )
+                              .toList(),
+                        ),
                       ),
-                      trailing: DropdownButton<int>(
-                        value: _leadDays,
-                        underline: const SizedBox.shrink(),
-                        borderRadius: BorderRadius.circular(16),
-                        onChanged: _reminders
-                            ? (v) async {
-                                if (v == null) return;
-                                await widget.settings.setLeadDays(v);
-                                setState(() => _leadDays = v);
-                              }
-                            : null,
-                        items: const [1, 2, 3, 5, 7]
-                            .map(
-                              (d) => DropdownMenuItem(
-                                value: d,
-                                child: Text('$d day${d == 1 ? '' : 's'}'),
-                              ),
-                            )
-                            .toList(),
-                      ),
-                    ),
+                    ],
                     // Only ever offered to the phone's owner: added people
                     // are often children.
                     if (widget.settings.offersFertileWindow)
@@ -593,10 +662,40 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       leading: const Icon(Icons.qr_code_scanner),
                       title: const Text('Receive from another phone'),
                       subtitle: const Text(
-                        'Scan the codes. Replaces what is in Ebb now.',
+                        'Scan the codes to add someone, update them, or replace '
+                        'everything.',
                       ),
                       onTap: _receive,
                     ),
+                  ],
+                ),
+                // Phone-wide and off by default: groups suit clubs and
+                // circles, not the parent tracking a child that most
+                // multi-person phones are.
+                Section(
+                  title: 'Advanced',
+                  children: [
+                    SwitchListTile(
+                      secondary: const Icon(Icons.groups_outlined),
+                      title: const Text('Groups'),
+                      subtitle: const Text(
+                        'For circles and clubs that track together: gather '
+                        'people under a name. Turning this off hides groups '
+                        'without deleting them.',
+                      ),
+                      value: _groups,
+                      onChanged: (v) async {
+                        await SettingsService.setGroupsEnabled(v);
+                        setState(() => _groups = v);
+                      },
+                    ),
+                    if (_groups)
+                      ListTile(
+                        leading: const SizedBox(width: 24),
+                        title: const Text('Manage groups'),
+                        trailing: const Icon(Icons.chevron_right),
+                        onTap: () => open(const GroupsScreen()),
+                      ),
                   ],
                 ),
                 Section(
@@ -668,4 +767,4 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 }
 
-enum _Incoming { add, replace }
+enum _Incoming { add, update, replace }

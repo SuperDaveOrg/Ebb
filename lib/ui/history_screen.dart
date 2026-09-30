@@ -16,10 +16,14 @@ class HistoryScreen extends StatefulWidget {
     super.key,
     required this.repository,
     this.title = 'History',
+    this.readOnly = false,
   });
 
   final CycleRepository repository;
   final String title;
+
+  /// For a shared copy: cycles can be looked at, not added or changed.
+  final bool readOnly;
 
   @override
   State<HistoryScreen> createState() => _HistoryScreenState();
@@ -119,7 +123,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
     return Scaffold(
       appBar: AppBar(title: Text(widget.title)),
-      floatingActionButton: _loading
+      floatingActionButton: _loading || widget.readOnly
           ? null
           : FloatingActionButton.extended(
               onPressed: _addPast,
@@ -186,7 +190,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
     final notes = cycle.notes;
 
     return InkWell(
-      onTap: () => _edit(cycle),
+      onTap: widget.readOnly ? null : () => _edit(cycle),
       child: Padding(
         padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
         child: Row(

@@ -29,11 +29,29 @@ turns that section into the release's own when it's cut.
 - With moon phases turned on, the charts show them too: moons above the
   day ratings, and feelings around full and new moons.
 
+- Groups, for circles and clubs that track together: turn on Settings →
+  Advanced → Groups, then gather people under a name. Someone can be in
+  more than one group, and deleting a group never deletes anyone. With
+  groups on, the people switcher lists everyone under their groups, and
+  "See … together" shows a group side by side: a lane each, periods as
+  bars over the dates you choose, with the moon along the top and lines
+  down from each full and new moon. Off by default, and nothing changes for
+  anyone who doesn't turn it on.
+- Receiving someone who's already on the phone now offers to update her
+  instead of adding her twice.
+- A group's members can be added (tracked on this phone, and logged for
+  here) or imported from their own phone: read-only here, with no
+  reminders, still theirs, and brought up to date when they send it
+  again.
+- Sending one person to another phone now asks how much: everything, the
+  last year, 6 or 3 months, or just the latest period; with daily notes,
+  ratings and feelings, or periods only. Everything is still the default.
+
 ### Changed
-- Backups now include day ratings and feelings, so they're written in a new
-  version of the backup format. An older Ebb will ask to be updated before
-  it restores one, rather than quietly dropping them. Older backups still restore
-  as before.
+- Backups now include day ratings, feelings and groups, so they're written
+  in a new version of the backup format. An older Ebb will ask to be
+  updated before it restores one, rather than quietly dropping them. Older
+  backups still restore as before.
 - On the calendar, a pencil under the date now means the day has a note,
   and a dot means it's rated. A day with neither is one still to rate.
 - The calendar reaches back a month before the earliest thing you've

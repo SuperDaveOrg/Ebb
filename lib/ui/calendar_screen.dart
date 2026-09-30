@@ -26,12 +26,16 @@ class CalendarScreen extends StatefulWidget {
     required this.repository,
     required this.settings,
     this.title = 'Calendar',
+    this.readOnly = false,
   });
 
   final Who who;
   final CycleRepository repository;
   final SettingsService settings;
   final String title;
+
+  /// For a shared copy: days can be looked at, not logged.
+  final bool readOnly;
 
   @override
   State<CalendarScreen> createState() => _CalendarScreenState();
@@ -127,9 +131,10 @@ class _CalendarScreenState extends State<CalendarScreen> {
         prediction: _prediction,
         log: _logs[isoDate(day)],
         moon: _showMoon ? moonPhasesByDay(day, day)[isoDate(day)] : null,
+        readOnly: widget.readOnly,
       ),
     );
-    if (result == null) return;
+    if (result == null || widget.readOnly) return;
 
     final log = result.log;
     if (log != null) await widget.repository.saveLog(log);
@@ -731,6 +736,7 @@ class _DaySheet extends StatefulWidget {
     required this.prediction,
     required this.log,
     this.moon,
+    this.readOnly = false,
   });
 
   final DateTime day;
@@ -740,6 +746,7 @@ class _DaySheet extends StatefulWidget {
   final CyclePrediction prediction;
   final DayLog? log;
   final MoonEvent? moon;
+  final bool readOnly;
 
   @override
   State<_DaySheet> createState() => _DaySheetState();
@@ -905,7 +912,9 @@ class _DaySheetState extends State<_DaySheet> {
                   ),
                 ),
               const SizedBox(height: 8),
-              if (_future)
+              if (widget.readOnly)
+                _LoggedDay(log: widget.log, padding: side)
+              else if (_future)
                 Padding(
                   padding: side + const EdgeInsets.only(bottom: 24, top: 8),
                   child: Text(
@@ -1063,3 +1072,54 @@ class _DaySheetState extends State<_DaySheet> {
 /// What a screen reader says for a feeling: "anxious", "smiling cat".
 String _feelingName(DayFeeling f) =>
     (f.named?.label ?? faceName(f.emoji)).toLowerCase();
+
+/// What was logged on a day of a shared copy, to read rather than change.
+class _LoggedDay extends StatelessWidget {
+  const _LoggedDay({required this.log, required this.padding});
+
+  final DayLog? log;
+  final EdgeInsets padding;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final l = log;
+    final lines = <String>[
+      if (l?.rating case final r?)
+        'Rated $r of 5, ${ratingNames[r - 1].toLowerCase()}',
+      if (l?.feeling case final f?) 'Felt ${f.emoji} ${_feelingName(f)}',
+      if (l != null && l.flow != Flow.none)
+        'Flow: ${l.flow.label.toLowerCase()}',
+      if (l?.notes case final n? when n.trim().isNotEmpty) '“${n.trim()}”',
+    ];
+    return Padding(
+      padding: padding + const EdgeInsets.only(top: 8, bottom: 24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (lines.isEmpty)
+            Text(
+              'Nothing logged this day.',
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            )
+          else
+            for (final line in lines)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 6),
+                child: Text(line, style: theme.textTheme.bodyLarge),
+              ),
+          const SizedBox(height: 8),
+          Align(
+            alignment: Alignment.centerRight,
+            child: TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Close'),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
