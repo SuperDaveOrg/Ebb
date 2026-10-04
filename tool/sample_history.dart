@@ -1,7 +1,8 @@
 /// Writes an entirely fictional history as an Ebb backup file, for testing
 /// restore and QR transfer without real data ever appearing on a screen.
 ///
-///     dart run tool/sample_history.dart [--gaps|--circle] [out.json] [YYYY-MM-DD]
+///     dart run tool/sample_history.dart [--gaps|--circle|--milestone=NAME]
+///         [out.json] [YYYY-MM-DD]
 ///
 /// Deterministic: the same seed and end date always produce the same file,
 /// so screen captures made from it stay reproducible. The end date defaults
@@ -16,6 +17,11 @@
 /// --circle writes a phone set up for the advanced groups option instead:
 /// the owner and five others, all in a group called "Moon circle", for
 /// seeing the group view with more than a couple of lanes.
+///
+/// --milestone=NAME writes the owner's periods alone, one short of the
+/// milestone NAME (firstCycle, threeCycles, sixCycles, oneYear, twoYears or
+/// fiveYears): restore it, log a period on the end date, and that milestone
+/// is celebrated. Restoring marks everything already reached as seen.
 library;
 
 import 'dart:io';
@@ -30,12 +36,18 @@ import 'package:ebb/models/profile.dart';
 void main(List<String> args) {
   final gaps = args.contains('--gaps');
   final circle = args.contains('--circle');
+  final milestone = args
+      .where((a) => a.startsWith('--milestone='))
+      .map((a) => a.substring('--milestone='.length))
+      .firstOrNull;
   final rest = args.where((a) => !a.startsWith('--')).toList();
   final out = rest.isEmpty ? 'sample-backup.json' : rest.first;
   final until = rest.length > 1 ? parseIsoDate(rest[1]) : null;
   File(out).writeAsStringSync(
     encodeBackup(
-      circle
+      milestone != null
+          ? sampleNearMilestone(milestone, until: until)
+          : circle
           ? sampleCircle(until: until)
           : sampleHistory(until: until, gaps: gaps),
     ),
@@ -265,6 +277,47 @@ Backup sampleCircle({DateTime? until}) {
       BackupGroup(
         name: 'Moon circle',
         members: [for (var i = 0; i <= others.length; i++) i],
+      ),
+    ],
+  );
+}
+
+/// How many 28-day-apart periods, the last four weeks before the end date,
+/// leave each milestone one logged period away. For the years, the last
+/// period falls just short of the anniversary and the end date just past it.
+const _periodsShort = {
+  'firstCycle': 1,
+  'threeCycles': 3,
+  'sixCycles': 6,
+  'oneYear': 14,
+  'twoYears': 27,
+  'fiveYears': 66,
+};
+
+/// The owner's periods alone, so that logging one on [until] reaches
+/// [milestone].
+Backup sampleNearMilestone(String milestone, {DateTime? until}) {
+  final count = _periodsShort[milestone];
+  if (count == null) {
+    throw ArgumentError(
+      'Unknown milestone "$milestone". One of: '
+      '${_periodsShort.keys.join(', ')}',
+    );
+  }
+  final end = dateOnly(until ?? DateTime(2026, 9, 20));
+  return Backup(
+    exportedOn: end,
+    people: [
+      BackupPerson(
+        profile: const Profile(),
+        cycles: [
+          for (var i = count; i >= 1; i--)
+            Cycle(
+              start: addDays(end, -28 * i),
+              end: addDays(end, -28 * i + 4),
+            ),
+        ],
+        days: const [],
       ),
     ],
   );
