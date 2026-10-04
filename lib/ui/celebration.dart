@@ -62,27 +62,42 @@ extension MilestoneWording on Milestone {
 
 enum CelebrationStyle { fireworks, streamers }
 
-/// Says [milestone] was reached, with fireworks or streamers for the bigger
-/// ones. Nothing moves when the system asks for less animation, and nothing
-/// blocks a tap: the overlay ignores the pointer and clears itself.
+/// Says [milestone] was reached: a badge in the middle of the screen for a
+/// few seconds, with fireworks or streamers behind it for the bigger ones.
+/// Nothing blocks a tap: the overlay ignores the pointer and clears itself.
+/// When the system asks for less animation the badge just appears and goes,
+/// with nothing behind it.
 void celebrate(BuildContext context, Milestone milestone, Who who) {
-  ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(content: Text(milestone.message(who))),
-  );
-  final style = milestone.style;
-  if (style == null || MediaQuery.disableAnimationsOf(context)) return;
+  final still = MediaQuery.disableAnimationsOf(context);
   final overlay = Overlay.of(context);
   late final OverlayEntry entry;
   entry = OverlayEntry(
-    builder: (_) => _Celebration(style: style, onDone: entry.remove),
+    builder: (_) => _Celebration(
+      milestone: milestone,
+      who: who,
+      style: still ? null : milestone.style,
+      still: still,
+      onDone: entry.remove,
+    ),
   );
   overlay.insert(entry);
 }
 
 class _Celebration extends StatefulWidget {
-  const _Celebration({required this.style, required this.onDone});
+  const _Celebration({
+    required this.milestone,
+    required this.who,
+    required this.style,
+    required this.still,
+    required this.onDone,
+  });
 
-  final CelebrationStyle style;
+  final Milestone milestone;
+  final Who who;
+
+  /// What plays behind the badge, if anything.
+  final CelebrationStyle? style;
+  final bool still;
   final VoidCallback onDone;
 
   @override
@@ -91,14 +106,18 @@ class _Celebration extends StatefulWidget {
 
 class _CelebrationState extends State<_Celebration>
     with SingleTickerProviderStateMixin {
+  late final _total = widget.style == CelebrationStyle.fireworks ? 3600 : 3000;
+
   late final _controller = AnimationController(
     vsync: this,
-    duration: Duration(
-      milliseconds: widget.style == CelebrationStyle.fireworks ? 3600 : 2800,
-    ),
+    duration: Duration(milliseconds: _total),
   )..forward().whenComplete(widget.onDone);
 
   final _seed = math.Random().nextInt(1 << 31);
+
+  /// How long the badge takes to pop in, and to fade at the end.
+  static const _inMs = 380;
+  static const _outMs = 450;
 
   @override
   void dispose() {
@@ -116,22 +135,113 @@ class _CelebrationState extends State<_Celebration>
       colors.elapsed,
       colors.window,
     ];
+    final badge = _Badge(milestone: widget.milestone, who: widget.who);
     return IgnorePointer(
-      child: CustomPaint(
-        size: Size.infinite,
-        painter: switch (widget.style) {
-          CelebrationStyle.fireworks => _FireworksPainter(
-            _controller,
-            palette,
-            Theme.of(context).brightness == Brightness.dark,
-            _seed,
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          if (widget.style != null)
+            CustomPaint(
+              painter: switch (widget.style!) {
+                CelebrationStyle.fireworks => _FireworksPainter(
+                  _controller,
+                  palette,
+                  Theme.of(context).brightness == Brightness.dark,
+                  _seed,
+                ),
+                CelebrationStyle.streamers => _StreamersPainter(
+                  _controller,
+                  palette,
+                  _seed,
+                ),
+              },
+            ),
+          Align(
+            // Below the fireworks, which go off in the upper half.
+            alignment: const Alignment(0, 0.2),
+            child: widget.still
+                ? badge
+                : AnimatedBuilder(
+                    animation: _controller,
+                    builder: (context, child) {
+                      final ms = _controller.value * _total;
+                      final popIn = (ms / _inMs).clamp(0.0, 1.0);
+                      final out = ((_total - ms) / _outMs).clamp(0.0, 1.0);
+                      return Opacity(
+                        opacity: math.min(Curves.easeOut.transform(popIn), out),
+                        child: Transform.scale(
+                          scale:
+                              0.6 + 0.4 * Curves.easeOutBack.transform(popIn),
+                          child: child,
+                        ),
+                      );
+                    },
+                    child: badge,
+                  ),
           ),
-          CelebrationStyle.streamers => _StreamersPainter(
-            _controller,
-            palette,
-            _seed,
+        ],
+      ),
+    );
+  }
+}
+
+/// The milestone, large enough to notice, small enough to leave the
+/// screen behind it in view.
+class _Badge extends StatelessWidget {
+  const _Badge({required this.milestone, required this.who});
+
+  final Milestone milestone;
+  final Who who;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    return Semantics(
+      liveRegion: true,
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 300),
+        child: Material(
+          color: theme.cardTheme.color ?? scheme.surface,
+          elevation: 8,
+          shadowColor: Colors.black54,
+          borderRadius: BorderRadius.circular(28),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(28, 28, 28, 24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 76,
+                  height: 76,
+                  decoration: BoxDecoration(
+                    color: scheme.primary,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    milestone.icon,
+                    size: 38,
+                    color: scheme.onPrimary,
+                  ),
+                ),
+                const SizedBox(height: 18),
+                Text(
+                  milestone.title,
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.headlineSmall,
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  milestone.message(who),
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: scheme.onSurfaceVariant,
+                  ),
+                ),
+              ],
+            ),
           ),
-        },
+        ),
       ),
     );
   }
