@@ -1,4 +1,5 @@
 import 'dart:math' as math;
+import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 
@@ -92,7 +93,9 @@ class _CelebrationState extends State<_Celebration>
     with SingleTickerProviderStateMixin {
   late final _controller = AnimationController(
     vsync: this,
-    duration: const Duration(milliseconds: 2800),
+    duration: Duration(
+      milliseconds: widget.style == CelebrationStyle.fireworks ? 3600 : 2800,
+    ),
   )..forward().whenComplete(widget.onDone);
 
   final _seed = math.Random().nextInt(1 << 31);
@@ -120,6 +123,7 @@ class _CelebrationState extends State<_Celebration>
           CelebrationStyle.fireworks => _FireworksPainter(
             _controller,
             palette,
+            Theme.of(context).brightness == Brightness.dark,
             _seed,
           ),
           CelebrationStyle.streamers => _StreamersPainter(
@@ -133,51 +137,139 @@ class _CelebrationState extends State<_Celebration>
   }
 }
 
-/// A few bursts in the upper part of the screen, one after another, each a
-/// ring of sparks that slow, fall a little and fade.
+/// Rockets rising to bursts across the upper screen, one after another.
+/// Each burst flashes, throws a ring of sparks that streak, slow, droop and
+/// twinkle out. A blurred copy drawn underneath gives the glow.
 class _FireworksPainter extends CustomPainter {
-  _FireworksPainter(this.t, this.palette, int seed)
-    : _bursts = _makeBursts(math.Random(seed)),
+  _FireworksPainter(this.t, List<Color> palette, this.dark, int seed)
+    : _colours = _brighten(palette, dark),
+      _bursts = _makeBursts(math.Random(seed)),
       super(repaint: t);
 
   final Animation<double> t;
-  final List<Color> palette;
+  final bool dark;
+  final List<Color> _colours;
   final List<_Burst> _bursts;
 
+  /// The period and primary colours pushed to firework brightness, with a
+  /// gold and a teal turned from the period colour. The pale window colour
+  /// would brighten into the period colour again, and the lavender into a
+  /// harsh indigo, so they sit this out.
+  static List<Color> _brighten(List<Color> palette, bool dark) {
+    final warm = HSLColor.fromColor(palette[1]);
+    Color turned(double by) => warm.withHue((warm.hue + by) % 360).toColor();
+    return [
+      for (final c in [
+        palette[1],
+        turned(35),
+        palette[0],
+        turned(170),
+      ].map(HSLColor.fromColor))
+        c
+            .withSaturation(math.max(c.saturation, dark ? 0.85 : 0.75))
+            // Deeper on a light screen, where a pale spark disappears.
+            .withLightness(dark ? 0.68 : 0.46)
+            .toColor(),
+    ];
+  }
+
   static List<_Burst> _makeBursts(math.Random r) => [
-    for (var i = 0; i < 4; i++)
+    for (var i = 0; i < 10; i++)
       _Burst(
-        x: 0.2 + r.nextDouble() * 0.6,
-        y: 0.15 + r.nextDouble() * 0.3,
-        delay: i * 0.16 + r.nextDouble() * 0.05,
-        sparks: 22 + r.nextInt(10),
+        x: 0.12 + r.nextDouble() * 0.76,
+        y: 0.12 + r.nextDouble() * 0.33,
+        delay: _rise + i * 0.052 + r.nextDouble() * 0.03,
+        size: 0.75 + r.nextDouble() * 0.45,
         colour: i,
-        spin: r.nextDouble() * math.pi,
+        sparks: [
+          for (var s = 0, n = 48 + r.nextInt(16); s < n; s++)
+            _Spark(
+              angle: (s + r.nextDouble() * 0.6) * 2 * math.pi / n,
+              speed: 0.7 + r.nextDouble() * 0.3,
+              twinkle: r.nextDouble() * 2 * math.pi,
+            ),
+        ],
       ),
   ];
 
-  static const _life = 0.5;
+  /// How long a rocket takes to climb, and a burst to burn out, as
+  /// fractions of the whole animation.
+  static const _rise = 0.1;
+  static const _life = 0.38;
 
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()..strokeCap = StrokeCap.round;
-    final reach = size.shortestSide * 0.28;
+    final glow = Paint()
+      ..strokeCap = StrokeCap.round
+      ..strokeWidth = dark ? 7 : 9;
+    final core = Paint()
+      ..strokeCap = StrokeCap.round
+      ..strokeWidth = 2.4;
+    canvas.saveLayer(
+      Offset.zero & size,
+      Paint()..imageFilter = ui.ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+    );
+    _draw(canvas, size, glow, isCore: false);
+    canvas.restore();
+    _draw(canvas, size, core, isCore: true);
+  }
+
+  void _draw(Canvas canvas, Size size, Paint paint, {required bool isCore}) {
+    final now = t.value;
+    final reach = size.shortestSide * 0.34;
     for (final b in _bursts) {
-      final local = (t.value - b.delay) / _life;
-      if (local <= 0 || local >= 1) continue;
-      final ease = Curves.easeOutCubic.transform(local);
-      final fade = 1 - Curves.easeIn.transform(local);
+      final base = _colours[b.colour % _colours.length];
+      // Cores run hot towards white at night; on a light screen white would
+      // vanish, so they keep their colour.
+      final colour = isCore && dark
+          ? Color.lerp(base, Colors.white, 0.55)!
+          : base;
       final centre = Offset(b.x * size.width, b.y * size.height);
-      final fall = local * local * reach * 0.35;
-      paint
-        ..color = palette[b.colour % palette.length].withValues(alpha: fade)
-        ..strokeWidth = 3;
-      for (var i = 0; i < b.sparks; i++) {
-        final angle = b.spin + i * 2 * math.pi / b.sparks;
-        final dir = Offset(math.cos(angle), math.sin(angle));
-        final head = centre + dir * (ease * reach) + Offset(0, fall);
-        final tail = centre + dir * (ease * reach * 0.8) + Offset(0, fall);
-        canvas.drawLine(tail, head, paint);
+
+      final climb = (now - (b.delay - _rise)) / _rise;
+      if (climb > 0 && climb < 1) {
+        final from = Offset(centre.dx, size.height);
+        final rise = Curves.easeOut.transform(climb);
+        final head = Offset.lerp(from, centre, rise)!;
+        paint.color = colour.withValues(alpha: 0.9);
+        canvas.drawLine(head, head + Offset(0, 36 * (1 - climb) + 8), paint);
+        continue;
+      }
+
+      final local = (now - b.delay) / _life;
+      if (local <= 0 || local >= 1) continue;
+      final r = reach * b.size;
+
+      if (local < 0.14) {
+        final f = local / 0.14;
+        canvas.drawCircle(
+          centre,
+          r * 0.35 * f + 4,
+          Paint()
+            ..shader = RadialGradient(
+              colors: [
+                Color.lerp(base, Colors.white, 0.7)!.withValues(alpha: 1 - f),
+                base.withValues(alpha: 0),
+              ],
+            ).createShader(Rect.fromCircle(center: centre, radius: r * 0.4)),
+        );
+      }
+
+      final ease = Curves.easeOutCubic.transform(local);
+      final lag = Curves.easeOutCubic.transform((local - 0.16).clamp(0, 1));
+      final fade = 1 - Curves.easeIn.transform(local);
+      final fall = local * local * r * 0.45;
+      for (final s in b.sparks) {
+        final flicker = local < 0.45
+            ? 1.0
+            : 0.5 + 0.5 * math.sin(now * 140 + s.twinkle);
+        paint.color = colour.withValues(alpha: fade * flicker);
+        final dir = Offset(math.cos(s.angle), math.sin(s.angle)) * r * s.speed;
+        canvas.drawLine(
+          centre + dir * lag + Offset(0, fall * 0.8),
+          centre + dir * ease + Offset(0, fall),
+          paint,
+        );
       }
     }
   }
@@ -191,9 +283,9 @@ class _Burst {
     required this.x,
     required this.y,
     required this.delay,
-    required this.sparks,
+    required this.size,
     required this.colour,
-    required this.spin,
+    required this.sparks,
   });
 
   /// Centre, as a fraction of the screen.
@@ -201,9 +293,21 @@ class _Burst {
 
   /// When it goes off, as a fraction of the whole animation.
   final double delay;
-  final int sparks;
+
+  /// Relative to the standard burst.
+  final double size;
   final int colour;
-  final double spin;
+  final List<_Spark> sparks;
+}
+
+class _Spark {
+  const _Spark({
+    required this.angle,
+    required this.speed,
+    required this.twinkle,
+  });
+
+  final double angle, speed, twinkle;
 }
 
 /// Ribbons drifting down from the top, swaying as they fall.
