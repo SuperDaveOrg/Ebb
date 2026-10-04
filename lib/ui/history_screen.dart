@@ -3,8 +3,11 @@ import 'package:intl/intl.dart';
 
 import 'package:ebb/data/cycle_repository.dart';
 import 'package:ebb/domain/dates.dart';
+import 'package:ebb/domain/milestones.dart';
 import 'package:ebb/domain/predictor.dart';
 import 'package:ebb/models/cycle.dart';
+import 'package:ebb/services/settings_service.dart';
+import 'package:ebb/ui/celebration.dart';
 import 'package:ebb/ui/cycle_editor.dart';
 import 'package:ebb/ui/layout.dart';
 import 'package:ebb/ui/section.dart';
@@ -15,11 +18,17 @@ class HistoryScreen extends StatefulWidget {
   const HistoryScreen({
     super.key,
     required this.repository,
+    required this.settings,
+    this.isOwner = true,
     this.title = 'History',
     this.readOnly = false,
   });
 
   final CycleRepository repository;
+  final SettingsService settings;
+
+  /// Only the owner has the phone's backup among her milestones.
+  final bool isOwner;
   final String title;
 
   /// For a shared copy: cycles can be looked at, not added or changed.
@@ -37,6 +46,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
   /// What counts as "usual" here, for spotting gaps that look like a period
   /// went unlogged.
   CyclePrediction _prediction = CyclePrediction.empty;
+
+  /// Newest first; empty when celebrations are turned off.
+  List<ReachedMilestone> _milestones = const [];
   bool _loading = true;
 
   @override
@@ -47,10 +59,19 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
   Future<void> _load() async {
     final cycles = await widget.repository.allCycles();
+    final milestones = await widget.settings.celebrations()
+        ? milestonesReached(
+            cycles,
+            firstBackup: widget.isOwner
+                ? await SettingsService.firstBackupOn()
+                : null,
+          )
+        : const <ReachedMilestone>[];
     if (!mounted) return;
     setState(() {
       _cycles = cycles.reversed.toList();
       _prediction = const Predictor().predict(cycles);
+      _milestones = milestones.reversed.toList();
       _loading = false;
     });
   }
@@ -124,6 +145,18 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   Section(
                     title: '${entry.key}',
                     children: [for (final i in entry.value) _row(context, i)],
+                  ),
+                if (_milestones.isNotEmpty)
+                  Section(
+                    title: 'Milestones',
+                    children: [
+                      for (final m in _milestones)
+                        ListTile(
+                          leading: Icon(m.milestone.icon),
+                          title: Text(m.milestone.title),
+                          subtitle: Text(DateFormat.yMMMd().format(m.on)),
+                        ),
+                    ],
                   ),
               ],
             ),

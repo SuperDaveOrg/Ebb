@@ -9,6 +9,15 @@ turns that section into the release's own when it's cut.
 
 ## [Unreleased]
 
+### Added
+- Milestones: a first period logged, a first full cycle, three and six
+  cycles, one, two and five years of history, and a first backup. Reaching
+  one when you log a period shows a short message, with fireworks or
+  streamers for the bigger ones (none if your phone is set to reduce
+  animation). They're listed at the bottom of History. Periods added after
+  the fact, restores and received histories never set one off. Turn them
+  off with Settings → Celebrate milestones.
+
 ## [0.6.0] - 2026-09-29
 
 ### Added

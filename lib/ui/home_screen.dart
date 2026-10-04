@@ -7,6 +7,7 @@ import 'package:ebb/data/cycle_repository.dart';
 import 'package:ebb/data/group_repository.dart';
 import 'package:ebb/domain/cycle_rules.dart';
 import 'package:ebb/domain/dates.dart';
+import 'package:ebb/domain/milestones.dart';
 import 'package:ebb/domain/predictor.dart';
 import 'package:ebb/models/cycle.dart';
 import 'package:ebb/models/person_group.dart';
@@ -15,6 +16,7 @@ import 'package:ebb/services/notification_service.dart';
 import 'package:ebb/services/reminder_sync.dart';
 import 'package:ebb/services/settings_service.dart';
 import 'package:ebb/ui/calendar_screen.dart';
+import 'package:ebb/ui/celebration.dart';
 import 'package:ebb/ui/charts_screen.dart';
 import 'package:ebb/ui/cycle_editor.dart';
 import 'package:ebb/ui/cycle_ring.dart';
@@ -92,10 +94,13 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   /// A read-only copy of someone's history from her own phone.
   bool get _copy => widget.profile.isSharedCopy;
 
-  Future<void> _refresh() async {
+  /// [logged] is set straight after she logs a period from here, the only
+  /// time a milestone is celebrated.
+  Future<void> _refresh({bool logged = false}) async {
     final cycles = await widget.repository.allCycles();
     final showFertile = await widget.settings.showFertileWindow();
     final prediction = _predictor.predict(cycles);
+    final milestone = await _newMilestone(cycles);
 
     await syncAllReminders(widget.notifications);
 
@@ -106,6 +111,26 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       _showFertileWindow = showFertile;
       _loading = false;
     });
+    if (logged && milestone != null && !_copy) {
+      celebrate(context, milestone, _who);
+    }
+  }
+
+  /// The latest milestone reached since the last look, if celebrations are
+  /// on. Everything reached is marked seen whatever the reason, so periods
+  /// added after the fact, a restore or a received history never set off a
+  /// celebration later.
+  Future<Milestone?> _newMilestone(List<Cycle> cycles) async {
+    final reached = {
+      for (final m in milestonesReached(cycles)) m.milestone,
+    };
+    final seen = await widget.settings.milestonesSeen();
+    final fresh = Milestone.values
+        .where((m) => reached.contains(m) && !seen.contains(m))
+        .toList();
+    if (fresh.isEmpty) return null;
+    await widget.settings.setMilestonesSeen({...seen, ...reached});
+    return await widget.settings.celebrations() ? fresh.last : null;
   }
 
   Cycle? get _current => _cycles.isEmpty ? null : _cycles.last;
@@ -127,7 +152,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     final day = on ?? today();
     if (!_allowed(Cycle(start: day))) return;
     await widget.repository.startPeriod(day);
-    await _refresh();
+    await _refresh(logged: true);
   }
 
   Future<void> _endPeriod([DateTime? on]) async {
@@ -322,6 +347,8 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                 MaterialPageRoute(
                   builder: (_) => HistoryScreen(
                     repository: widget.repository,
+                    settings: widget.settings,
+                    isOwner: _who.isOwner,
                     title: _hasPeople ? '${_who.whoseCap} history' : 'History',
                     readOnly: _copy,
                   ),

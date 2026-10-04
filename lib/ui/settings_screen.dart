@@ -72,6 +72,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   int _leadDays = 2;
   bool _fertileWindow = false;
   bool _moonPhases = false;
+  bool _celebrations = true;
   bool _groups = false;
   bool _loading = true;
   String? _version;
@@ -91,6 +92,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final lead = await widget.settings.leadDays();
     final fertile = await widget.settings.showFertileWindow();
     final moon = await widget.settings.showMoonPhases();
+    final celebrations = await widget.settings.celebrations();
     final groups = await SettingsService.groupsEnabled();
     final version = await installedVersion();
     if (!mounted) return;
@@ -100,6 +102,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       _leadDays = lead;
       _fertileWindow = fertile;
       _moonPhases = moon;
+      _celebrations = celebrations;
       _groups = groups;
       _loading = false;
     });
@@ -150,7 +153,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
         bytes,
       );
       if (saved) {
-        _say('Backup saved. Keep a copy somewhere other than this phone.');
+        final first = await SettingsService.noteBackup(today());
+        _say(
+          first
+              ? 'Your first backup is saved. Keep a copy somewhere other '
+                    'than this phone.'
+              : 'Backup saved. Keep a copy somewhere other than this phone.',
+        );
       }
     } on PlatformException catch (e) {
       _say(
@@ -554,6 +563,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         setState(() => _moonPhases = v);
                       },
                     ),
+                    if (!widget.profile.isSharedCopy)
+                      SwitchListTile(
+                        secondary: const Icon(Icons.celebration_outlined),
+                        title: const Text('Celebrate milestones'),
+                        subtitle: Text(
+                          'A small celebration for things like a first full '
+                          'cycle or a year of history, listed in '
+                          '${_who.whose} History.',
+                        ),
+                        value: _celebrations,
+                        onChanged: (v) async {
+                          await widget.settings.setCelebrations(v);
+                          setState(() => _celebrations = v);
+                        },
+                      ),
                     if (!_who.isOwner)
                       ListTile(
                         leading: const Icon(Icons.person_remove_outlined),
