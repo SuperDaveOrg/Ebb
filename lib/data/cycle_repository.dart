@@ -35,18 +35,6 @@ class CycleRepository {
     return rows.map(Cycle.fromRow).toList();
   }
 
-  Future<Cycle?> latestCycle() async {
-    final db = await _db.database;
-    final rows = await db.query(
-      'cycles',
-      where: _mine,
-      whereArgs: [profileId],
-      orderBy: 'start_date DESC',
-      limit: 1,
-    );
-    return rows.isEmpty ? null : Cycle.fromRow(rows.first);
-  }
-
   /// Records a period beginning on [start].
   ///
   /// Re-entering a start date that already exists returns that row untouched
@@ -114,17 +102,6 @@ class CycleRepository {
       limit: 1,
     );
     return rows.isEmpty ? null : DayLog.fromRow(rows.first);
-  }
-
-  Future<List<DayLog>> logsBetween(DateTime from, DateTime to) async {
-    final db = await _db.database;
-    final rows = await db.query(
-      'day_logs',
-      where: '$_mine AND log_date BETWEEN ? AND ?',
-      whereArgs: [profileId, isoDate(dateOnly(from)), isoDate(dateOnly(to))],
-      orderBy: 'log_date ASC',
-    );
-    return rows.map(DayLog.fromRow).toList();
   }
 
   Future<List<DayLog>> allLogs() async {

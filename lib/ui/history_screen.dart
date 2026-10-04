@@ -30,7 +30,6 @@ class HistoryScreen extends StatefulWidget {
 }
 
 class _HistoryScreenState extends State<HistoryScreen> {
-  static final _fmt = DateFormat.yMMMd();
   static final _day = DateFormat.MMMEd();
 
   List<Cycle> _cycles = const [];
@@ -56,43 +55,13 @@ class _HistoryScreenState extends State<HistoryScreen> {
     });
   }
 
-  Future<void> _delete(Cycle cycle) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Delete this cycle?'),
-        content: Text(
-          'The entry starting ${_fmt.format(cycle.start)} will be '
-          'removed. This cannot be undone.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('Cancel'),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.of(ctx).pop(true),
-            child: const Text('Delete'),
-          ),
-        ],
-      ),
-    );
-    if (confirmed != true || cycle.id == null) return;
-    await widget.repository.deleteCycle(cycle.id!);
-    await _load();
-  }
-
-  Future<void> _edit(Cycle cycle) async {
-    final edited = await showCycleEditor(
-      context,
-      cycle: cycle,
-      all: _cycles,
-      onDelete: () => _delete(cycle),
-    );
-    if (edited == null) return;
-    await widget.repository.updateCycle(edited);
-    await _load();
-  }
+  Future<void> _edit(Cycle cycle) => editCycle(
+    context,
+    repository: widget.repository,
+    cycle: cycle,
+    all: _cycles,
+    onChanged: _load,
+  );
 
   Future<void> _addPast() async {
     final added = await showCycleEditor(context, all: _cycles);

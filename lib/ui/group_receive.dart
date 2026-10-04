@@ -7,6 +7,7 @@ import 'package:ebb/data/database.dart';
 import 'package:ebb/data/group_repository.dart';
 import 'package:ebb/data/profile_repository.dart';
 import 'package:ebb/models/person_group.dart';
+import 'package:ebb/ui/confirm.dart';
 import 'package:ebb/ui/people.dart';
 import 'package:ebb/ui/receive_screen.dart';
 import 'package:ebb/ui/wording.dart';
@@ -67,32 +68,19 @@ Future<bool> receiveIntoGroup(
     final name = known.id == EbbDatabase.primaryProfileId
         ? 'your history'
         : Who.label(known);
-    final ok = await showDialog<bool>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text('Update $name?'),
-        content: Text(
-          known.isSharedCopy
-              ? 'This is ${Who(known).whose} history again, sent $sent: '
-                    '$periods. It replaces the copy on this phone.'
-              : 'This is ${Who(known).whose} history, sent $sent: $periods. '
-                    'It replaces what’s on this phone for '
-                    '${known.name ?? 'you'}, including anything logged here '
-                    'since.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('Cancel'),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.of(ctx).pop(true),
-            child: Text('Update $name'),
-          ),
-        ],
-      ),
+    final ok = await confirm(
+      context,
+      title: 'Update $name?',
+      body: known.isSharedCopy
+          ? 'This is ${Who(known).whose} history again, sent $sent: '
+                '$periods. It replaces the copy on this phone.'
+          : 'This is ${Who(known).whose} history, sent $sent: $periods. '
+                'It replaces what’s on this phone for '
+                '${known.name ?? 'you'}, including anything logged here '
+                'since.',
+      action: 'Update $name',
     );
-    if (ok != true) return false;
+    if (!ok) return false;
     await service.updatePerson(known.id!, person, sentOn: backup.exportedOn);
     await groups.addMember(group.id!, known.id!);
     say('${Who.label(known)} updated.');

@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+import 'package:ebb/data/cycle_repository.dart';
 import 'package:ebb/domain/cycle_rules.dart';
 import 'package:ebb/domain/dates.dart';
 import 'package:ebb/models/cycle.dart';
+import 'package:ebb/ui/confirm.dart';
 
 /// Plain-language wording for each [CycleProblem].
 String describeCycleProblem(CycleProblem problem) => switch (problem) {
@@ -34,6 +36,41 @@ Future<Cycle?> showCycleEditor(
     showDragHandle: true,
     builder: (_) => _CycleEditor(initial: cycle, all: all, onDelete: onDelete),
   );
+}
+
+/// Opens the editor for an existing [cycle] and saves the result to
+/// [repository], or deletes the cycle once she confirms. [onChanged] runs
+/// after either.
+Future<void> editCycle(
+  BuildContext context, {
+  required CycleRepository repository,
+  required Cycle cycle,
+  required List<Cycle> all,
+  required Future<void> Function() onChanged,
+}) async {
+  Future<void> delete() async {
+    final confirmed = await confirm(
+      context,
+      title: 'Delete this cycle?',
+      body:
+          'The entry starting ${DateFormat.yMMMd().format(cycle.start)} will '
+          'be removed. This cannot be undone.',
+      action: 'Delete',
+    );
+    if (!confirmed || cycle.id == null) return;
+    await repository.deleteCycle(cycle.id!);
+    await onChanged();
+  }
+
+  final edited = await showCycleEditor(
+    context,
+    cycle: cycle,
+    all: all,
+    onDelete: delete,
+  );
+  if (edited == null) return;
+  await repository.updateCycle(edited);
+  await onChanged();
 }
 
 class _CycleEditor extends StatefulWidget {
