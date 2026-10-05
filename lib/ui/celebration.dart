@@ -106,7 +106,7 @@ class _Celebration extends StatefulWidget {
 
 class _CelebrationState extends State<_Celebration>
     with SingleTickerProviderStateMixin {
-  late final _total = widget.style == CelebrationStyle.fireworks ? 3600 : 3000;
+  late final _total = widget.style == null ? 3000 : 3600;
 
   late final _controller = AnimationController(
     vsync: this,
@@ -152,7 +152,9 @@ class _CelebrationState extends State<_Celebration>
                 CelebrationStyle.streamers => _StreamersPainter(
                   _controller,
                   palette,
+                  Theme.of(context).brightness == Brightness.dark,
                   _seed,
+                  seconds: _total / 1000,
                 ),
               },
             ),
@@ -247,6 +249,28 @@ class _Badge extends StatelessWidget {
   }
 }
 
+/// The period and primary colours pushed to firework brightness, with a
+/// gold and a teal turned from the period colour. The pale window colour
+/// would brighten into the period colour again, and the lavender into a
+/// harsh indigo, so they sit this out.
+List<Color> _brighten(List<Color> palette, bool dark) {
+  final warm = HSLColor.fromColor(palette[1]);
+  Color turned(double by) => warm.withHue((warm.hue + by) % 360).toColor();
+  return [
+    for (final c in [
+      palette[1],
+      turned(35),
+      palette[0],
+      turned(170),
+    ].map(HSLColor.fromColor))
+      c
+          .withSaturation(math.max(c.saturation, dark ? 0.85 : 0.75))
+          // Deeper on a light screen, where a pale spark disappears.
+          .withLightness(dark ? 0.68 : 0.46)
+          .toColor(),
+  ];
+}
+
 /// Rockets rising to bursts across the upper screen, one after another.
 /// Each burst flashes, throws a ring of sparks that streak, slow, droop and
 /// twinkle out. A blurred copy drawn underneath gives the glow.
@@ -260,28 +284,6 @@ class _FireworksPainter extends CustomPainter {
   final bool dark;
   final List<Color> _colours;
   final List<_Burst> _bursts;
-
-  /// The period and primary colours pushed to firework brightness, with a
-  /// gold and a teal turned from the period colour. The pale window colour
-  /// would brighten into the period colour again, and the lavender into a
-  /// harsh indigo, so they sit this out.
-  static List<Color> _brighten(List<Color> palette, bool dark) {
-    final warm = HSLColor.fromColor(palette[1]);
-    Color turned(double by) => warm.withHue((warm.hue + by) % 360).toColor();
-    return [
-      for (final c in [
-        palette[1],
-        turned(35),
-        palette[0],
-        turned(170),
-      ].map(HSLColor.fromColor))
-        c
-            .withSaturation(math.max(c.saturation, dark ? 0.85 : 0.75))
-            // Deeper on a light screen, where a pale spark disappears.
-            .withLightness(dark ? 0.68 : 0.46)
-            .toColor(),
-    ];
-  }
 
   static List<_Burst> _makeBursts(math.Random r) => [
     for (var i = 0; i < 10; i++)
@@ -420,53 +422,123 @@ class _Spark {
   final double angle, speed, twinkle;
 }
 
-/// Ribbons drifting down from the top, swaying as they fall.
+/// Party poppers in both bottom corners: a volley of curly ribbons and
+/// confetti shot up and inwards, then a smaller second one. Each piece
+/// slows against the air and flutters down, swaying, as the glow fades.
 class _StreamersPainter extends CustomPainter {
-  _StreamersPainter(this.t, this.palette, int seed)
-    : _ribbons = _makeRibbons(math.Random(seed)),
-      super(repaint: t);
+  _StreamersPainter(
+    this.t,
+    List<Color> palette,
+    this.dark,
+    int seed, {
+    required this.seconds,
+  }) : _colours = _brighten(palette, dark),
+       _pieces = _makePieces(math.Random(seed)),
+       super(repaint: t);
 
   final Animation<double> t;
-  final List<Color> palette;
-  final List<_Ribbon> _ribbons;
+  final bool dark;
 
-  static List<_Ribbon> _makeRibbons(math.Random r) => [
-    for (var i = 0; i < 36; i++)
-      _Ribbon(
-        x: r.nextDouble(),
-        delay: r.nextDouble() * 0.35,
-        speed: 0.8 + r.nextDouble() * 0.5,
-        sway: 10 + r.nextDouble() * 18,
-        phase: r.nextDouble() * 2 * math.pi,
-        length: 14 + r.nextDouble() * 16,
-        colour: i,
-      ),
+  /// The animation's length, since the flight is worked out in seconds.
+  final double seconds;
+  final List<Color> _colours;
+  final List<_Piece> _pieces;
+
+  static List<_Piece> _makePieces(math.Random r) => [
+    for (final left in [true, false])
+      for (var i = 0; i < 52; i++)
+        _Piece(
+          left: left,
+          // Above the horizontal, from steep to fairly flat.
+          angle: (48 + r.nextDouble() * 34) * math.pi / 180,
+          speed: 0.6 + r.nextDouble() * 0.45,
+          // Most in the first pop, the rest in a second one.
+          delay: i < 36
+              ? r.nextDouble() * 0.05
+              : 0.45 + r.nextDouble() * 0.06,
+          ribbon: r.nextInt(5) < 2,
+          colour: r.nextInt(4),
+          spin: (r.nextDouble() - 0.5) * 10,
+          phase: r.nextDouble() * 2 * math.pi,
+          sway: 0.5 + r.nextDouble(),
+          length: 0.7 + r.nextDouble() * 0.6,
+        ),
   ];
+
+  /// How quickly the air slows a piece, per second.
+  static const _drag = 1.8;
 
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()
+    final glow = Paint()
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 3
-      ..strokeCap = StrokeCap.round;
+      ..strokeCap = StrokeCap.round
+      ..strokeWidth = 7;
+    final core = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round
+      ..strokeWidth = 3.2;
+    canvas.saveLayer(
+      Offset.zero & size,
+      Paint()..imageFilter = ui.ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+    );
+    _draw(canvas, size, glow, isCore: false);
+    canvas.restore();
+    _draw(canvas, size, core, isCore: true);
+  }
+
+  void _draw(Canvas canvas, Size size, Paint paint, {required bool isCore}) {
+    final w = size.width, h = size.height;
     // Fades out over the last fifth, rather than leaving mid-fall.
     final fade =
         1 - Curves.easeIn.transform(((t.value - 0.8) / 0.2).clamp(0, 1));
-    for (final r in _ribbons) {
-      final local = (t.value - r.delay) / (1 - r.delay);
-      if (local <= 0) continue;
-      final y = -r.length + local * r.speed * (size.height + r.length);
-      final x = r.x * size.width;
-      paint.color = palette[r.colour % palette.length].withValues(alpha: fade);
-      final path = Path();
-      for (var i = 0; i <= 6; i++) {
-        final along = i / 6;
-        final py = y + along * r.length;
-        final px =
-            x + math.sin(r.phase + local * 9 + along * math.pi) * r.sway * 0.4;
-        i == 0 ? path.moveTo(px, py) : path.lineTo(px, py);
+    // Falling speed once the air has taken the pop out of a piece.
+    final terminal = h * 0.17;
+    for (final p in _pieces) {
+      final s = t.value * seconds - p.delay;
+      if (s <= 0) continue;
+      // Linear drag: the launch dies away and gravity takes over.
+      final slowed = 1 - math.exp(-_drag * s);
+      final dx = math.cos(p.angle) / math.cos(math.pi / 4) * p.speed * 0.72;
+      final rise = math.sin(p.angle) * p.speed * 0.95;
+      final sway = math.sin(s * 3 + p.phase) * p.sway * 14 * slowed;
+      final x = p.left
+          ? -8 + dx * w * slowed + sway
+          : w + 8 - dx * w * slowed + sway;
+      final y = h + 8 - rise * h * slowed + terminal * (s - slowed / _drag);
+      if (y > h + 40) continue;
+
+      final base = _colours[p.colour % _colours.length];
+      final colour = isCore && dark
+          ? Color.lerp(base, Colors.white, 0.3)!
+          : base;
+      paint.color = colour.withValues(alpha: fade);
+
+      canvas.save();
+      canvas.translate(x, y);
+      canvas.rotate(p.phase + p.spin * s * 0.4);
+      if (p.ribbon) {
+        // A curl that keeps rippling along its length.
+        final length = 30 * p.length;
+        final path = Path();
+        for (var i = 0; i <= 10; i++) {
+          final along = i / 10;
+          final pt = Offset(
+            (along - 0.5) * length,
+            math.sin(p.phase + s * 9 + along * 2 * math.pi) * 5,
+          );
+          i == 0 ? path.moveTo(pt.dx, pt.dy) : path.lineTo(pt.dx, pt.dy);
+        }
+        canvas.drawPath(path, paint);
+      } else {
+        // A flat scrap tumbling end over end: it narrows as it turns.
+        canvas.scale(1, math.cos(s * 7 * p.sway + p.phase));
+        canvas.drawRect(
+          Rect.fromCenter(center: Offset.zero, width: 10, height: 6),
+          Paint()..color = paint.color,
+        );
       }
-      canvas.drawPath(path, paint);
+      canvas.restore();
     }
   }
 
@@ -474,17 +546,32 @@ class _StreamersPainter extends CustomPainter {
   bool shouldRepaint(_StreamersPainter old) => false;
 }
 
-class _Ribbon {
-  const _Ribbon({
-    required this.x,
-    required this.delay,
+class _Piece {
+  const _Piece({
+    required this.left,
+    required this.angle,
     required this.speed,
-    required this.sway,
-    required this.phase,
-    required this.length,
+    required this.delay,
+    required this.ribbon,
     required this.colour,
+    required this.spin,
+    required this.phase,
+    required this.sway,
+    required this.length,
   });
 
-  final double x, delay, speed, sway, phase, length;
+  /// Which corner fired it.
+  final bool left;
+
+  /// Launch angle above the horizontal, in radians.
+  final double angle;
+  final double speed;
+
+  /// Seconds after the start.
+  final double delay;
+
+  /// A curly ribbon, or else a flat scrap of confetti.
+  final bool ribbon;
   final int colour;
+  final double spin, phase, sway, length;
 }
