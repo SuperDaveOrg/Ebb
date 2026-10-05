@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 
 import 'package:ebb/models/day_log.dart';
@@ -142,6 +144,11 @@ class FeelingPicker extends StatelessWidget {
     final picked = await showDialog<DayFeeling>(
       context: context,
       builder: (ctx) => AlertDialog(
+        // Narrower margins than usual, so more faces fit to a row.
+        insetPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 24,
+        ),
         title: const Text('More faces'),
         content: SizedBox(
           width: double.maxFinite,
@@ -233,7 +240,19 @@ class FacePicker<T> extends StatelessWidget {
   final bool outlined;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) => LayoutBuilder(
+    builder: (context, box) {
+      // Fewer to a row when five won't fit, as on a phone with its display
+      // size turned up, rather than running off the edge.
+      final perRow = math.max(
+        1,
+        math.min(FacePicker.perRow, box.maxWidth ~/ FaceButton.size),
+      );
+      return _rows(perRow);
+    },
+  );
+
+  Widget _rows(int perRow) {
     return Column(
       spacing: 8,
       children: [

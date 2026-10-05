@@ -19,6 +19,10 @@ turns that section into the release's own when it's cut.
   the fact, restores and received histories never set one off. Turn them
   off with Settings → Celebrate milestones.
 
+### Fixed
+- More faces no longer cuts faces off the side of the screen on phones
+  with a larger display size: rows hold as many faces as fit.
+
 ## [0.6.0] - 2026-09-29
 
 ### Added
