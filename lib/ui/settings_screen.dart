@@ -10,6 +10,7 @@ import 'package:ebb/data/database.dart';
 import 'package:ebb/data/profile_repository.dart';
 import 'package:ebb/models/profile.dart';
 import 'package:ebb/domain/dates.dart';
+import 'package:ebb/domain/milestones.dart';
 import 'package:ebb/services/app_info.dart';
 import 'package:ebb/services/document_service.dart';
 import 'package:ebb/services/links.dart';
@@ -17,6 +18,7 @@ import 'package:ebb/services/notification_service.dart';
 import 'package:ebb/services/person_removal.dart';
 import 'package:ebb/services/settings_service.dart';
 import 'package:ebb/ui/about_screen.dart';
+import 'package:ebb/ui/celebration.dart';
 import 'package:ebb/ui/confirm.dart';
 import 'package:ebb/ui/groups_screen.dart';
 import 'package:ebb/ui/help_screen.dart';
@@ -154,12 +156,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
       );
       if (saved) {
         final first = await SettingsService.noteBackup(today());
-        _say(
-          first
-              ? 'Your first backup is saved. Keep a copy somewhere other '
-                    'than this phone.'
-              : 'Backup saved. Keep a copy somewhere other than this phone.',
-        );
+        if (first && await widget.settings.celebrations() && mounted) {
+          celebrate(context, Milestone.firstBackup, _who);
+        } else {
+          _say('Backup saved. Keep a copy somewhere other than this phone.');
+        }
       }
     } on PlatformException catch (e) {
       _say(

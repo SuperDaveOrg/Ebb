@@ -117,19 +117,23 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   }
 
   /// The latest milestone reached since the last look, if celebrations are
-  /// on. Everything reached is marked seen whatever the reason, so periods
-  /// added after the fact, a restore or a received history never set off a
-  /// celebration later.
+  /// on. What's seen is set to exactly what the history reaches now,
+  /// whatever the reason for looking: periods added after the fact, a
+  /// restore or a received history never set off a celebration later, and a
+  /// history replaced by a shorter one can reach its milestones again.
   Future<Milestone?> _newMilestone(List<Cycle> cycles) async {
     final reached = {
       for (final m in milestonesReached(cycles)) m.milestone,
     };
     final seen = await widget.settings.milestonesSeen();
+    if (seen.length == reached.length && seen.containsAll(reached)) {
+      return null;
+    }
+    await widget.settings.setMilestonesSeen(reached);
     final fresh = Milestone.values
         .where((m) => reached.contains(m) && !seen.contains(m))
         .toList();
     if (fresh.isEmpty) return null;
-    await widget.settings.setMilestonesSeen({...seen, ...reached});
     return await widget.settings.celebrations() ? fresh.last : null;
   }
 
