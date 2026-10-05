@@ -80,18 +80,7 @@ class BackupService {
         } else {
           await txn.insert('profiles', row);
         }
-        for (final c in person.cycles) {
-          await txn.insert('cycles', {
-            ...c.toRow()..remove('id'),
-            'profile_id': profileId,
-          });
-        }
-        for (final d in person.days) {
-          await txn.insert('day_logs', {
-            ...d.toRow()..remove('id'),
-            'profile_id': profileId,
-          });
-        }
+        await _insertHistory(txn, profileId, person);
       }
       for (final g in backup.groups) {
         final groupId = await txn.insert('person_groups', {'name': g.name});

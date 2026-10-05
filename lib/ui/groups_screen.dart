@@ -6,6 +6,7 @@ import 'package:ebb/data/profile_repository.dart';
 import 'package:ebb/models/person_group.dart';
 import 'package:ebb/models/profile.dart';
 import 'package:ebb/services/person_removal.dart';
+import 'package:ebb/ui/confirm.dart';
 import 'package:ebb/ui/group_receive.dart';
 import 'package:ebb/ui/layout.dart';
 import 'package:ebb/ui/people.dart';
@@ -231,35 +232,17 @@ class _GroupEditorState extends State<_GroupEditor> {
     if (await receiveIntoGroup(context, group)) await _reload();
   }
 
-  Future<bool> _confirm(String title, String body, String action) async =>
-      await showDialog<bool>(
-        context: context,
-        builder: (ctx) => AlertDialog(
-          title: Text(title),
-          content: Text(body),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(ctx).pop(false),
-              child: const Text('Cancel'),
-            ),
-            FilledButton(
-              onPressed: () => Navigator.of(ctx).pop(true),
-              child: Text(action),
-            ),
-          ],
-        ),
-      ) ==
-      true;
-
   Future<void> _toggle(Profile p, bool on) async {
     if (!on && _onlyHere.any((o) => o.id == p.id)) {
       final name = Who.label(p);
-      final ok = await _confirm(
-        'Take $name out of $_name?',
-        '$name was imported from their phone and isn’t in any other group, '
+      final ok = await confirm(
+        context,
+        title: 'Take $name out of $_name?',
+        body:
+            '$name was imported from their phone and isn’t in any other group, '
             'so the imported history comes off this phone too. $name can '
             'send it again to rejoin.',
-        'Take out',
+        action: 'Take out',
       );
       if (!ok) return;
       await removeSharedCopy(p.id!);
@@ -273,14 +256,15 @@ class _GroupEditorState extends State<_GroupEditor> {
   Future<void> _delete() async {
     final going = _onlyHere;
     final names = going.map(Who.label).join(', ');
-    final ok = await _confirm(
-      'Delete $_name?',
-      going.isEmpty
+    final ok = await confirm(
+      context,
+      title: 'Delete $_name?',
+      body: going.isEmpty
           ? 'Only the group goes. Everyone in it stays on this phone, with '
                 'all their history.'
           : 'The people imported only into this group come off this phone '
                 'too: $names. Everyone else stays, with all their history.',
-      'Delete group',
+      action: 'Delete group',
     );
     if (!ok) return;
     for (final p in going) {

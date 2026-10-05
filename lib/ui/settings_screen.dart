@@ -17,6 +17,7 @@ import 'package:ebb/services/notification_service.dart';
 import 'package:ebb/services/person_removal.dart';
 import 'package:ebb/services/settings_service.dart';
 import 'package:ebb/ui/about_screen.dart';
+import 'package:ebb/ui/confirm.dart';
 import 'package:ebb/ui/groups_screen.dart';
 import 'package:ebb/ui/help_screen.dart';
 import 'package:ebb/ui/layout.dart';
@@ -250,28 +251,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
 
     if (backup.people.length == 1 && phoneIsEmpty) {
-      final ok = await showDialog<bool>(
-        context: context,
-        builder: (ctx) => AlertDialog(
-          title: const Text('Set up with this history?'),
-          content: Text(
+      final ok = await confirm(
+        context,
+        title: 'Set up with this history?',
+        body:
             '${_periods(backup.cycleCount)}, sent '
             '${DateFormat.yMMMd().format(backup.exportedOn)}. On this phone '
             'it becomes your history.',
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(ctx).pop(false),
-              child: const Text('Cancel'),
-            ),
-            FilledButton(
-              onPressed: () => Navigator.of(ctx).pop(true),
-              child: const Text('Continue'),
-            ),
-          ],
-        ),
+        action: 'Continue',
       );
-      if (ok == true) await _replaceWith(backup, current: current);
+      if (ok) await _replaceWith(backup, current: current);
       return;
     }
 
@@ -391,61 +380,33 @@ class _SettingsScreenState extends State<SettingsScreen> {
     if (mounted) Navigator.of(context).pop();
   }
 
-  Future<bool> _confirmReplace(Backup backup, Backup current) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Replace what’s in Ebb?'),
-        content: Text(
-          [
-            'Saved ${DateFormat.yMMMd().format(backup.exportedOn)}, with '
-                '${_periods(backup.cycleCount)}'
-                '${backup.people.length > 1 ? ' for ${backup.people.length} people' : ''}.',
-            if (current.cycleCount > 0 || current.dayCount > 0)
-              'It replaces everything in Ebb now, including '
-                  '${_periods(current.cycleCount)} on this phone.',
-          ].join('\n\n'),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('Cancel'),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.of(ctx).pop(true),
-            child: const Text('Replace'),
-          ),
-        ],
-      ),
-    );
-    return confirmed == true;
-  }
+  Future<bool> _confirmReplace(Backup backup, Backup current) => confirm(
+    context,
+    title: 'Replace what’s in Ebb?',
+    body: [
+      'Saved ${DateFormat.yMMMd().format(backup.exportedOn)}, with '
+          '${_periods(backup.cycleCount)}'
+          '${backup.people.length > 1 ? ' for ${backup.people.length} people' : ''}.',
+      if (current.cycleCount > 0 || current.dayCount > 0)
+        'It replaces everything in Ebb now, including '
+            '${_periods(current.cycleCount)} on this phone.',
+    ].join('\n\n'),
+    action: 'Replace',
+  );
 
   static String _periods(int n) => n == 1 ? '1 period' : '$n periods';
 
   Future<void> _eraseEverything() async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Delete all data?'),
-        content: Text(
+    final confirmed = await confirm(
+      context,
+      title: 'Delete all data?',
+      body:
           'Every cycle and note${_hasPeople ? ', for everyone on this phone,' : ''} '
           'will be permanently erased. Ebb keeps no other copy, so this '
           'cannot be undone unless you have saved a backup file.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('Cancel'),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.of(ctx).pop(true),
-            child: const Text('Delete everything'),
-          ),
-        ],
-      ),
+      action: 'Delete everything',
     );
-    if (confirmed != true) return;
+    if (!confirmed) return;
 
     await EbbDatabase.instance.deleteAllData();
     await SettingsService.forgetEveryone();
@@ -475,27 +436,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   Future<void> _removePerson() async {
     final label = Who.label(widget.profile);
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text('Remove $label from this phone?'),
-        content: Text(
+    final confirmed = await confirm(
+      context,
+      title: 'Remove $label from this phone?',
+      body:
           'Every cycle and note for $label will be permanently erased. '
           'Nobody else’s history is affected.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('Cancel'),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.of(ctx).pop(true),
-            child: const Text('Remove'),
-          ),
-        ],
-      ),
+      action: 'Remove',
     );
-    if (confirmed != true) return;
+    if (!confirmed) return;
 
     await removePerson(widget.profile.id!, widget.notifications);
     _say('$label removed.');
