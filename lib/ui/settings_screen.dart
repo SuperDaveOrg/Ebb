@@ -10,6 +10,7 @@ import 'package:ebb/data/database.dart';
 import 'package:ebb/data/profile_repository.dart';
 import 'package:ebb/models/profile.dart';
 import 'package:ebb/domain/dates.dart';
+import 'package:ebb/domain/milestones.dart';
 import 'package:ebb/services/app_info.dart';
 import 'package:ebb/services/document_service.dart';
 import 'package:ebb/services/links.dart';
@@ -17,6 +18,7 @@ import 'package:ebb/services/notification_service.dart';
 import 'package:ebb/services/person_removal.dart';
 import 'package:ebb/services/settings_service.dart';
 import 'package:ebb/ui/about_screen.dart';
+import 'package:ebb/ui/celebration.dart';
 import 'package:ebb/ui/confirm.dart';
 import 'package:ebb/ui/groups_screen.dart';
 import 'package:ebb/ui/help_screen.dart';
@@ -72,6 +74,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   int _leadDays = 2;
   bool _fertileWindow = false;
   bool _moonPhases = false;
+  bool _celebrations = true;
   bool _groups = false;
   bool _loading = true;
   String? _version;
@@ -91,6 +94,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final lead = await widget.settings.leadDays();
     final fertile = await widget.settings.showFertileWindow();
     final moon = await widget.settings.showMoonPhases();
+    final celebrations = await widget.settings.celebrations();
     final groups = await SettingsService.groupsEnabled();
     final version = await installedVersion();
     if (!mounted) return;
@@ -100,6 +104,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       _leadDays = lead;
       _fertileWindow = fertile;
       _moonPhases = moon;
+      _celebrations = celebrations;
       _groups = groups;
       _loading = false;
     });
@@ -150,7 +155,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
         bytes,
       );
       if (saved) {
-        _say('Backup saved. Keep a copy somewhere other than this phone.');
+        final first = await SettingsService.noteBackup(today());
+        if (first && await widget.settings.celebrations() && mounted) {
+          celebrate(context, Milestone.firstBackup, _who);
+        } else {
+          _say('Backup saved. Keep a copy somewhere other than this phone.');
+        }
       }
     } on PlatformException catch (e) {
       _say(
@@ -554,6 +564,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         setState(() => _moonPhases = v);
                       },
                     ),
+                    if (!widget.profile.isSharedCopy)
+                      SwitchListTile(
+                        secondary: const Icon(Icons.celebration_outlined),
+                        title: const Text('Celebrate milestones'),
+                        subtitle: Text(
+                          'A small celebration for things like a first full '
+                          'cycle or a year of history, listed in '
+                          '${_who.whose} History.',
+                        ),
+                        value: _celebrations,
+                        onChanged: (v) async {
+                          await widget.settings.setCelebrations(v);
+                          setState(() => _celebrations = v);
+                        },
+                      ),
                     if (!_who.isOwner)
                       ListTile(
                         leading: const Icon(Icons.person_remove_outlined),

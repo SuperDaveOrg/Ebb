@@ -116,24 +116,39 @@ class _CalendarScreenState extends State<CalendarScreen> {
     return (past, ahead);
   }
 
-  Future<void> _openDay(DateTime day) async {
-    final info = _marks.on(day);
+  Future<void> _openDay(DateTime tapped) async {
+    final (past, ahead) = _months;
     final result = await showModalBottomSheet<_DayResult>(
       context: context,
       isScrollControlled: true,
       showDragHandle: true,
-      builder: (_) => _DaySheet(
-        day: day,
-        info: info,
-        who: widget.who,
-        cycles: _cycles,
-        prediction: _prediction,
-        log: _logs[isoDate(day)],
-        moon: _showMoon ? moonPhasesByDay(day, day)[isoDate(day)] : null,
-        readOnly: widget.readOnly,
+      builder: (_) => _DayPager(
+        day: tapped,
+        first: past.isEmpty ? ahead.first : past.last,
+        last: DateTime(ahead.last.year, ahead.last.month + 1, 0),
+        // Read when each day is shown, so a day saved on the way past is
+        // seen as saved on the way back.
+        sheet: (day, key, {onPrevious, onNext}) => _DaySheet(
+          key: key,
+          onPrevious: onPrevious,
+          onNext: onNext,
+          day: day,
+          info: _marks.on(day),
+          who: widget.who,
+          cycles: _cycles,
+          prediction: _prediction,
+          log: _logs[isoDate(day)],
+          moon: _showMoon ? moonPhasesByDay(day, day)[isoDate(day)] : null,
+          readOnly: widget.readOnly,
+        ),
+        save: (log) async {
+          await widget.repository.saveLog(log);
+          await _load();
+        },
       ),
     );
     if (result == null || widget.readOnly) return;
+    final day = result.day;
 
     final log = result.log;
     if (log != null) await widget.repository.saveLog(log);
@@ -690,14 +705,115 @@ class _Edit extends _Action {
 /// What the day sheet asks for: a period change, a changed day log, or
 /// both. Either may be null.
 class _DayResult {
-  const _DayResult({this.action, this.log});
+  const _DayResult({required this.day, this.action, this.log});
+  final DateTime day;
   final _Action? action;
   final DayLog? log;
+}
+
+/// The day sheet, swiped sideways to the day before or after, as far as
+/// the calendar goes. Changes to the day being left are saved, as Save
+/// would save them.
+class _DayPager extends StatefulWidget {
+  const _DayPager({
+    required this.day,
+    required this.first,
+    required this.last,
+    required this.sheet,
+    required this.save,
+  });
+
+  final DateTime day;
+  final DateTime first;
+  final DateTime last;
+  final _DaySheet Function(
+    DateTime day,
+    GlobalKey<_DaySheetState> key, {
+    VoidCallback? onPrevious,
+    VoidCallback? onNext,
+  })
+  sheet;
+  final Future<void> Function(DayLog log) save;
+
+  @override
+  State<_DayPager> createState() => _DayPagerState();
+}
+
+class _DayPagerState extends State<_DayPager> {
+  late DateTime _day = widget.day;
+  var _key = GlobalKey<_DaySheetState>();
+  var _step = 1;
+  var _busy = false;
+
+  bool _canGo(int step) {
+    final next = addDays(_day, step);
+    return !next.isBefore(widget.first) && !next.isAfter(widget.last);
+  }
+
+  Future<void> _go(int step) async {
+    if (_busy || !_canGo(step)) return;
+    final next = addDays(_day, step);
+    final log = _key.currentState?._changedLog;
+    if (log != null) {
+      _busy = true;
+      await widget.save(log);
+      _busy = false;
+      if (!mounted) return;
+    }
+    setState(() {
+      _step = step;
+      _day = next;
+      _key = GlobalKey();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      behavior: HitTestBehavior.translucent,
+      onHorizontalDragEnd: (d) {
+        final v = d.primaryVelocity ?? 0;
+        if (v.abs() >= 300) _go(v < 0 ? 1 : -1);
+      },
+      child: AnimatedSwitcher(
+        duration: MediaQuery.disableAnimationsOf(context)
+            ? Duration.zero
+            : const Duration(milliseconds: 220),
+        layoutBuilder: (current, previous) => Stack(
+          alignment: Alignment.topCenter,
+          children: [...previous, ?current],
+        ),
+        // The new day comes in from the side swiped towards, and the old
+        // one leaves by the other.
+        transitionBuilder: (child, animation) {
+          final incoming = child.key == ValueKey(_day);
+          final from = (incoming ? _step : -_step).toDouble();
+          return SlideTransition(
+            position: Tween(
+              begin: Offset(from, 0),
+              end: Offset.zero,
+            ).animate(animation),
+            child: child,
+          );
+        },
+        child: KeyedSubtree(
+          key: ValueKey(_day),
+          child: widget.sheet(
+            _day,
+            _key,
+            onPrevious: _canGo(-1) ? () => _go(-1) : null,
+            onNext: _canGo(1) ? () => _go(1) : null,
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 /// Everything about one day, and what can be logged on it.
 class _DaySheet extends StatefulWidget {
   const _DaySheet({
+    super.key,
     required this.day,
     required this.info,
     required this.who,
@@ -706,6 +822,8 @@ class _DaySheet extends StatefulWidget {
     required this.log,
     this.moon,
     this.readOnly = false,
+    this.onPrevious,
+    this.onNext,
   });
 
   final DateTime day;
@@ -716,6 +834,10 @@ class _DaySheet extends StatefulWidget {
   final DayLog? log;
   final MoonEvent? moon;
   final bool readOnly;
+
+  /// Null at the ends of the calendar.
+  final VoidCallback? onPrevious;
+  final VoidCallback? onNext;
 
   @override
   State<_DaySheet> createState() => _DaySheetState();
@@ -760,7 +882,9 @@ class _DaySheetState extends State<_DaySheet> {
   }
 
   void _done([_Action? action]) =>
-      Navigator.of(context).pop(_DayResult(action: action, log: _changedLog));
+      Navigator.of(context).pop(
+    _DayResult(day: widget.day, action: action, log: _changedLog),
+  );
 
   String get _status {
     final who = widget.who;
@@ -846,11 +970,27 @@ class _DaySheetState extends State<_DaySheet> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Padding(
-                padding: side,
-                child: Text(
-                  '${isToday ? 'Today, ' : ''}'
-                  '${DateFormat.MMMMEEEEd().format(widget.day)}',
-                  style: theme.textTheme.titleLarge,
+                padding: const EdgeInsets.only(left: 24, right: 12),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        '${isToday ? 'Today, ' : ''}'
+                        '${DateFormat.MMMMEEEEd().format(widget.day)}',
+                        style: theme.textTheme.titleLarge,
+                      ),
+                    ),
+                    IconButton(
+                      tooltip: 'Previous day',
+                      icon: const Icon(Icons.chevron_left),
+                      onPressed: widget.onPrevious,
+                    ),
+                    IconButton(
+                      tooltip: 'Next day',
+                      icon: const Icon(Icons.chevron_right),
+                      onPressed: widget.onNext,
+                    ),
+                  ],
                 ),
               ),
               if (status.isNotEmpty)

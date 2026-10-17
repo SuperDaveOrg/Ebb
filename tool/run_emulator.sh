@@ -18,6 +18,9 @@ set -euo pipefail
 #                                          back and for the last two months
 #                    ebb-sample-circle.json  six people in a "Moon circle"
 #                                          group, for the groups option
+#                    ebb-milestone-*.json  one period short of a
+#                                          milestone: restore one, then
+#                                          log a period today
 #   --fresh        Clear Ebb's data on the emulator first. Wipes whatever you
 #                  had there.
 #   --dark         Switch the emulator to dark mode
@@ -130,8 +133,13 @@ if (( SAMPLE )); then
   # Six people in a "Moon circle" group, for the advanced groups option.
   (cd "$REPO" && dart run tool/sample_history.dart --circle "$sample" "$(date +%F)" >/dev/null)
   adb -s "$SERIAL" push "$sample" /sdcard/Download/ebb-sample-circle.json >/dev/null
+  # One period short of each milestone, for seeing its celebration.
+  for m in firstCycle threeCycles sixCycles oneYear twoYears fiveYears; do
+    (cd "$REPO" && dart run tool/sample_history.dart "--milestone=$m" "$sample" "$(date +%F)" >/dev/null)
+    adb -s "$SERIAL" push "$sample" "/sdcard/Download/ebb-milestone-$m.json" >/dev/null
+  done
   rm -f "$sample"
-  say "Sample histories in the emulator's Downloads: ebb-sample.json, ebb-sample-gaps.json, ebb-sample-circle.json"
+  say "Sample histories in the emulator's Downloads: ebb-sample.json, ebb-sample-gaps.json, ebb-sample-circle.json, ebb-milestone-*.json"
   echo "    Restore one in Ebb: Settings -> Restore from a backup."
 fi
 
