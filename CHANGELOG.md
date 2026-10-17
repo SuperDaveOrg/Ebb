@@ -18,6 +18,9 @@ turns that section into the release's own when it's cut.
   reduce animation). It never blocks a tap. They're listed at the bottom of History. Periods added after
   the fact, restores and received histories never set one off. Turn them
   off with Settings → Celebrate milestones.
+- On the calendar, swipe left or right on a day to move to the next or
+  previous one, or use the arrows beside the date. Anything changed on the day you leave is saved, as if you'd
+  tapped Save.
 
 ### Fixed
 - More faces no longer cuts faces off the side of the screen on phones
