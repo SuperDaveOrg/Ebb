@@ -9,18 +9,21 @@ turns that section into the release's own when it's cut.
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-10-17
+
 ### Added
 - Milestones: a first period logged, a first full cycle, three and six
   cycles, one, two and five years of history, and a first backup. Reaching
   one when you log a period shows a badge in the middle of the screen for
   a few seconds, with fireworks or streamers behind it for the bigger ones
   (the badge just appears, with nothing moving, if your phone is set to
-  reduce animation). It never blocks a tap. They're listed at the bottom of History. Periods added after
-  the fact, restores and received histories never set one off. Turn them
-  off with Settings → Celebrate milestones.
+  reduce animation). It never blocks a tap. They're listed at the bottom
+  of History. Periods added after the fact, restores and received
+  histories never set one off. Turn them off with Settings → Celebrate
+  milestones.
 - On the calendar, swipe left or right on a day to move to the next or
-  previous one, or use the arrows beside the date. Anything changed on the day you leave is saved, as if you'd
-  tapped Save.
+  previous one, or use the arrows beside the date. Anything changed on the
+  day you leave is saved, as if you'd tapped Save.
 
 ### Fixed
 - More faces no longer cuts faces off the side of the screen on phones
