@@ -45,6 +45,55 @@ List<TimelineDay> ratingTimeline(
   ];
 }
 
+/// One day on the temperature chart: the reading and cervical mucus as
+/// logged, and whether it was a logged period day.
+class TemperatureDay {
+  const TemperatureDay(
+    this.date, {
+    this.temperature,
+    this.disturbed = false,
+    this.mucusFeel,
+    this.mucusLook,
+    this.period = false,
+  });
+
+  final DateTime date;
+  final double? temperature;
+  final bool disturbed;
+  final MucusFeel? mucusFeel;
+  final MucusLook? mucusLook;
+  final bool period;
+}
+
+/// Every day from [from] to [to], with what was logged of temperature and
+/// cervical mucus. Nothing is smoothed, filled in or marked as a shift: the
+/// chart draws the readings and she reads them.
+List<TemperatureDay> temperatureTimeline(
+  CalendarMarks marks,
+  List<DayLog> logs, {
+  required DateTime from,
+  required DateTime to,
+}) {
+  final byDay = {
+    for (final l in logs)
+      if (l.hasTemperatureOrMucus) isoDate(l.date): l,
+  };
+  return [
+    for (var d = dateOnly(from); !d.isAfter(to); d = addDays(d, 1))
+      if (byDay[isoDate(d)] case final l?)
+        TemperatureDay(
+          d,
+          temperature: l.temperature,
+          disturbed: l.temperatureDisturbed,
+          mucusFeel: l.mucusFeel,
+          mucusLook: l.mucusLook,
+          period: marks.on(d).mark == DayMark.period,
+        )
+      else
+        TemperatureDay(d, period: marks.on(d).mark == DayMark.period),
+  ];
+}
+
 /// A run of period days within a range, for the group view's lanes.
 class PeriodRun {
   const PeriodRun(this.start, this.end, {this.estimated = false});

@@ -9,6 +9,21 @@ turns that section into the release's own when it's cut.
 
 ## [Unreleased]
 
+### Added
+- Temperature and cervical mucus, if you want them: turn on Settings →
+  Track temperature and cervical mucus. Each day on the calendar then has
+  room for your waking temperature (with a box to tick if something may
+  have thrown it off, like illness or little sleep), and for how cervical
+  mucus felt and looked. Charts draws the temperatures as a line, with the
+  mucus underneath and periods shaded, in °C or °F. Ebb records and draws
+  these and nothing more: it doesn't use them to estimate fertile days.
+
+### Changed
+- Backups now include temperatures and cervical mucus, so they're written
+  in a new version of the backup format. An older Ebb will ask to be
+  updated before it restores one, rather than quietly dropping them. Older
+  backups still restore as before.
+
 ## [0.7.0] - 2026-10-17
 
 ### Added

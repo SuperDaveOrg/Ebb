@@ -15,6 +15,43 @@ enum Flow {
       Flow.values.firstWhere((f) => f.name == name, orElse: () => Flow.none);
 }
 
+/// How cervical mucus felt, from driest to wettest: the sensation half of
+/// what the sympto-thermal method records, in the categories drip uses.
+/// Stored by [name]. The order is only dry to wet; Ebb draws no conclusion
+/// from it.
+enum MucusFeel {
+  dry('Dry'),
+  nothing('Nothing felt'),
+  wet('Wet'),
+  slippery('Slippery');
+
+  const MucusFeel(this.label);
+  final String label;
+
+  /// On a chip under "How it felt", where "felt" goes without saying.
+  String get chip => this == nothing ? 'Nothing' : label;
+
+  static MucusFeel? fromName(String? name) =>
+      MucusFeel.values.where((m) => m.name == name).firstOrNull;
+}
+
+/// How cervical mucus looked, from none to clear and stretchy. Stored by
+/// [name].
+enum MucusLook {
+  nothing('Nothing seen'),
+  creamy('Creamy'),
+  eggWhite('Egg white');
+
+  const MucusLook(this.label);
+  final String label;
+
+  /// On a chip under "How it looked".
+  String get chip => this == nothing ? 'Nothing' : label;
+
+  static MucusLook? fromName(String? name) =>
+      MucusLook.values.where((m) => m.name == name).firstOrNull;
+}
+
 /// The named feelings offered first. Stored by [name], which is also what
 /// backups use, so a face can be redrawn without touching anyone's history.
 ///
@@ -102,6 +139,10 @@ class DayLog {
     this.notes,
     this.rating,
     this.feeling,
+    this.temperature,
+    this.temperatureDisturbed = false,
+    this.mucusFeel,
+    this.mucusLook,
   });
 
   /// The range of [rating].
@@ -122,12 +163,27 @@ class DayLog {
   /// How she felt, separate from [rating]: a bad day can still be a calm one.
   final DayFeeling? feeling;
 
+  /// Waking body temperature in °C, rounded to a thousandth. Null when not
+  /// taken.
+  final double? temperature;
+
+  /// Something may have thrown the reading off: illness, little sleep,
+  /// alcohol, taken late. Only meaningful with a [temperature].
+  final bool temperatureDisturbed;
+
+  final MucusFeel? mucusFeel;
+  final MucusLook? mucusLook;
+
+  bool get hasTemperatureOrMucus =>
+      temperature != null || mucusFeel != null || mucusLook != null;
+
   bool get isEmpty =>
       flow == Flow.none &&
       symptoms.isEmpty &&
       (notes == null || notes!.trim().isEmpty) &&
       rating == null &&
-      feeling == null;
+      feeling == null &&
+      !hasTemperatureOrMucus;
 
   DayLog copyWith({
     DateTime? date,
@@ -136,6 +192,10 @@ class DayLog {
     String? notes,
     int? rating,
     DayFeeling? feeling,
+    double? temperature,
+    bool? temperatureDisturbed,
+    MucusFeel? mucusFeel,
+    MucusLook? mucusLook,
   }) {
     return DayLog(
       id: id,
@@ -145,6 +205,10 @@ class DayLog {
       notes: notes ?? this.notes,
       rating: rating ?? this.rating,
       feeling: feeling ?? this.feeling,
+      temperature: temperature ?? this.temperature,
+      temperatureDisturbed: temperatureDisturbed ?? this.temperatureDisturbed,
+      mucusFeel: mucusFeel ?? this.mucusFeel,
+      mucusLook: mucusLook ?? this.mucusLook,
     );
   }
 
@@ -157,6 +221,12 @@ class DayLog {
     'notes': notes,
     'rating': rating,
     'feeling': feeling?.value,
+    'temperature': temperature,
+    'temperature_disturbed': temperature != null && temperatureDisturbed
+        ? 1
+        : 0,
+    'mucus_feel': mucusFeel?.name,
+    'mucus_look': mucusLook?.name,
   };
 
   factory DayLog.fromRow(Map<String, Object?> row) {
@@ -169,6 +239,10 @@ class DayLog {
       notes: row['notes'] as String?,
       rating: row['rating'] as int?,
       feeling: DayFeeling.parse(row['feeling'] as String?),
+      temperature: (row['temperature'] as num?)?.toDouble(),
+      temperatureDisturbed: (row['temperature_disturbed'] as int? ?? 0) == 1,
+      mucusFeel: MucusFeel.fromName(row['mucus_feel'] as String?),
+      mucusLook: MucusLook.fromName(row['mucus_look'] as String?),
     );
   }
 }

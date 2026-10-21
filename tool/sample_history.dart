@@ -29,6 +29,7 @@ import 'dart:math';
 
 import 'package:ebb/data/backup.dart';
 import 'package:ebb/domain/dates.dart';
+import 'package:ebb/domain/temperature.dart';
 import 'package:ebb/models/cycle.dart';
 import 'package:ebb/models/day_log.dart';
 import 'package:ebb/models/profile.dart';
@@ -56,19 +57,23 @@ void main(List<String> args) {
 }
 
 /// Two people: the phone's owner with two years of fairly steady cycles and
-/// daily notes, and a second person with eight months of irregular ones.
-/// With [gaps], some of the owner's periods are left unlogged.
+/// daily notes, the last four months with waking temperatures and cervical
+/// mucus too; and a second person with eight months of irregular ones. With
+/// [gaps], some of the owner's periods are left unlogged.
 Backup sampleHistory({DateTime? until, bool gaps = false}) {
   final end = dateOnly(until ?? DateTime(2026, 9, 20));
   final random = Random(42);
-  final owner = _person(
-    const Profile(),
-    random,
+  final owner = _withTemperatures(
+    _person(
+      const Profile(),
+      random,
+      until: end,
+      months: 24,
+      meanLength: 29,
+      spread: 2,
+      detailed: true,
+    ),
     until: end,
-    months: 24,
-    meanLength: 29,
-    spread: 2,
-    detailed: true,
   );
   return Backup(
     exportedOn: end,
@@ -105,6 +110,55 @@ const _notes = [
   'Busy week at work.',
   'Better than last month.',
 ];
+
+/// [person] with a waking temperature on most of the last 120 days and
+/// cervical mucus on many, shaped the way a textbook cycle is: lower before
+/// ovulation, about 14 days before the next period, and a few tenths of a
+/// degree higher after; mucus wetter and clearer in the days leading up to
+/// it. Fictional, and only for seeing the chart with something on it.
+BackupPerson _withTemperatures(BackupPerson person, {required DateTime until}) {
+  final random = Random(17);
+  final starts = [for (final c in person.cycles) c.start]..sort();
+  final last = until.isAfter(today()) ? today() : until;
+  final byDay = {for (final d in person.days) isoDate(d.date): d};
+  for (var d = addDays(last, -119); !d.isAfter(last); d = addDays(d, 1)) {
+    final next = starts.where((s) => s.isAfter(d)).firstOrNull;
+    // Days before ovulation, counted down; negative once it's past.
+    final toOvulation = next == null ? 6 : daysBetween(d, next) - 14;
+    final high = toOvulation < 0;
+    final taken = random.nextInt(10) < 8;
+    final disturbed = taken && random.nextInt(20) == 0;
+    final temperature = taken
+        ? roundTemperature(
+            (high ? 36.72 : 36.38) +
+                (random.nextInt(21) - 10) / 100 +
+                (disturbed ? 0.25 : 0),
+          )
+        : null;
+    final noted = random.nextInt(10) < 7;
+    final (feel, look) = switch (toOvulation) {
+      _ when !noted => (null, null),
+      >= 0 && <= 1 => (MucusFeel.slippery, MucusLook.eggWhite),
+      >= 2 && <= 4 => (MucusFeel.wet, MucusLook.creamy),
+      >= 5 && <= 6 => (MucusFeel.nothing, MucusLook.nothing),
+      _ => (MucusFeel.dry, MucusLook.nothing),
+    };
+    final day = byDay[isoDate(d)] ?? DayLog(date: d);
+    byDay[isoDate(d)] = day.copyWith(
+      temperature: temperature,
+      temperatureDisturbed: disturbed,
+      mucusFeel: feel,
+      mucusLook: look,
+    );
+  }
+  final days = byDay.values.where((d) => !d.isEmpty).toList()
+    ..sort((a, b) => a.date.compareTo(b.date));
+  return BackupPerson(
+    profile: person.profile,
+    cycles: person.cycles,
+    days: days,
+  );
+}
 
 /// [person] as if one period about a year before [until] and everything in
 /// the last two months had never been logged.

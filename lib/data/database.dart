@@ -16,7 +16,7 @@ class EbbDatabase {
   static final EbbDatabase instance = EbbDatabase();
 
   static const _fileName = 'ebb.db';
-  static const version = 7;
+  static const version = 8;
 
   /// The profile every install starts with. It always exists, which lets the
   /// UI stay single-person until it needs to be otherwise.
@@ -87,6 +87,17 @@ class EbbDatabase {
     // Version 6: named groups of people, for the advanced groups option.
     if (oldVersion < 6) await _addGroups(db);
     if (oldVersion < 7) await _addPersonIds(db);
+    // Version 8: waking temperature in °C, whether something may have
+    // thrown it off, and cervical mucus as MucusFeel and MucusLook names.
+    if (oldVersion < 8) {
+      await db.execute('ALTER TABLE day_logs ADD COLUMN temperature REAL');
+      await db.execute(
+        'ALTER TABLE day_logs ADD COLUMN temperature_disturbed INTEGER '
+        'NOT NULL DEFAULT 0',
+      );
+      await db.execute('ALTER TABLE day_logs ADD COLUMN mucus_feel TEXT');
+      await db.execute('ALTER TABLE day_logs ADD COLUMN mucus_look TEXT');
+    }
   }
 
   /// Version 3: every cycle and day log belongs to a profile, so one phone

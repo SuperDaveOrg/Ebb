@@ -34,6 +34,13 @@ void main() {
               rating: 2,
               feeling: DayFeeling.named(Feeling.tired),
             ),
+            DayLog(
+              date: DateTime(2026, 3, 16),
+              temperature: 36.506,
+              temperatureDisturbed: true,
+              mucusFeel: MucusFeel.wet,
+              mucusLook: MucusLook.eggWhite,
+            ),
           ],
         ),
         const BackupPerson(profile: Profile(name: 'Sam')),
@@ -51,17 +58,31 @@ void main() {
         (mar1, DateTime(2026, 3, 5), false, null),
         (DateTime(2026, 3, 29), null, true, 'flu'),
       ]);
-      final day = me.days.single;
+      final day = me.days.first;
       expect(day.flow, Flow.heavy);
       expect(day.symptoms, ['cramps', 'tired, a bit']);
       expect(day.notes, 'long day');
       expect(day.rating, 2);
       expect(day.feeling, DayFeeling.named(Feeling.tired));
+      expect(day.temperature, isNull);
+      final taken = me.days.last;
+      expect(taken.temperature, 36.506);
+      expect(taken.temperatureDisturbed, isTrue);
+      expect(taken.mucusFeel, MucusFeel.wet);
+      expect(taken.mucusLook, MucusLook.eggWhite);
     });
 
     test('is readable, documented JSON', () {
       final json = jsonDecode(encodeBackup(sample)) as Map<String, Object?>;
-      expect(json['ebbBackup'], 2);
+      expect(json['ebbBackup'], 3);
+      final days = ((json['people'] as List)[0] as Map)['days'] as List;
+      expect(days.last, {
+        'date': '2026-03-16',
+        'temperature': 36.506,
+        'temperatureDisturbed': true,
+        'mucusFeel': 'wet',
+        'mucusLook': 'eggWhite',
+      });
       final cycle = ((json['people'] as List)[0] as Map)['cycles'][0] as Map;
       expect(cycle, {'start': '2026-03-01', 'end': '2026-03-05'});
     });
@@ -94,7 +115,7 @@ void main() {
     });
 
     test('refuses a newer format rather than half-reading it', () {
-      rejects(file([], version: 3), contains('newer version'));
+      rejects(file([], version: 4), contains('newer version'));
     });
 
     test('rejects impossible and malformed dates', () {
@@ -225,6 +246,49 @@ void main() {
       final feeling = back.people.single.days.single.feeling!;
       expect(feeling.named, isNull);
       expect(feeling.emoji, '😹');
+    });
+
+    test('reads a temperature in °C, whole or not', () {
+      DayLog read(Object t) =>
+          decodeBackup(withDay({'temperature': t}, version: 3))
+              .people
+              .single
+              .days
+              .single;
+      expect(read(37).temperature, 37.0);
+      expect(read(36.45).temperature, 36.45);
+      expect(read(36.45).temperatureDisturbed, isFalse);
+    });
+
+    test('rejects a temperature no thermometer would show', () {
+      for (final t in [33.9, 43.1, '36.5', true]) {
+        rejects(withDay({'temperature': t}, version: 3), contains('damaged'));
+      }
+    });
+
+    test('rejects "may have been affected" without a temperature', () {
+      rejects(
+        withDay({'temperatureDisturbed': true}, version: 3),
+        contains('temperature'),
+      );
+    });
+
+    test('rejects cervical mucus it doesn’t know', () {
+      rejects(
+        withDay({'mucusFeel': 'damp'}, version: 3),
+        contains('cervical mucus'),
+      );
+      rejects(
+        withDay({'mucusLook': 'egg white'}, version: 3),
+        contains('cervical mucus'),
+      );
+      final day = decodeBackup(
+        withDay({'mucusFeel': 'nothing', 'mucusLook': 'nothing'}, version: 3),
+      ).people.single.days.single;
+      expect(
+        (day.mucusFeel, day.mucusLook),
+        (MucusFeel.nothing, MucusLook.nothing),
+      );
     });
 
     test('still reads version 1, which had no ratings', () {
