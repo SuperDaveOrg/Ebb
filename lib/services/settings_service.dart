@@ -1,8 +1,11 @@
+import 'dart:ui' show PlatformDispatcher;
+
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:ebb/data/database.dart';
 import 'package:ebb/domain/dates.dart';
 import 'package:ebb/domain/milestones.dart';
+import 'package:ebb/domain/temperature.dart';
 
 /// One person's preferences, stored on the device alongside everything else.
 ///
@@ -18,6 +21,7 @@ class SettingsService {
   String get _kReminderHour => _key('reminder_hour');
   String get _kShowFertileWindow => _key('show_fertile_window');
   String get _kShowMoonPhases => _key('show_moon_phases');
+  String get _kTracksTemperature => _key('tracks_temperature');
   String get _kCelebrations => _key('celebrations');
   String get _kMilestonesSeen => _key('milestones_seen');
 
@@ -79,6 +83,18 @@ class SettingsService {
   Future<void> setShowMoonPhases(bool value) async =>
       (await SharedPreferences.getInstance()).setBool(_kShowMoonPhases, value);
 
+  /// Off by default: most people never take their temperature, and the day
+  /// sheet stays shorter without it. Covers cervical mucus too.
+  Future<bool> tracksTemperature() async =>
+      (await SharedPreferences.getInstance()).getBool(_kTracksTemperature) ??
+      false;
+
+  Future<void> setTracksTemperature(bool value) async =>
+      (await SharedPreferences.getInstance()).setBool(
+        _kTracksTemperature,
+        value,
+      );
+
   /// On by default: a small celebration when a milestone is reached.
   Future<bool> celebrations() async =>
       (await SharedPreferences.getInstance()).getBool(_kCelebrations) ?? true;
@@ -115,6 +131,7 @@ class SettingsService {
       _kReminderHour,
       _kShowFertileWindow,
       _kShowMoonPhases,
+      _kTracksTemperature,
       _kCelebrations,
       _kMilestonesSeen,
     ]) {
@@ -141,12 +158,34 @@ class SettingsService {
     await prefs.remove(_kActiveProfile);
     await prefs.remove(_kGroupsEnabled);
     await prefs.remove(_kFirstBackup);
+    await prefs.remove(_kTemperatureUnit);
   }
 
   static const _othersPrefix = 'profile_';
   static const _kFirstBackup = 'first_backup_on';
   static const _kActiveProfile = 'active_profile_id';
   static const _kGroupsEnabled = 'groups_enabled';
+  static const _kTemperatureUnit = 'temperature_unit';
+
+  /// The unit temperatures are typed and shown in. Phone-wide: it's about
+  /// the thermometer and whoever reads the screen, not whose cycle it is.
+  /// Until one is chosen, the one usual where the phone is set.
+  static Future<TemperatureUnit> temperatureUnit() async {
+    final name = (await SharedPreferences.getInstance()).getString(
+      _kTemperatureUnit,
+    );
+    return name == null
+        ? TemperatureUnit.forCountry(
+            PlatformDispatcher.instance.locale.countryCode,
+          )
+        : TemperatureUnit.fromName(name);
+  }
+
+  static Future<void> setTemperatureUnit(TemperatureUnit unit) async =>
+      (await SharedPreferences.getInstance()).setString(
+        _kTemperatureUnit,
+        unit.name,
+      );
 
   /// Whether the advanced groups option is on. Phone-wide, and off by
   /// default: most people with more than one person here are a parent and

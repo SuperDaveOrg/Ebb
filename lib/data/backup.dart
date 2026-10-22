@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:ebb/domain/dates.dart';
+import 'package:ebb/domain/temperature.dart';
 import 'package:ebb/models/cycle.dart';
 import 'package:ebb/models/day_log.dart';
 import 'package:ebb/models/person_group.dart';
@@ -15,7 +16,10 @@ import 'package:ebb/models/profile.dart';
 /// Version 2 added a day's `rating` and `feeling`, and groups of people. It's
 /// a new version, not just new fields, so an older Ebb refuses the file
 /// instead of quietly dropping them.
-const backupFormatVersion = 2;
+///
+/// Version 3 added a day's temperature and cervical mucus, for the same
+/// reason.
+const backupFormatVersion = 3;
 
 /// One person's history within a backup.
 class BackupPerson {
@@ -150,6 +154,11 @@ String encodeBackup(Backup backup, {bool pretty = true}) {
                 if (d.notes != null) 'notes': d.notes,
                 if (d.rating != null) 'rating': d.rating,
                 if (d.feeling != null) 'feeling': d.feeling!.value,
+                if (d.temperature != null) 'temperature': d.temperature,
+                if (d.temperature != null && d.temperatureDisturbed)
+                  'temperatureDisturbed': true,
+                if (d.mucusFeel != null) 'mucusFeel': d.mucusFeel!.name,
+                if (d.mucusLook != null) 'mucusLook': d.mucusLook!.name,
               },
           ],
         },
@@ -343,6 +352,29 @@ BackupPerson _person(Object? raw, DateTime exportedOn) {
       throw _damaged('the feeling on ${isoDate(date)}');
     }
 
+    final rawTemperature = _optional<num>(d, 'temperature', 'a day entry');
+    final temperature = rawTemperature == null
+        ? null
+        : roundTemperature(rawTemperature.toDouble());
+    if (rawTemperature != null && !isTemperature(temperature)) {
+      throw _damaged('the temperature on ${isoDate(date)}');
+    }
+    final disturbed =
+        _optional<bool>(d, 'temperatureDisturbed', 'a day entry') ?? false;
+    if (disturbed && temperature == null) {
+      throw _damaged('the temperature on ${isoDate(date)}');
+    }
+    final feelName = _optional<String>(d, 'mucusFeel', 'a day entry');
+    final mucusFeel = MucusFeel.fromName(feelName);
+    if (feelName != null && mucusFeel == null) {
+      throw _damaged('the cervical mucus on ${isoDate(date)}');
+    }
+    final lookName = _optional<String>(d, 'mucusLook', 'a day entry');
+    final mucusLook = MucusLook.fromName(lookName);
+    if (lookName != null && mucusLook == null) {
+      throw _damaged('the cervical mucus on ${isoDate(date)}');
+    }
+
     days.add(
       DayLog(
         date: date,
@@ -351,6 +383,10 @@ BackupPerson _person(Object? raw, DateTime exportedOn) {
         notes: _optional<String>(d, 'notes', 'a day entry'),
         rating: rating,
         feeling: feeling,
+        temperature: temperature,
+        temperatureDisturbed: disturbed,
+        mucusFeel: mucusFeel,
+        mucusLook: mucusLook,
       ),
     );
   }

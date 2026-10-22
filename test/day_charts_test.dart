@@ -42,6 +42,31 @@ void main() {
     expect(days.map((d) => d.rating).nonNulls, [2]);
   });
 
+  test('temperatureTimeline has every day, with what was logged', () {
+    final days = temperatureTimeline(
+      marks,
+      [
+        DayLog(date: DateTime(2026, 3, 4), temperature: 36.4),
+        DayLog(
+          date: DateTime(2026, 3, 6),
+          temperature: 36.9,
+          temperatureDisturbed: true,
+          mucusFeel: MucusFeel.wet,
+        ),
+        DayLog(date: DateTime(2026, 3, 7), rating: 4),
+      ],
+      from: DateTime(2026, 3, 4),
+      to: DateTime(2026, 3, 7),
+    );
+    expect(days.map((d) => (d.temperature, d.disturbed, d.mucusFeel)), [
+      (36.4, false, null),
+      (null, false, null),
+      (36.9, true, MucusFeel.wet),
+      (null, false, null),
+    ]);
+    expect(days.map((d) => d.period), [true, true, false, false]);
+  });
+
   group('periodRuns', () {
     test('finds each period, cut at the edges of the range', () {
       final runs = periodRuns(

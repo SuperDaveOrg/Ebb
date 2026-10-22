@@ -12,7 +12,7 @@ file**, and Android's own Save picker decides where it goes.
 
 ```json
 {
-  "ebbBackup": 2,
+  "ebbBackup": 3,
   "exportedOn": "2026-09-26",
   "people": [
     {
@@ -22,7 +22,9 @@ file**, and Android's own Save picker decides where it goes.
         { "start": "2026-03-29", "excluded": true, "notes": "flu" }
       ],
       "days": [
-        { "date": "2026-03-02", "flow": "heavy", "symptoms": ["cramps"], "notes": "long day", "rating": 2, "feeling": "tired" }
+        { "date": "2026-03-02", "flow": "heavy", "symptoms": ["cramps"], "notes": "long day", "rating": 2, "feeling": "tired" },
+        { "date": "2026-03-16", "temperature": 36.45, "mucusFeel": "wet", "mucusLook": "creamy" },
+        { "date": "2026-03-17", "temperature": 36.8, "temperatureDisturbed": true }
       ]
     }
   ]
@@ -38,7 +40,7 @@ A cycle is a day in someone's life, not an instant.
 
 | Field | Type | Meaning |
 |---|---|---|
-| `ebbBackup` | integer, required | Format version. Currently `2`; see [Versions](#versions). |
+| `ebbBackup` | integer, required | Format version. Currently `3`; see [Versions](#versions). |
 | `exportedOn` | date, required | The day the backup was made. |
 | `people` | array, required, non-empty | One entry per person tracked on the phone. |
 | `groups` | array, optional | Named groups of people, from the advanced groups option. Absent when there are none. Version 2 and later. |
@@ -84,6 +86,10 @@ one `start` to the next.
 | `notes` | string, optional | Free text. |
 | `rating` | integer, optional | How the day went, from `1` (rough) to `5` (great). Absent means not rated, which is not the same as `3`. Anything other than a whole number from 1 to 5 rejects the file. Version 2 and later. |
 | `feeling` | string, optional | How the person felt. Either one of the named feelings — `happy`, `calm`, `loving`, `energetic`, `tired`, `sad`, `anxious`, `irritable`, `angry`, `confused` — written as the name, never as the emoji Ebb shows for it; or any other face, written as the emoji itself (`"👽"`), which means whatever it means to that person. A face is at most 16 UTF-16 code units, with no ASCII and no whitespace; it need not be one Ebb offers, so faces added to Ebb later still restore in older versions. Names are ASCII and faces never are, so the two can't be confused. Absent means none picked. Anything else rejects the file. Version 2 and later. |
+| `temperature` | number, optional | Waking body temperature in degrees Celsius, whatever unit the app shows it in, from `34` to `43`. Read to a thousandth of a degree, so a reading taken in °F comes back as it was typed. Absent means not taken. Version 3 and later. |
+| `temperatureDisturbed` | boolean, optional | `true` if something may have thrown the reading off: illness, little sleep, alcohol, taken late. Only with a `temperature`; on its own it rejects the file. Absent means `false`. Version 3 and later. |
+| `mucusFeel` | string, optional | How cervical mucus felt: `dry`, `nothing` (nothing felt), `wet` or `slippery`. Absent means not noted, which is not the same as `nothing`. Version 3 and later. |
+| `mucusLook` | string, optional | How cervical mucus looked: `nothing` (nothing seen), `creamy` or `eggWhite`. Absent means not noted. Version 3 and later. |
 
 ### Group
 
@@ -119,6 +125,7 @@ history.
 |---|---|
 | `1` | The first format. |
 | `2` | Added a day's `rating` and `feeling`, `groups`, and a person's `id` and `sharedOn`. Older readers ignore fields they don't know, so an Ebb that only understood version 1 would have restored a file with either and silently dropped them. The version was raised so that it refuses the file instead. Ebb still reads version 1. |
+| `3` | Added a day's `temperature`, `temperatureDisturbed`, `mucusFeel` and `mucusLook`, raised for the same reason as version 2. Ebb still reads versions 1 and 2. |
 
 ## What a backup does not contain
 

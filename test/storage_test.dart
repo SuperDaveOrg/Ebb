@@ -220,4 +220,32 @@ void main() {
       expect(await repo.logFor(day), isNull);
     },
   );
+
+  test(
+    'temperature and cervical mucus survive storage, and clear like the rest',
+    () async {
+      final repo = CycleRepository(db: db);
+      final day = DateTime(2026, 3, 16);
+      await repo.saveLog(
+        DayLog(
+          date: day,
+          temperature: 36.506,
+          temperatureDisturbed: true,
+          mucusFeel: MucusFeel.slippery,
+          mucusLook: MucusLook.creamy,
+        ),
+      );
+      final back = (await repo.logFor(day))!;
+      expect(back.temperature, 36.506);
+      expect(back.temperatureDisturbed, isTrue);
+      expect(back.mucusFeel, MucusFeel.slippery);
+      expect(back.mucusLook, MucusLook.creamy);
+
+      await repo.saveLog(DayLog(date: day, mucusLook: MucusLook.nothing));
+      expect((await repo.logFor(day))?.mucusLook, MucusLook.nothing);
+
+      await repo.saveLog(DayLog(date: day));
+      expect(await repo.logFor(day), isNull);
+    },
+  );
 }

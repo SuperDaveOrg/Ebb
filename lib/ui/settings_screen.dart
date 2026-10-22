@@ -11,6 +11,7 @@ import 'package:ebb/data/profile_repository.dart';
 import 'package:ebb/models/profile.dart';
 import 'package:ebb/domain/dates.dart';
 import 'package:ebb/domain/milestones.dart';
+import 'package:ebb/domain/temperature.dart';
 import 'package:ebb/services/app_info.dart';
 import 'package:ebb/services/document_service.dart';
 import 'package:ebb/services/links.dart';
@@ -74,6 +75,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   int _leadDays = 2;
   bool _fertileWindow = false;
   bool _moonPhases = false;
+  bool _temperature = false;
+  TemperatureUnit _unit = TemperatureUnit.celsius;
   bool _celebrations = true;
   bool _groups = false;
   bool _loading = true;
@@ -94,6 +97,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final lead = await widget.settings.leadDays();
     final fertile = await widget.settings.showFertileWindow();
     final moon = await widget.settings.showMoonPhases();
+    final temperature = await widget.settings.tracksTemperature();
+    final unit = await SettingsService.temperatureUnit();
     final celebrations = await widget.settings.celebrations();
     final groups = await SettingsService.groupsEnabled();
     final version = await installedVersion();
@@ -104,6 +109,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
       _leadDays = lead;
       _fertileWindow = fertile;
       _moonPhases = moon;
+      _temperature = temperature;
+      _unit = unit;
       _celebrations = celebrations;
       _groups = groups;
       _loading = false;
@@ -564,6 +571,45 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         setState(() => _moonPhases = v);
                       },
                     ),
+                    // A shared copy is logged on her own phone; its charts
+                    // show whatever came with it.
+                    if (!widget.profile.isSharedCopy) ...[
+                      SwitchListTile(
+                        secondary: const Icon(Icons.thermostat_outlined),
+                        title: const Text(
+                          'Track temperature and cervical mucus',
+                        ),
+                        subtitle: const Text(
+                          'On each day of the calendar, with a temperature '
+                          'chart. Recorded and drawn, never used to estimate '
+                          'anything.',
+                        ),
+                        value: _temperature,
+                        onChanged: (v) async {
+                          await widget.settings.setTracksTemperature(v);
+                          setState(() => _temperature = v);
+                        },
+                      ),
+                      if (_temperature)
+                        ListTile(
+                          leading: const SizedBox.shrink(),
+                          title: const Text('Temperature in'),
+                          trailing: SegmentedButton<TemperatureUnit>(
+                            showSelectedIcon: false,
+                            segments: [
+                              for (final u in TemperatureUnit.values)
+                                ButtonSegment(value: u, label: Text(u.symbol)),
+                            ],
+                            selected: {_unit},
+                            onSelectionChanged: (u) async {
+                              await SettingsService.setTemperatureUnit(
+                                u.single,
+                              );
+                              setState(() => _unit = u.single);
+                            },
+                          ),
+                        ),
+                    ],
                     if (!widget.profile.isSharedCopy)
                       SwitchListTile(
                         secondary: const Icon(Icons.celebration_outlined),

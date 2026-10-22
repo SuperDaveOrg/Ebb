@@ -6,6 +6,8 @@ import 'package:intl/intl.dart' show DateFormat;
 import 'package:ebb/domain/dates.dart';
 import 'package:ebb/domain/day_charts.dart';
 import 'package:ebb/domain/moon.dart';
+import 'package:ebb/domain/temperature.dart';
+import 'package:ebb/models/day_log.dart';
 import 'package:ebb/ui/moon_icon.dart';
 import 'package:ebb/ui/theme.dart';
 
@@ -539,4 +541,345 @@ class _LanesPainter extends CustomPainter {
       old.label != label ||
       old.grid != grid ||
       old.period != period;
+}
+
+/// Waking temperatures as points over the days, with cervical mucus in two
+/// rows beneath — how it felt and how it looked — and logged period days
+/// shaded behind both, the way a paper chart for the sympto-thermal method
+/// is laid out.
+///
+/// Draws only what was logged. It finds no rise, draws no cover line and
+/// marks no fertile days: those are the method's rules, and applying them is
+/// left to her.
+class TemperatureChart extends StatelessWidget {
+  const TemperatureChart({super.key, required this.days, required this.unit});
+
+  final List<TemperatureDay> days;
+  final TemperatureUnit unit;
+
+  static const _axisWidth = 46.0;
+  static const _plotHeight = 200.0;
+  static const _rowHeight = 18.0;
+  static const _rowGap = 6.0;
+
+  /// Room between the readings and the mucus rows, so the lowest label on
+  /// the axis stays clear of "Felt".
+  static const _plotGap = 18.0;
+  static const _months = 22.0;
+
+  static double get height =>
+      _plotHeight + _plotGap + 2 * _rowHeight + _rowGap + _months;
+
+  String get _summary {
+    final fmt = DateFormat.yMMMd();
+    final readings = [
+      for (final d in days)
+        if (d.temperature != null) d.temperature!,
+    ];
+    final mucus = days
+        .where((d) => d.mucusFeel != null || d.mucusLook != null)
+        .length;
+    final range = readings.isEmpty
+        ? 'no temperatures'
+        : '${readings.length} temperature${readings.length == 1 ? '' : 's'}, '
+              'from ${unit.formatWithUnit(readings.reduce(math.min))} to '
+              '${unit.formatWithUnit(readings.reduce(math.max))}';
+    return 'Temperatures from ${fmt.format(days.first.date)} to '
+        '${fmt.format(days.last.date)}: $range, cervical mucus noted on '
+        '$mucus day${mucus == 1 ? '' : 's'}, with period days shaded.';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colors = EbbColors.of(context);
+    final label = _labelStyle(theme);
+    final axis = temperatureAxis(days.map((d) => d.temperature).nonNulls, unit);
+    return Semantics(
+      label: _summary,
+      excludeSemantics: true,
+      child: SizedBox(
+        height: height,
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            SizedBox(
+              width: _axisWidth,
+              child: CustomPaint(
+                painter: _TemperatureAxisPainter(
+                  axis: axis,
+                  unit: unit,
+                  label: label,
+                ),
+              ),
+            ),
+            Expanded(
+              child: CustomPaint(
+                painter: _TemperaturePainter(
+                  days: days,
+                  axis: axis,
+                  unit: unit,
+                  point: theme.colorScheme.primary,
+                  look: theme.colorScheme.tertiary,
+                  grid: colors.track,
+                  period: colors.period,
+                  label: label,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Where things sit vertically, shared by the axis and the chart.
+class _TemperatureLayout {
+  _TemperatureLayout(this.axis);
+
+  final (double, double) axis;
+
+  static const top = 8.0;
+  static const plotBottom = TemperatureChart._plotHeight;
+  static const feelTop = plotBottom + TemperatureChart._plotGap;
+  static const lookTop =
+      feelTop + TemperatureChart._rowHeight + TemperatureChart._rowGap;
+  static const rowsBottom = lookTop + TemperatureChart._rowHeight;
+
+  double y(double value) {
+    final (low, high) = axis;
+    return plotBottom - (value - low) / (high - low) * (plotBottom - top);
+  }
+
+  /// Every gridline from the bottom of the axis to the top, in the unit
+  /// shown.
+  List<double> lines(double step) {
+    final (low, high) = axis;
+    final n = ((high - low) / step).round();
+    return [for (var i = 0; i <= n; i++) low + i * step];
+  }
+
+  /// Every how many gridlines to put a label, keeping them apart.
+  int labelEvery(double step) {
+    final (low, high) = axis;
+    final px = (plotBottom - top) / ((high - low) / step);
+    return [1, 2, 5, 10].firstWhere((k) => k * px >= 22, orElse: () => 10);
+  }
+}
+
+class _TemperatureAxisPainter extends CustomPainter {
+  _TemperatureAxisPainter({
+    required this.axis,
+    required this.unit,
+    required this.label,
+  });
+
+  final (double, double) axis;
+  final TemperatureUnit unit;
+  final TextStyle label;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final layout = _TemperatureLayout(axis);
+    final step = unit.chartStep;
+    final every = layout.labelEvery(step);
+    final lines = layout.lines(step);
+    for (final (i, v) in lines.indexed) {
+      if (i % every != 0) continue;
+      _text(
+        canvas,
+        v.toStringAsFixed(1),
+        label,
+        Offset(2, layout.y(v)),
+        left: true,
+      );
+    }
+    const half = TemperatureChart._rowHeight / 2;
+    _text(
+      canvas,
+      'Felt',
+      label,
+      const Offset(2, _TemperatureLayout.feelTop + half),
+      left: true,
+    );
+    _text(
+      canvas,
+      'Looked',
+      label,
+      const Offset(2, _TemperatureLayout.lookTop + half),
+      left: true,
+    );
+  }
+
+  @override
+  bool shouldRepaint(_TemperatureAxisPainter old) =>
+      old.axis != axis || old.unit != unit || old.label != label;
+}
+
+class _TemperaturePainter extends CustomPainter {
+  _TemperaturePainter({
+    required this.days,
+    required this.axis,
+    required this.unit,
+    required this.point,
+    required this.look,
+    required this.grid,
+    required this.period,
+    required this.label,
+  });
+
+  final List<TemperatureDay> days;
+  final (double, double) axis;
+  final TemperatureUnit unit;
+  final Color point;
+  final Color look;
+  final Color grid;
+  final Color period;
+  final TextStyle label;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final layout = _TemperatureLayout(axis);
+    final right = size.width - 4;
+    final slot = right / days.length;
+    double cx(int i) => (i + 0.5) * slot;
+
+    // Period days as blocks behind the readings and the mucus rows alike.
+    final shade = Paint()..color = period.withValues(alpha: 0.18);
+    for (var i = 0; i < days.length; i++) {
+      if (!days[i].period || (i > 0 && days[i - 1].period)) continue;
+      var j = i;
+      while (j + 1 < days.length && days[j + 1].period) {
+        j++;
+      }
+      canvas.drawRect(
+        Rect.fromLTRB(
+          i * slot,
+          _TemperatureLayout.top,
+          (j + 1) * slot,
+          _TemperatureLayout.rowsBottom,
+        ),
+        shade,
+      );
+    }
+
+    final gridPaint = Paint()
+      ..color = grid
+      ..strokeWidth = 1;
+    final step = unit.chartStep;
+    final every = layout.labelEvery(step);
+    final faint = Paint()
+      ..color = grid.withValues(alpha: 0.5)
+      ..strokeWidth = 1;
+    for (final (i, v) in layout.lines(step).indexed) {
+      final y = layout.y(v);
+      canvas.drawLine(
+        Offset(0, y),
+        Offset(right, y),
+        i % every == 0 ? gridPaint : faint,
+      );
+    }
+
+    // Joined only from one reading to the next day's, and never to or from
+    // one that may have been affected: across a gap the line breaks rather
+    // than inventing what came between.
+    final linePaint = Paint()
+      ..color = point
+      ..strokeWidth = 2
+      ..strokeJoin = StrokeJoin.round
+      ..strokeCap = StrokeCap.round
+      ..style = PaintingStyle.stroke;
+    final dot = slot >= 2 ? math.min(3.5, slot * 0.4 + 1) : 1.2;
+    final fill = Paint()..color = point;
+    final ring = Paint()
+      ..color = point
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.5;
+    double? y(double? c) => c == null ? null : layout.y(unit.fromCelsius(c));
+    for (var i = 0; i < days.length; i++) {
+      final d = days[i];
+      final yi = y(d.temperature);
+      if (yi == null) continue;
+      if (i > 0) {
+        final prev = days[i - 1];
+        final yp = y(prev.temperature);
+        if (yp != null && !prev.disturbed && !d.disturbed) {
+          canvas.drawLine(Offset(cx(i - 1), yp), Offset(cx(i), yi), linePaint);
+        }
+      }
+      if (d.disturbed) {
+        canvas.drawCircle(Offset(cx(i), yi), math.max(dot, 2.5), ring);
+      } else {
+        canvas.drawCircle(Offset(cx(i), yi), dot, fill);
+      }
+    }
+
+    // Mucus as a bar per day, taller from dry to wet and from nothing seen
+    // to egg white. Only an order of what was noted: no day is singled out.
+    final width = slot >= 3 ? slot * 0.7 : slot;
+    void bars(
+      double top,
+      Color color,
+      int? Function(TemperatureDay) level,
+      int levels,
+    ) {
+      final paint = Paint()..color = color;
+      const h = TemperatureChart._rowHeight;
+      canvas.drawLine(Offset(0, top + h), Offset(right, top + h), faint);
+      for (var i = 0; i < days.length; i++) {
+        final n = level(days[i]);
+        if (n == null) continue;
+        final barH = math.max(2.0, h * (n + 1) / levels);
+        canvas.drawRRect(
+          RRect.fromRectAndRadius(
+            Rect.fromLTRB(
+              cx(i) - width / 2,
+              top + h - barH,
+              cx(i) + width / 2,
+              top + h,
+            ),
+            Radius.circular(math.min(2, width / 2)),
+          ),
+          paint,
+        );
+      }
+    }
+
+    bars(
+      _TemperatureLayout.feelTop,
+      point,
+      (d) => d.mucusFeel?.index,
+      MucusFeel.values.length,
+    );
+    bars(
+      _TemperatureLayout.lookTop,
+      look,
+      (d) => d.mucusLook?.index,
+      MucusLook.values.length,
+    );
+
+    _paintMonths(
+      canvas,
+      first: days.first.date,
+      count: days.length,
+      left: 0,
+      slot: slot,
+      axis: _TemperatureLayout.rowsBottom,
+      labelY: size.height - 10,
+      label: label,
+      grid: gridPaint,
+    );
+  }
+
+  @override
+  bool shouldRepaint(_TemperaturePainter old) =>
+      old.days != days ||
+      old.axis != axis ||
+      old.unit != unit ||
+      old.point != point ||
+      old.look != look ||
+      old.grid != grid ||
+      old.period != period ||
+      old.label != label;
 }

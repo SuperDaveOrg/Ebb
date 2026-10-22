@@ -7,6 +7,7 @@ import 'package:ebb/domain/cycle_rules.dart';
 import 'package:ebb/domain/dates.dart';
 import 'package:ebb/domain/moon.dart';
 import 'package:ebb/domain/predictor.dart';
+import 'package:ebb/domain/temperature.dart';
 import 'package:ebb/models/cycle.dart';
 import 'package:ebb/models/day_log.dart';
 import 'package:ebb/services/settings_service.dart';
@@ -54,6 +55,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
   Map<String, DayLog> _logs = const {};
   bool _showFertile = false;
   bool _showMoon = false;
+  bool _tracksTemperature = false;
+  TemperatureUnit _unit = TemperatureUnit.celsius;
   bool _loading = true;
 
   @override
@@ -67,6 +70,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
     final logs = await widget.repository.allLogs();
     final fertile = await widget.settings.showFertileWindow();
     final moon = await widget.settings.showMoonPhases();
+    final temperature = await widget.settings.tracksTemperature();
+    final unit = await SettingsService.temperatureUnit();
     final prediction = const Predictor().predict(cycles);
     if (!mounted) return;
     setState(() {
@@ -74,6 +79,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
       _prediction = prediction;
       _showFertile = fertile;
       _showMoon = moon;
+      _tracksTemperature = temperature;
+      _unit = unit;
       _marks = CalendarMarks(cycles, prediction, showFertile: fertile);
       _logs = {for (final l in logs) isoDate(l.date): l};
       _loading = false;
@@ -139,6 +146,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
           prediction: _prediction,
           log: _logs[isoDate(day)],
           moon: _showMoon ? moonPhasesByDay(day, day)[isoDate(day)] : null,
+          tracksTemperature: _tracksTemperature,
+          unit: _unit,
           readOnly: widget.readOnly,
         ),
         save: (log) async {
@@ -752,6 +761,8 @@ class _DayPagerState extends State<_DayPager> {
 
   Future<void> _go(int step) async {
     if (_busy || !_canGo(step)) return;
+    // Leaving would lose what was typed; the field already says why.
+    if (_key.currentState?._temperatureInvalid ?? false) return;
     final next = addDays(_day, step);
     final log = _key.currentState?._changedLog;
     if (log != null) {
@@ -821,6 +832,8 @@ class _DaySheet extends StatefulWidget {
     required this.prediction,
     required this.log,
     this.moon,
+    this.tracksTemperature = false,
+    this.unit = TemperatureUnit.celsius,
     this.readOnly = false,
     this.onPrevious,
     this.onNext,
@@ -833,6 +846,11 @@ class _DaySheet extends StatefulWidget {
   final CyclePrediction prediction;
   final DayLog? log;
   final MoonEvent? moon;
+
+  /// Whether to offer temperature and cervical mucus. Shown anyway on a day
+  /// that already has them, so nothing logged is ever out of reach.
+  final bool tracksTemperature;
+  final TemperatureUnit unit;
   final bool readOnly;
 
   /// Null at the ends of the calendar.
@@ -850,11 +868,37 @@ class _DaySheetState extends State<_DaySheet> {
   late int? _rating = widget.log?.rating;
   late DayFeeling? _feeling = widget.log?.feeling;
   late final _notes = TextEditingController(text: widget.log?.notes);
+  late final String _temperatureShown = widget.log?.temperature == null
+      ? ''
+      : widget.unit.format(widget.log!.temperature!);
+  late final _temperatureText = TextEditingController(text: _temperatureShown);
+  late bool _disturbed = widget.log?.temperatureDisturbed ?? false;
+  late MucusFeel? _mucusFeel = widget.log?.mucusFeel;
+  late MucusLook? _mucusLook = widget.log?.mucusLook;
 
   @override
   void dispose() {
     _notes.dispose();
+    _temperatureText.dispose();
     super.dispose();
+  }
+
+  bool get _showsTemperature =>
+      widget.tracksTemperature || (widget.log?.hasTemperatureOrMucus ?? false);
+
+  bool get _temperatureInvalid =>
+      _temperatureText.text.trim().isNotEmpty &&
+      widget.unit.parse(_temperatureText.text) == null;
+
+  /// The temperature as edited. Text left as it was shown keeps the stored
+  /// reading exactly, rather than the two decimals it was shown to; text
+  /// that can't be read keeps it too (Save is off until it's fixed).
+  double? get _temperature {
+    final text = _temperatureText.text.trim();
+    if (text == _temperatureShown || _temperatureInvalid) {
+      return widget.log?.temperature;
+    }
+    return text.isEmpty ? null : widget.unit.parse(text);
   }
 
   bool get _future => widget.day.isAfter(today());
@@ -864,10 +908,16 @@ class _DaySheetState extends State<_DaySheet> {
     String? clean(String? s) => s == null || s.trim().isEmpty ? null : s.trim();
     final old = widget.log;
     final notes = clean(_notes.text);
+    final temperature = _temperature;
+    final disturbed = temperature != null && _disturbed;
     if (_flow == (old?.flow ?? Flow.none) &&
         _rating == old?.rating &&
         _feeling == old?.feeling &&
-        notes == clean(old?.notes)) {
+        notes == clean(old?.notes) &&
+        temperature == old?.temperature &&
+        disturbed == (old?.temperatureDisturbed ?? false) &&
+        _mucusFeel == old?.mucusFeel &&
+        _mucusLook == old?.mucusLook) {
       return null;
     }
     return DayLog(
@@ -878,6 +928,45 @@ class _DaySheetState extends State<_DaySheet> {
       notes: notes,
       rating: _rating,
       feeling: _feeling,
+      temperature: temperature,
+      temperatureDisturbed: disturbed,
+      mucusFeel: _mucusFeel,
+      mucusLook: _mucusLook,
+    );
+  }
+
+  /// One row of choices that share the width, like Flow: tap the chosen one
+  /// again to clear it. No checkmark: it would widen the chosen chip, and
+  /// the fill already shows it.
+  Widget _choices<T>(
+    List<T> values,
+    T? chosen,
+    String Function(T) label,
+    ValueChanged<T?> onChanged,
+  ) {
+    final theme = Theme.of(context);
+    return Row(
+      children: [
+        for (final (i, v) in values.indexed) ...[
+          if (i > 0) const SizedBox(width: 8),
+          Expanded(
+            child: ChoiceChip(
+              showCheckmark: false,
+              labelPadding: EdgeInsets.zero,
+              // Chosen the same way as the faces above.
+              selectedColor: theme.colorScheme.primaryContainer,
+              side: chosen == v
+                  ? BorderSide(color: theme.colorScheme.primary, width: 2)
+                  : null,
+              label: Center(
+                child: FittedBox(fit: BoxFit.scaleDown, child: Text(label(v))),
+              ),
+              selected: chosen == v,
+              onSelected: (on) => onChanged(on ? v : null),
+            ),
+          ),
+        ],
+      ],
     );
   }
 
@@ -945,6 +1034,79 @@ class _DaySheetState extends State<_DaySheet> {
     if (daysBetween(c.start, widget.day) >= Cycle.maxPeriodDays) return null;
     final candidate = c.copyWith(end: widget.day);
     return checkCycle(candidate, widget.cycles) == null ? c : null;
+  }
+
+  List<Widget> _temperatureAndMucus(EdgeInsets side) {
+    final theme = Theme.of(context);
+    final unit = widget.unit;
+    final small = theme.textTheme.bodyMedium?.copyWith(
+      color: theme.colorScheme.onSurfaceVariant,
+    );
+    final hasTemperature = _temperatureText.text.trim().isNotEmpty;
+    return [
+      Padding(
+        padding: side + const EdgeInsets.only(top: 16),
+        child: Text(
+          'Temperature, ${unit.symbol}',
+          style: theme.textTheme.titleSmall,
+        ),
+      ),
+      Padding(
+        padding: side + const EdgeInsets.only(top: 8),
+        child: TextField(
+          controller: _temperatureText,
+          keyboardType: const TextInputType.numberWithOptions(decimal: true),
+          decoration: InputDecoration(
+            hintText: unit.format(36.5),
+            errorText: _temperatureInvalid
+                ? 'Enter a temperature from ${unit.range}'
+                : null,
+            helperText: 'On waking, before getting up',
+          ),
+          onChanged: (_) => setState(() {}),
+        ),
+      ),
+      CheckboxListTile(
+        contentPadding: side,
+        controlAffinity: ListTileControlAffinity.leading,
+        value: hasTemperature && _disturbed,
+        onChanged: hasTemperature
+            ? (v) => setState(() => _disturbed = v ?? false)
+            : null,
+        title: const Text('Something may have affected it'),
+        subtitle: const Text('Illness, little sleep, alcohol, taken late'),
+      ),
+      Padding(
+        padding: side + const EdgeInsets.only(top: 8),
+        child: Text('Cervical mucus', style: theme.textTheme.titleSmall),
+      ),
+      Padding(
+        padding: side + const EdgeInsets.only(top: 8),
+        child: Text('How it felt', style: small),
+      ),
+      Padding(
+        padding: side + const EdgeInsets.only(top: 6),
+        child: _choices(
+          MucusFeel.values,
+          _mucusFeel,
+          (m) => m.chip,
+          (m) => setState(() => _mucusFeel = m),
+        ),
+      ),
+      Padding(
+        padding: side + const EdgeInsets.only(top: 10),
+        child: Text('How it looked', style: small),
+      ),
+      Padding(
+        padding: side + const EdgeInsets.only(top: 6),
+        child: _choices(
+          MucusLook.values,
+          _mucusLook,
+          (m) => m.chip,
+          (m) => setState(() => _mucusLook = m),
+        ),
+      ),
+    ];
   }
 
   @override
@@ -1022,7 +1184,7 @@ class _DaySheetState extends State<_DaySheet> {
                 ),
               const SizedBox(height: 8),
               if (widget.readOnly)
-                _LoggedDay(log: widget.log, padding: side)
+                _LoggedDay(log: widget.log, unit: widget.unit, padding: side)
               else if (_future)
                 Padding(
                   padding: side + const EdgeInsets.only(bottom: 24, top: 8),
@@ -1103,41 +1265,16 @@ class _DaySheetState extends State<_DaySheet> {
                   padding: side + const EdgeInsets.only(top: 16),
                   child: Text('Flow', style: theme.textTheme.titleSmall),
                 ),
-                // One row, like the faces above. No checkmark: it would
-                // widen the chosen chip, and the fill already shows it.
                 Padding(
                   padding: side + const EdgeInsets.only(top: 8),
-                  child: Row(
-                    children: [
-                      for (final (i, f) in Flow.values.skip(1).indexed) ...[
-                        if (i > 0) const SizedBox(width: 8),
-                        Expanded(
-                          child: ChoiceChip(
-                            showCheckmark: false,
-                            labelPadding: EdgeInsets.zero,
-                            // Chosen the same way as the faces above.
-                            selectedColor: theme.colorScheme.primaryContainer,
-                            side: _flow == f
-                                ? BorderSide(
-                                    color: theme.colorScheme.primary,
-                                    width: 2,
-                                  )
-                                : null,
-                            label: Center(
-                              child: FittedBox(
-                                fit: BoxFit.scaleDown,
-                                child: Text(f.label),
-                              ),
-                            ),
-                            selected: _flow == f,
-                            onSelected: (on) =>
-                                setState(() => _flow = on ? f : Flow.none),
-                          ),
-                        ),
-                      ],
-                    ],
+                  child: _choices(
+                    Flow.values.skip(1).toList(),
+                    _flow == Flow.none ? null : _flow,
+                    (f) => f.label,
+                    (f) => setState(() => _flow = f ?? Flow.none),
                   ),
                 ),
+                if (_showsTemperature) ..._temperatureAndMucus(side),
                 Padding(
                   padding: side + const EdgeInsets.only(top: 16),
                   child: TextField(
@@ -1162,7 +1299,7 @@ class _DaySheetState extends State<_DaySheet> {
                       const SizedBox(width: 12),
                       Expanded(
                         child: FilledButton(
-                          onPressed: () => _done(),
+                          onPressed: _temperatureInvalid ? null : () => _done(),
                           child: const Text('Save'),
                         ),
                       ),
@@ -1184,9 +1321,14 @@ String _feelingName(DayFeeling f) =>
 
 /// What was logged on a day of a shared copy, to read rather than change.
 class _LoggedDay extends StatelessWidget {
-  const _LoggedDay({required this.log, required this.padding});
+  const _LoggedDay({
+    required this.log,
+    required this.unit,
+    required this.padding,
+  });
 
   final DayLog? log;
+  final TemperatureUnit unit;
   final EdgeInsets padding;
 
   @override
@@ -1199,6 +1341,11 @@ class _LoggedDay extends StatelessWidget {
       if (l?.feeling case final f?) 'Felt ${f.emoji} ${_feelingName(f)}',
       if (l != null && l.flow != Flow.none)
         'Flow: ${l.flow.label.toLowerCase()}',
+      if (l?.temperature case final t?)
+        'Temperature: ${unit.formatWithUnit(t)}'
+            '${l!.temperatureDisturbed ? ', may have been affected' : ''}',
+      if (l != null && (l.mucusFeel != null || l.mucusLook != null))
+        'Cervical mucus: ${[if (l.mucusFeel case final f?) f.label.toLowerCase(), if (l.mucusLook case final k?) k.label.toLowerCase()].join(', ')}',
       if (l?.notes case final n? when n.trim().isNotEmpty) '“${n.trim()}”',
     ];
     return Padding(

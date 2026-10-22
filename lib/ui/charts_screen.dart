@@ -6,6 +6,7 @@ import 'package:ebb/domain/dates.dart';
 import 'package:ebb/domain/day_charts.dart';
 import 'package:ebb/domain/moon.dart';
 import 'package:ebb/domain/predictor.dart';
+import 'package:ebb/domain/temperature.dart';
 import 'package:ebb/models/cycle.dart';
 import 'package:ebb/models/day_log.dart';
 import 'package:ebb/services/settings_service.dart';
@@ -44,6 +45,8 @@ class _ChartsScreenState extends State<ChartsScreen> {
   List<DayLog> _logs = const [];
   CyclePrediction _prediction = CyclePrediction.empty;
   bool _showMoon = false;
+  bool _tracksTemperature = false;
+  TemperatureUnit _unit = TemperatureUnit.celsius;
   bool _loading = true;
 
   DateSpan _span = const DateSpan(SpanChoice.months3);
@@ -60,12 +63,16 @@ class _ChartsScreenState extends State<ChartsScreen> {
     final cycles = await widget.repository.allCycles();
     final logs = await widget.repository.allLogs();
     final moon = await widget.settings.showMoonPhases();
+    final temperature = await widget.settings.tracksTemperature();
+    final unit = await SettingsService.temperatureUnit();
     if (!mounted) return;
     setState(() {
       _cycles = cycles;
       _logs = logs;
       _prediction = const Predictor().predict(cycles);
       _showMoon = moon;
+      _tracksTemperature = temperature;
+      _unit = unit;
       _loading = false;
     });
   }
@@ -113,6 +120,11 @@ class _ChartsScreenState extends State<ChartsScreen> {
                   ),
                 ),
                 _timeline(context, logs, marks, from, to),
+                // Also for anyone who has turned tracking off since, or a
+                // shared copy that came with readings.
+                if (_tracksTemperature ||
+                    _logs.any((l) => l.hasTemperatureOrMucus))
+                  _temperature(context, logs, marks, from, to),
                 _feelings(context, logs, marks),
               ],
             ),
@@ -195,6 +207,50 @@ class _ChartsScreenState extends State<ChartsScreen> {
                   '${bars ? 'Each bar is one day’s rating' : 'Each point is one day’s rating, joined to the next day’s when both were rated'}, '
                   '1 to 5. Period days are shaded.'
                   '${_showMoon ? ' Moons mark the moon’s phases; over a long range, only the new and full moons, or just the full ones.' : ''}',
+                ),
+              ],
+            ),
+          ),
+      ],
+    );
+  }
+
+  Widget _temperature(
+    BuildContext context,
+    List<DayLog> logs,
+    CalendarMarks marks,
+    DateTime from,
+    DateTime to,
+  ) {
+    final days = temperatureTimeline(marks, logs, from: from, to: to);
+    return Section(
+      title: 'Temperature and cervical mucus',
+      children: [
+        if (!days.any(
+          (d) =>
+              d.temperature != null ||
+              d.mucusFeel != null ||
+              d.mucusLook != null,
+        ))
+          _empty(
+            context,
+            'Nothing logged in this range yet. Tap a day on the calendar to '
+            'add a temperature or cervical mucus.',
+          )
+        else
+          _padded(
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                TemperatureChart(days: days, unit: _unit),
+                const SizedBox(height: 8),
+                _caption(
+                  context,
+                  'Each point is one day’s temperature, in ${_unit.symbol}, '
+                  'joined to the next day’s when both were taken. A hollow '
+                  'point may have been affected, and isn’t joined. Below, '
+                  'cervical mucus: taller bars are wetter (felt) and clearer '
+                  'and stretchier (looked). Period days are shaded.',
                 ),
               ],
             ),

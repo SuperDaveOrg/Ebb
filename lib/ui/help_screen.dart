@@ -84,6 +84,22 @@ class HelpScreen extends StatelessWidget {
           'that’s yours to judge.',
     ),
     (
+      Icons.thermostat_outlined,
+      'Temperature and cervical mucus',
+      'Turn on “Track temperature and cervical mucus” in Settings, and each '
+          'day on the calendar has room for your waking temperature and how '
+          'cervical mucus felt and looked. If something may have thrown a '
+          'reading off — illness, little sleep, alcohol, taking it late — '
+          'tick the box under it.\n\n'
+          'Charts shows the temperatures as a line, with mucus underneath '
+          'and periods shaded, in °C or °F (Settings).\n\n'
+          'Ebb records and draws these, and that’s all. It doesn’t look for '
+          'a rise or work out fertile days from them, and its fertile-window '
+          'estimate still comes from cycle timing alone. If you follow a '
+          'method such as the sympto-thermal method, the chart is there for '
+          'you to read by its rules.',
+    ),
+    (
       Icons.notifications_none,
       'Reminders',
       'A heads-up a few days before your period is expected, and another on '
