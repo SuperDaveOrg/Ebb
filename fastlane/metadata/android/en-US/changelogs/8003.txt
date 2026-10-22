@@ -1,0 +1,2 @@
+• Temperature and cervical mucus, if you want them: turn on Settings → Track temperature and cervical mucus to log your waking temperature and how mucus felt and looked on each calendar day. Charts draws them, in °C or °F, with periods shaded. Recorded and drawn only, never used to estimate fertile days.
+• Backups include them, in a new backup format version. Update Ebb on other phones before restoring a new backup there.

@@ -9,6 +9,8 @@ turns that section into the release's own when it's cut.
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-10-22
+
 ### Added
 - Temperature and cervical mucus, if you want them: turn on Settings →
   Track temperature and cervical mucus. Each day on the calendar then has
