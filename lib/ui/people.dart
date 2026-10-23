@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:ebb/data/database.dart';
 import 'package:ebb/models/person_group.dart';
 import 'package:ebb/models/profile.dart';
+import 'package:ebb/ui/language.dart';
 import 'package:ebb/ui/wording.dart';
 
 /// Asks for a name. Returns the trimmed name, `''` if [optional] and she
@@ -18,7 +19,7 @@ Future<String?> showNameDialog(
   bool optional = false,
   String? hint,
   bool Function(String name)? taken,
-  String takenMessage = 'That name is already used on this phone.',
+  String? takenMessage,
   int maxLength = Profile.maxNameLength,
 }) {
   return showDialog<String>(
@@ -30,7 +31,7 @@ Future<String?> showNameDialog(
       optional: optional,
       hint: hint,
       taken: taken,
-      takenMessage: takenMessage,
+      takenMessage: takenMessage ?? context.l.peopleNameTaken,
       maxLength: maxLength,
     ),
   );
@@ -86,7 +87,7 @@ class _NameDialogState extends State<_NameDialog> {
           // "You" is how the owner appears when unnamed.
           (p.id == EbbDatabase.primaryProfileId &&
               p.name == null &&
-              _name.toLowerCase() == 'you'),
+              _name.toLowerCase() == strings.you.toLowerCase()),
     );
     return taken ? widget.takenMessage : null;
   }
@@ -106,7 +107,7 @@ class _NameDialogState extends State<_NameDialog> {
         maxLength: widget.maxLength,
         textCapitalization: TextCapitalization.words,
         decoration: InputDecoration(
-          labelText: 'Name',
+          labelText: context.l.peopleName,
           helperText: widget.hint,
           helperMaxLines: 3,
           errorMaxLines: 2,
@@ -118,11 +119,11 @@ class _NameDialogState extends State<_NameDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Cancel'),
+          child: Text(context.l.cancel),
         ),
         FilledButton(
           onPressed: problem == null ? _save : null,
-          child: const Text('Save'),
+          child: Text(context.l.save),
         ),
       ],
     );
@@ -211,7 +212,7 @@ Future<PeopleChoice?> showPeopleSheet(
                   ListTile(
                     contentPadding: side,
                     leading: const Icon(Icons.view_timeline_outlined),
-                    title: Text('See ${g.name} together'),
+                    title: Text(ctx.l.peopleSeeTogether(g.name)),
                     onTap: () => Navigator.of(ctx).pop(SeeGroup(g)),
                   ),
                   for (final p in people)
@@ -220,7 +221,7 @@ Future<PeopleChoice?> showPeopleSheet(
                     Padding(
                       padding: side + const EdgeInsets.only(bottom: 8),
                       child: Text(
-                        'No one yet',
+                        ctx.l.groupsNoOneYet,
                         style: theme.textTheme.bodyMedium?.copyWith(
                           color: theme.colorScheme.onSurfaceVariant,
                         ),
@@ -228,7 +229,7 @@ Future<PeopleChoice?> showPeopleSheet(
                     ),
                 ],
                 if (loose.isNotEmpty) ...[
-                  heading('Not in a group'),
+                  heading(ctx.l.peopleNotInGroup),
                   for (final p in loose) person(p),
                 ],
               ],
@@ -236,7 +237,7 @@ Future<PeopleChoice?> showPeopleSheet(
               ListTile(
                 contentPadding: side,
                 leading: const Icon(Icons.person_add_alt),
-                title: const Text('Add someone'),
+                title: Text(ctx.l.peopleAddSomeone),
                 onTap: () => Navigator.of(ctx).pop(const AddSomeone()),
               ),
               const SizedBox(height: 8),

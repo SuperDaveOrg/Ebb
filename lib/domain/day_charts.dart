@@ -140,14 +140,26 @@ List<PeriodRun> periodRuns(
   return runs;
 }
 
+/// Which days a [FeelingGroup] covers. The screen puts them into words.
+enum FeelingDays {
+  duringPeriod,
+  beforePeriod,
+  restOfCycle,
+  nearFullMoon,
+  nearNewMoon,
+  restOfMonth,
+}
+
 /// One group of days, and how often each feeling was picked on them.
 class FeelingGroup {
-  const FeelingGroup(this.title, this.detail, this.days, this.counts);
+  const FeelingGroup(this.kind, this.span, this.days, this.counts);
 
-  final String title;
+  final FeelingDays kind;
 
-  /// Which days the group covers, briefly: "the 5 days before".
-  final String detail;
+  /// How many days the group covers, where that's part of saying which:
+  /// the usual period length (null when unknown), the days before a
+  /// period, or the days either side of a moon phase. Null otherwise.
+  final int? span;
 
   /// Days in the group with a feeling picked.
   final int days;
@@ -158,15 +170,15 @@ class FeelingGroup {
 
 /// Counts, never averages: feelings aren't a scale. [groupOf] names the
 /// group a day belongs to, or returns null to leave it out; groups come
-/// back in [titles] order.
+/// back in [groups] order.
 List<FeelingGroup> _groupFeelings(
   List<DayLog> logs,
-  List<(String, String)> groups,
-  String? Function(DateTime day) groupOf,
+  List<(FeelingDays, int?)> groups,
+  FeelingDays? Function(DateTime day) groupOf,
 ) {
-  final titles = [for (final (t, _) in groups) t];
-  final tallies = {for (final t in titles) t: <DayFeeling, int>{}};
-  final days = {for (final t in titles) t: 0};
+  final kinds = [for (final (k, _) in groups) k];
+  final tallies = {for (final k in kinds) k: <DayFeeling, int>{}};
+  final days = {for (final k in kinds) k: 0};
   for (final l in logs) {
     final feeling = l.feeling;
     if (feeling == null) continue;
@@ -176,12 +188,12 @@ List<FeelingGroup> _groupFeelings(
     days[group] = days[group]! + 1;
   }
   return [
-    for (final (t, detail) in groups)
+    for (final (k, span) in groups)
       FeelingGroup(
-        t,
-        detail,
-        days[t]!,
-        tallies[t]!.entries.map((e) => (e.key, e.value)).toList()
+        k,
+        span,
+        days[k]!,
+        tallies[k]!.entries.map((e) => (e.key, e.value)).toList()
           ..sort((a, b) => b.$2.compareTo(a.$2)),
       ),
   ];
@@ -201,18 +213,13 @@ List<FeelingGroup> feelingsAroundPeriods(
   int before = 5,
   int? usualPeriodLength,
 }) {
-  const period = 'During a period', other = 'Other days';
-  const beforeTitle = 'Just before a period';
+  const period = FeelingDays.duringPeriod, other = FeelingDays.restOfCycle;
+  const beforeTitle = FeelingDays.beforePeriod;
   final starts = cycles.map((c) => c.start).toList()..sort();
   final groups = [
-    (
-      period,
-      usualPeriodLength == null
-          ? 'logged period days'
-          : 'usually $usualPeriodLength days',
-    ),
-    (beforeTitle, 'the $before days before'),
-    (other, 'the rest of the cycle'),
+    (period, usualPeriodLength),
+    (beforeTitle, before),
+    (other, null),
   ];
   return _groupFeelings(logs, groups, (d) {
     final mark = marks.on(d).mark;
@@ -227,15 +234,12 @@ List<FeelingGroup> feelingsAroundPeriods(
 /// Feelings picked around full moons, around new moons, and on other days.
 /// "Around" is the day of the phase and [around] days either side.
 List<FeelingGroup> feelingsAroundMoon(List<DayLog> logs, {int around = 1}) {
-  const full = 'Around a full moon', fresh = 'Around a new moon';
-  const other = 'Other days';
-  final span = around == 0
-      ? 'the day itself'
-      : 'the day, ±$around day${around == 1 ? '' : 's'}';
+  const full = FeelingDays.nearFullMoon, fresh = FeelingDays.nearNewMoon;
+  const other = FeelingDays.restOfMonth;
   final groups = [
-    (full, span),
-    (fresh, span),
-    (other, 'the rest of the month'),
+    (full, around),
+    (fresh, around),
+    (other, null),
   ];
   final felt = [
     for (final l in logs)
@@ -249,7 +253,7 @@ List<FeelingGroup> feelingsAroundMoon(List<DayLog> logs, {int around = 1}) {
     addDays(felt.first, -around - 1).toUtc(),
     addDays(felt.last, around + 2).toUtc(),
   );
-  final near = <String, String>{};
+  final near = <String, FeelingDays>{};
   for (final e in phases) {
     final title = switch (e.phase) {
       MoonPhase.full => full,

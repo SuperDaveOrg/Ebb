@@ -166,6 +166,22 @@ class SettingsService {
   static const _kActiveProfile = 'active_profile_id';
   static const _kGroupsEnabled = 'groups_enabled';
   static const _kTemperatureUnit = 'temperature_unit';
+  static const _kLanguage = 'language';
+
+  /// The language picked in Settings, or null to follow the phone.
+  /// Phone-wide, and kept by "Delete all data": it's about who reads the
+  /// screen, not anyone's records.
+  static Future<String?> language() async =>
+      (await SharedPreferences.getInstance()).getString(_kLanguage);
+
+  static Future<void> setLanguage(String? code) async {
+    final prefs = await SharedPreferences.getInstance();
+    if (code == null) {
+      await prefs.remove(_kLanguage);
+    } else {
+      await prefs.setString(_kLanguage, code);
+    }
+  }
 
   /// The unit temperatures are typed and shown in. Phone-wide: it's about
   /// the thermometer and whoever reads the screen, not whose cycle it is.

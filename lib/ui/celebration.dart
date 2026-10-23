@@ -12,30 +12,30 @@ import 'package:ebb/ui/wording.dart';
 /// "six cycles" is a count, not a promise that estimates are now right.
 extension MilestoneWording on Milestone {
   String get title => switch (this) {
-    Milestone.firstPeriod => 'First period logged',
-    Milestone.firstCycle => 'First full cycle',
-    Milestone.threeCycles => 'Three full cycles',
-    Milestone.sixCycles => 'Six full cycles',
-    Milestone.oneYear => 'A year of history',
-    Milestone.twoYears => 'Two years of history',
-    Milestone.fiveYears => 'Five years of history',
-    Milestone.firstBackup => 'First backup saved',
+    Milestone.firstPeriod => strings.homeMilestoneFirstPeriod,
+    Milestone.firstCycle => strings.homeMilestoneFirstCycle,
+    Milestone.threeCycles => strings.homeMilestoneThreeCycles,
+    Milestone.sixCycles => strings.homeMilestoneSixCycles,
+    Milestone.oneYear => strings.homeMilestoneOneYear,
+    Milestone.twoYears => strings.homeMilestoneTwoYears,
+    Milestone.fiveYears => strings.homeMilestoneFiveYears,
+    Milestone.firstBackup => strings.homeMilestoneFirstBackup,
   };
 
   String message(Who who) => switch (this) {
-    Milestone.firstPeriod => '${who.whoseCap} first period in Ebb.',
+    Milestone.firstPeriod =>
+      strings.homeMilestoneFirstPeriodMessage(who.who, who.name),
     Milestone.firstCycle =>
-      'A first full cycle. Ebb can start learning ${who.whose} rhythm.',
-    Milestone.threeCycles =>
-      'Three full cycles logged. Each one gives Ebb more to go on.',
-    Milestone.sixCycles =>
-      'Six full cycles logged: as many as Ebb looks at for each estimate.',
-    Milestone.oneYear => 'A year of ${who.whose} history in Ebb.',
-    Milestone.twoYears => 'Two years of ${who.whose} history in Ebb.',
-    Milestone.fiveYears => 'Five years of ${who.whose} history in Ebb.',
-    Milestone.firstBackup =>
-      'Your first backup is saved. Keep a copy somewhere other than this '
-          'phone.',
+      strings.homeMilestoneFirstCycleMessage(who.who, who.name),
+    Milestone.threeCycles => strings.homeMilestoneThreeCyclesMessage,
+    Milestone.sixCycles => strings.homeMilestoneSixCyclesMessage,
+    Milestone.oneYear =>
+      strings.homeMilestoneOneYearMessage(who.who, who.name),
+    Milestone.twoYears =>
+      strings.homeMilestoneTwoYearsMessage(who.who, who.name),
+    Milestone.fiveYears =>
+      strings.homeMilestoneFiveYearsMessage(who.who, who.name),
+    Milestone.firstBackup => strings.homeMilestoneFirstBackupMessage,
   };
 
   IconData get icon => switch (this) {

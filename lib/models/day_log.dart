@@ -2,14 +2,11 @@ import 'package:ebb/domain/dates.dart';
 
 /// How heavy the bleeding was on a given day.
 enum Flow {
-  none('None'),
-  spotting('Spotting'),
-  light('Light'),
-  medium('Medium'),
-  heavy('Heavy');
-
-  const Flow(this.label);
-  final String label;
+  none,
+  spotting,
+  light,
+  medium,
+  heavy;
 
   static Flow fromName(String? name) =>
       Flow.values.firstWhere((f) => f.name == name, orElse: () => Flow.none);
@@ -20,16 +17,10 @@ enum Flow {
 /// Stored by [name]. The order is only dry to wet; Ebb draws no conclusion
 /// from it.
 enum MucusFeel {
-  dry('Dry'),
-  nothing('Nothing felt'),
-  wet('Wet'),
-  slippery('Slippery');
-
-  const MucusFeel(this.label);
-  final String label;
-
-  /// On a chip under "How it felt", where "felt" goes without saying.
-  String get chip => this == nothing ? 'Nothing' : label;
+  dry,
+  nothing,
+  wet,
+  slippery;
 
   static MucusFeel? fromName(String? name) =>
       MucusFeel.values.where((m) => m.name == name).firstOrNull;
@@ -38,15 +29,9 @@ enum MucusFeel {
 /// How cervical mucus looked, from none to clear and stretchy. Stored by
 /// [name].
 enum MucusLook {
-  nothing('Nothing seen'),
-  creamy('Creamy'),
-  eggWhite('Egg white');
-
-  const MucusLook(this.label);
-  final String label;
-
-  /// On a chip under "How it looked".
-  String get chip => this == nothing ? 'Nothing' : label;
+  nothing,
+  creamy,
+  eggWhite;
 
   static MucusLook? fromName(String? name) =>
       MucusLook.values.where((m) => m.name == name).firstOrNull;
@@ -58,20 +43,19 @@ enum MucusLook {
 /// Kinds of feeling, not a scale: nothing here is better or worse than
 /// anything else, so feelings are never averaged.
 enum Feeling {
-  happy('😁', 'Happy'),
-  calm('😌', 'Calm'),
-  loving('🥰', 'Loving'),
-  energetic('🤩', 'Energetic'),
-  tired('😴', 'Tired'),
-  sad('😢', 'Sad'),
-  anxious('😰', 'Anxious'),
-  irritable('😤', 'Irritable'),
-  angry('😠', 'Angry'),
-  confused('🤔', 'Confused');
+  happy('😁'),
+  calm('😌'),
+  loving('🥰'),
+  energetic('🤩'),
+  tired('😴'),
+  sad('😢'),
+  anxious('😰'),
+  irritable('😤'),
+  angry('😠'),
+  confused('🤔');
 
-  const Feeling(this.emoji, this.label);
+  const Feeling(this.emoji);
   final String emoji;
-  final String label;
 
   static Feeling? fromName(String? name) =>
       Feeling.values.where((m) => m.name == name).firstOrNull;

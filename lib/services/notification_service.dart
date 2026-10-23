@@ -3,10 +3,10 @@ import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:timezone/data/latest_all.dart' as tzdata;
 import 'package:timezone/timezone.dart' as tz;
 
-import 'package:ebb/data/database.dart';
 import 'package:ebb/domain/dates.dart';
 import 'package:ebb/domain/predictor.dart';
 import 'package:ebb/models/profile.dart';
+import 'package:ebb/ui/wording.dart';
 
 /// Schedules reminders with the operating system.
 ///
@@ -25,9 +25,6 @@ class NotificationService {
   final FlutterLocalNotificationsPlugin _plugin;
 
   static const _channelId = 'ebb_cycle_reminders';
-  static const _channelName = 'Cycle reminders';
-  static const _channelDescription =
-      'Heads-up before your period is expected, and a nudge to log it.';
 
   /// IDs are fixed per profile so that rescheduling replaces rather than
   /// stacks, and one person's reminders never cancel another's. The primary
@@ -81,27 +78,26 @@ class NotificationService {
     final headsUp = addDays(expected, -leadDays);
 
     // The owner is "you" even with a name set; anyone else is named, so the
-    // reminder says whose period it is.
-    final owner = id == EbbDatabase.primaryProfileId;
-    final whose = owner ? 'your' : '${profile.name}’s';
-    final subject = owner ? 'Period' : '${profile.name}’s period';
+    // reminder says whose period it is. In the language on screen now; a
+    // change of language reschedules them.
+    final who = Who(profile);
 
     await _scheduleAt(
       id: _idUpcoming(id),
       when: headsUp,
       hour: hour,
-      title: '$subject expected soon',
+      title: strings.notifUpcomingTitle(who.who, who.name),
       body: leadDays == 1
-          ? 'Ebb expects $whose period to start tomorrow.'
-          : 'Ebb expects $whose period in about $leadDays days.',
+          ? strings.notifUpcomingTomorrow(who.who, who.name)
+          : strings.notifUpcomingInDays(who.who, who.name, leadDays),
     );
 
     await _scheduleAt(
       id: _idExpectedToday(id),
       when: expected,
       hour: hour,
-      title: '$subject expected today',
-      body: 'Tap to log how things are going.',
+      title: strings.notifTodayTitle(who.who, who.name),
+      body: strings.notifTodayBody,
     );
   }
 
@@ -126,11 +122,11 @@ class NotificationService {
       title: title,
       body: body,
       scheduledDate: scheduled,
-      notificationDetails: const NotificationDetails(
+      notificationDetails: NotificationDetails(
         android: AndroidNotificationDetails(
           _channelId,
-          _channelName,
-          channelDescription: _channelDescription,
+          strings.notifChannelName,
+          channelDescription: strings.notifChannelDescription,
           importance: Importance.defaultImportance,
           priority: Priority.defaultPriority,
         ),

@@ -22,6 +22,7 @@ import 'package:ebb/ui/cycle_editor.dart';
 import 'package:ebb/ui/cycle_ring.dart';
 import 'package:ebb/ui/group_screen.dart';
 import 'package:ebb/ui/history_screen.dart';
+import 'package:ebb/ui/language.dart';
 import 'package:ebb/ui/layout.dart';
 import 'package:ebb/ui/people.dart';
 import 'package:ebb/ui/settings_screen.dart';
@@ -216,7 +217,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
           : last != null
           ? addDays(last.start, 1)
           : addDays(today(), -90),
-      helpText: 'When did it start?',
+      helpText: context.l.homeWhenStarted,
     );
     if (day != null) await _startPeriod(day);
   }
@@ -227,7 +228,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     final day = await _pickEarlierDay(
       firstDate: c.start,
       lastDate: addDays(c.start, Cycle.maxPeriodDays - 1),
-      helpText: 'When did it end?',
+      helpText: context.l.homeWhenEnded,
     );
     if (day != null) await _endPeriod(day);
   }
@@ -325,7 +326,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         actions: [
           IconButton(
             icon: const Icon(Icons.calendar_month_outlined),
-            tooltip: 'Calendar',
+            tooltip: context.l.homeCalendar,
             onPressed: () async {
               await Navigator.of(context).push(
                 MaterialPageRoute(
@@ -334,8 +335,8 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                     repository: widget.repository,
                     settings: widget.settings,
                     title: _hasPeople
-                        ? '${_who.whoseCap} calendar'
-                        : 'Calendar',
+                        ? context.l.homeCalendarOf(_who.who, _who.name)
+                        : context.l.homeCalendar,
                     readOnly: _copy,
                   ),
                 ),
@@ -345,7 +346,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
           ),
           IconButton(
             icon: const Icon(Icons.history),
-            tooltip: 'History',
+            tooltip: context.l.homeHistory,
             onPressed: () async {
               await Navigator.of(context).push(
                 MaterialPageRoute(
@@ -353,7 +354,9 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                     repository: widget.repository,
                     settings: widget.settings,
                     isOwner: _who.isOwner,
-                    title: _hasPeople ? '${_who.whoseCap} history' : 'History',
+                    title: _hasPeople
+                        ? context.l.homeHistoryOf(_who.who, _who.name)
+                        : null,
                     readOnly: _copy,
                   ),
                 ),
@@ -363,20 +366,22 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
           ),
           IconButton(
             icon: const Icon(Icons.insights_outlined),
-            tooltip: 'Charts',
+            tooltip: context.l.homeCharts,
             onPressed: () => Navigator.of(context).push(
               MaterialPageRoute(
                 builder: (_) => ChartsScreen(
                   repository: widget.repository,
                   settings: widget.settings,
-                  title: _hasPeople ? '${_who.whoseCap} charts' : 'Charts',
+                  title: _hasPeople
+                      ? context.l.homeChartsOf(_who.who, _who.name)
+                      : context.l.homeCharts,
                 ),
               ),
             ),
           ),
           IconButton(
             icon: const Icon(Icons.settings_outlined),
-            tooltip: 'Settings',
+            tooltip: context.l.homeSettings,
             onPressed: _openSettings,
           ),
         ],
@@ -418,26 +423,26 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         FilledButton.tonalIcon(
           onPressed: _endPeriod,
           icon: const Icon(Icons.check),
-          label: Text('${_who.mine} period ended today'),
+          label: Text(context.l.homePeriodEndedToday(_who.who, _who.name)),
         ),
         TextButton(
           onPressed: _endedEarlier,
-          child: const Text('It ended on an earlier day'),
+          child: Text(context.l.homeEndedEarlier),
         ),
       ] else ...[
         FilledButton.icon(
           onPressed: _startPeriod,
           icon: const Icon(Icons.water_drop_outlined),
-          label: Text('${_who.mine} period started today'),
+          label: Text(context.l.homePeriodStartedToday(_who.who, _who.name)),
         ),
         TextButton(
           onPressed: _startedEarlier,
-          child: const Text('It started on an earlier day'),
+          child: Text(context.l.homeStartedEarlier),
         ),
         if (_endMissing)
           TextButton(
             onPressed: _endedEarlier,
-            child: Text('Add when ${_who.whose} last period ended'),
+            child: Text(context.l.homeAddLastEnd(_who.who, _who.name)),
           ),
       ],
     ];
@@ -510,10 +515,11 @@ class _SharedCopyNote extends StatelessWidget {
             const SizedBox(width: 12),
             Expanded(
               child: Text(
-                'Imported from ${who.whose} phone on '
-                '${DateFormat.yMMMd().format(sharedOn)}. It can’t be changed '
-                'here, and is brought up to date when ${who.subject} sends '
-                'it again.',
+                context.l.homeSharedCopy(
+                  who.who,
+                  who.name,
+                  DateFormat.yMMMd().format(sharedOn),
+                ),
                 style: theme.textTheme.bodyMedium,
               ),
             ),
@@ -550,6 +556,7 @@ class _StatusCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l = context.l;
     final day = prediction.dayOfCycle;
     final missed = !periodInProgress && prediction.unloggedCycles > 0;
 
@@ -557,39 +564,30 @@ class _StatusCard extends StatelessWidget {
     final String detail;
 
     if (missed) {
-      headline =
-          'No period logged since '
-          '${DateFormat.MMMd().format(prediction.lastStart!)}';
+      headline = l.homeNoPeriodSince(
+        DateFormat.MMMd().format(prediction.lastStart!),
+      );
       detail = prediction.unloggedCycles == 1
-          ? 'Ebb has assumed a period went unlogged and estimated from '
-                'there. If you remember when it started, add it to put the '
-                'estimate right.'
-          : 'Ebb has assumed some periods went unlogged and estimated from '
-                'there. If you remember when any started, add them to put the '
-                'estimate right.';
+          ? l.homeMissedOne
+          : l.homeMissedSome;
     } else if (day == null) {
-      headline = who.isOwner ? 'Welcome to Ebb' : 'Nothing logged yet';
-      detail =
-          'Log the first day of ${who.whose} next period, or add past '
-          'periods if you remember them, and Ebb will start learning '
-          '${who.isOwner ? 'your' : 'the'} rhythm. Everything stays on this '
-          'phone.';
+      headline = who.isOwner ? l.homeWelcome : l.homeNothingYet;
+      detail = l.homeFirstLog(who.who, who.name);
     } else if (periodInProgress) {
-      headline = 'Day $day of ${who.whose} period';
-      detail = 'Let Ebb know when it ends so the estimate stays accurate.';
+      headline = l.homeDayOfPeriod(who.who, who.name, day);
+      detail = l.homeTellEnd;
     } else {
-      headline = 'Day $day of ${who.whose} cycle';
+      headline = l.homeDayOfCycle(who.who, who.name, day);
       final until = prediction.daysUntilNext;
       detail = until == null
           ? ''
           : until > 1
-          ? 'About $until days until ${who.whose} period is expected.'
+          ? l.homeDaysUntil(who.who, who.name, until)
           : until == 1
-          ? '${who.whoseCap} period is expected tomorrow.'
+          ? l.homeExpectedTomorrow(who.who, who.name)
           : until == 0
-          ? '${who.whoseCap} period is expected today.'
-          : '${-until} days later than expected. '
-                'Cycles shift for all sorts of reasons.';
+          ? l.homeExpectedToday(who.who, who.name)
+          : l.homeDaysLate(-until);
     }
 
     final p = prediction;
@@ -616,8 +614,10 @@ class _StatusCard extends StatelessWidget {
                 windowStart: p.earliest == null ? null : dayOf(p.earliest!),
                 windowEnd: p.latest == null ? null : dayOf(p.latest!),
                 inPeriod: periodInProgress,
-                label:
-                    'of ${who.whose} ${periodInProgress ? 'period' : 'cycle'}',
+                label: periodInProgress
+                    ? l.homeRingOfPeriod(who.who, who.name)
+                    : l.homeRingOfCycle(who.who, who.name),
+                semanticLabel: headline,
                 size: ringSize,
               ),
               const SizedBox(height: 18),
@@ -631,13 +631,13 @@ class _StatusCard extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  _Key(color: colors.period, text: 'Period'),
+                  _Key(color: colors.period, text: l.homeKeyPeriod),
                   const SizedBox(width: 18),
-                  _Key(color: colors.window, text: 'Likely next'),
+                  _Key(color: colors.window, text: l.homeKeyLikelyNext),
                   const SizedBox(width: 18),
                   _Key(
                     color: theme.colorScheme.primary,
-                    text: 'Today',
+                    text: l.homeKeyToday,
                     dot: true,
                   ),
                 ],
@@ -668,8 +668,8 @@ class _StatusCard extends StatelessWidget {
                   icon: const Icon(Icons.add),
                   label: Text(
                     current == null
-                        ? 'Add past periods'
-                        : 'Add a missed period',
+                        ? l.homeAddPastPeriods
+                        : l.homeAddMissedPeriod,
                   ),
                 ),
               ),
@@ -721,7 +721,7 @@ class _PredictionCard extends StatelessWidget {
   final CyclePrediction prediction;
   final bool showFertileWindow;
 
-  static final _fmt = DateFormat.MMMEd();
+  static DateFormat get _fmt => DateFormat.MMMEd();
 
   @override
   Widget build(BuildContext context) {
@@ -734,7 +734,10 @@ class _PredictionCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Next period', style: theme.textTheme.titleMedium),
+            Text(
+              context.l.homeNextPeriod,
+              style: theme.textTheme.titleMedium,
+            ),
             const SizedBox(height: 6),
             Text(
               _fmt.format(p.nextStart!),
@@ -742,8 +745,10 @@ class _PredictionCard extends StatelessWidget {
             ),
             const SizedBox(height: 4),
             Text(
-              'likely between ${_fmt.format(p.earliest!)} '
-              'and ${_fmt.format(p.latest!)}',
+              context.l.homeLikelyBetween(
+                _fmt.format(p.earliest!),
+                _fmt.format(p.latest!),
+              ),
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
               ),
@@ -753,7 +758,7 @@ class _PredictionCard extends StatelessWidget {
             if (showFertileWindow && p.fertileStart != null) ...[
               const Divider(height: 28),
               Text(
-                'Estimated fertile window',
+                context.l.homeFertileWindow,
                 style: theme.textTheme.titleSmall,
               ),
               const SizedBox(height: 4),
@@ -763,8 +768,7 @@ class _PredictionCard extends StatelessWidget {
               ),
               const SizedBox(height: 6),
               Text(
-                'An estimate based on cycle timing alone. Not reliable enough '
-                'to use as contraception.',
+                context.l.homeFertileWarning,
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: theme.colorScheme.onSurfaceVariant,
                 ),
@@ -787,35 +791,30 @@ class _ConfidenceNote extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l = context.l;
     final p = prediction;
 
     final (IconData icon, String text) = switch (p.confidence) {
       _ when p.unloggedCycles > 0 => (
         Icons.history_toggle_off,
-        'Estimated from the last period logged, on '
-            '${DateFormat.MMMd().format(p.lastStart!)}, so it may be less '
-            'accurate than usual.',
+        l.homeConfidenceUnlogged(DateFormat.MMMd().format(p.lastStart!)),
       ),
-      PredictionConfidence.none => (Icons.help_outline, 'Nothing logged yet.'),
+      PredictionConfidence.none => (Icons.help_outline, l.homeConfidenceNone),
       PredictionConfidence.low => (
         Icons.trending_up,
         p.observedCycles == 0
-            ? 'Based on a typical 28-day cycle for now. This will get more '
-                  'accurate as you log.'
-            : 'Based on ${p.observedCycles} cycle'
-                  '${p.observedCycles == 1 ? '' : 's'} so far, so it may be '
-                  'less accurate for now.',
+            ? l.homeConfidenceTypical
+            : l.homeConfidenceFew(p.observedCycles),
       ),
       PredictionConfidence.moderate => (
         Icons.show_chart,
         p.isIrregular
-            ? '${who.whoseCap} cycles vary quite a bit, so this is a wide '
-                  'estimate rather than a firm date.'
-            : 'Based on ${who.whose} last ${p.observedCycles} cycles.',
+            ? l.homeConfidenceIrregular(who.who, who.name)
+            : l.homeConfidenceLast(who.who, who.name, p.observedCycles),
       ),
       PredictionConfidence.good => (
         Icons.check_circle_outline,
-        'Based on ${p.observedCycles} fairly consistent cycles.',
+        l.homeConfidenceGood(p.observedCycles),
       ),
     };
 

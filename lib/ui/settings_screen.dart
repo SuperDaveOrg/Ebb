@@ -23,6 +23,7 @@ import 'package:ebb/ui/celebration.dart';
 import 'package:ebb/ui/confirm.dart';
 import 'package:ebb/ui/groups_screen.dart';
 import 'package:ebb/ui/help_screen.dart';
+import 'package:ebb/ui/language.dart';
 import 'package:ebb/ui/layout.dart';
 import 'package:ebb/ui/people.dart';
 import 'package:ebb/ui/receive_screen.dart';
@@ -123,12 +124,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       if (!granted) {
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-              'Notifications are turned off for Ebb in system '
-              'settings.',
-            ),
-          ),
+          SnackBar(content: Text(context.l.settingsNotificationsOff)),
         );
         return;
       }
@@ -138,8 +134,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Future<void> _openLink(Uri uri) async {
-    if (!await openInBrowser(uri)) {
-      _say('No browser to open it with. Visit $websiteLabel instead.');
+    if (!await openInBrowser(uri) && mounted) {
+      _say(context.l.settingsNoBrowser(websiteLabel));
     }
   }
 
@@ -151,8 +147,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   Future<void> _backUp() async {
     final backup = await widget.backups.snapshot();
+    if (!mounted) return;
     if (backup.cycleCount == 0 && backup.dayCount == 0) {
-      _say('Nothing to back up yet.');
+      _say(context.l.settingsNothingToBackUp);
       return;
     }
     final bytes = utf8.encode(encodeBackup(backup));
@@ -165,36 +162,34 @@ class _SettingsScreenState extends State<SettingsScreen> {
         final first = await SettingsService.noteBackup(today());
         if (first && await widget.settings.celebrations() && mounted) {
           celebrate(context, Milestone.firstBackup, _who);
-        } else {
-          _say('Backup saved. Keep a copy somewhere other than this phone.');
+        } else if (mounted) {
+          _say(context.l.settingsBackupSaved);
         }
       }
     } on PlatformException catch (e) {
+      if (!mounted) return;
       _say(
         e.code == 'no_picker'
-            ? _noPicker
-            : "The backup couldn't be saved there. Try another location.",
+            ? context.l.settingsNoPicker
+            : context.l.settingsBackupNotSaved,
       );
     }
   }
-
-  static const _noPicker =
-      'This phone has no file picker for Ebb to use. Sending to another '
-      'phone works without one.';
 
   Future<void> _restore() async {
     final Uint8List? bytes;
     try {
       bytes = await widget.documents.open();
     } on PlatformException catch (e) {
+      if (!mounted) return;
       _say(switch (e.code) {
-        'too_large' => "That file is too large to be an Ebb backup.",
-        'no_picker' => _noPicker,
-        _ => "That file couldn't be read.",
+        'too_large' => context.l.settingsFileTooLarge,
+        'no_picker' => context.l.settingsNoPicker,
+        _ => context.l.settingsFileUnreadable,
       });
       return;
     }
-    if (bytes == null) return;
+    if (bytes == null || !mounted) return;
 
     final Backup backup;
     try {
@@ -203,7 +198,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       _say(e.message);
       return;
     } on FormatException {
-      _say("This file isn't an Ebb backup.");
+      _say(context.l.settingsNotABackup);
       return;
     }
     await _confirmAndRestore(backup);
@@ -270,12 +265,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
     if (backup.people.length == 1 && phoneIsEmpty) {
       final ok = await confirm(
         context,
-        title: 'Set up with this history?',
-        body:
-            '${_periods(backup.cycleCount)}, sent '
-            '${DateFormat.yMMMd().format(backup.exportedOn)}. On this phone '
-            'it becomes your history.',
-        action: 'Continue',
+        title: context.l.settingsSetUpTitle,
+        body: context.l.settingsSetUpBody(
+          _periods(backup.cycleCount),
+          DateFormat.yMMMd().format(backup.exportedOn),
+        ),
+        action: context.l.continueAction,
       );
       if (ok) await _replaceWith(backup, current: current);
       return;
@@ -286,37 +281,30 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   Future<_Incoming?> _askUpdateOrReplace(Backup backup, Profile known) {
     final who = Who(known);
-    final label = known.id == EbbDatabase.primaryProfileId
-        ? 'your history'
-        : Who.label(known);
     final sent = DateFormat.yMMMd().format(backup.exportedOn);
+    final periods = _periods(backup.cycleCount);
     return showDialog<_Incoming>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text('Update $label?'),
+        title: Text(ctx.l.settingsUpdateTitle(who.who, who.name)),
         actionsOverflowDirection: VerticalDirection.up,
         content: Text(
           known.isSharedCopy
-              ? 'This is ${who.whose} history again, sent $sent: '
-                    '${_periods(backup.cycleCount)}. It replaces the copy '
-                    'on this phone.'
-              : 'This is ${who.whose} history, sent $sent: '
-                    '${_periods(backup.cycleCount)}. It replaces what’s on '
-                    'this phone for ${known.name ?? 'you'}, '
-                    'including anything logged here since.',
+              ? ctx.l.settingsUpdateSharedBody(who.who, who.name, sent, periods)
+              : ctx.l.settingsUpdateBody(who.who, who.name, sent, periods),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('Cancel'),
+            child: Text(ctx.l.cancel),
           ),
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(_Incoming.replace),
-            child: const Text('Replace everything'),
+            child: Text(ctx.l.settingsReplaceEverything),
           ),
           FilledButton(
             onPressed: () => Navigator.of(ctx).pop(_Incoming.update),
-            child: Text('Update $label'),
+            child: Text(ctx.l.settingsUpdateAction(who.who, who.name)),
           ),
         ],
       ),
@@ -329,7 +317,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     required DateTime sentOn,
   }) async {
     await widget.backups.updatePerson(known.id!, person, sentOn: sentOn);
-    _say('${Who.label(known)} updated.');
+    if (mounted) _say(context.l.settingsPersonUpdated(Who.label(known)));
     if (mounted) Navigator.of(context).pop(ShowPersonAction(known.id!));
   }
 
@@ -338,27 +326,31 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return showDialog<_Incoming>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text(name == null ? 'Add this history?' : 'Add $name?'),
+        title: Text(
+          name == null
+              ? ctx.l.settingsAddThisHistoryTitle
+              : ctx.l.settingsAddNamedTitle(name),
+        ),
         // Three buttons stack on a phone; keep the main one on top and
         // Cancel at the bottom, where a stacked list reads naturally.
         actionsOverflowDirection: VerticalDirection.up,
         content: Text(
-          '${name == null ? 'It has' : '$name’s history has'} '
-          '${_periods(backup.cycleCount)}. You can add it alongside what’s '
-          'already here, or replace everything on this phone with it.',
+          name == null
+              ? ctx.l.settingsAddBody(_periods(backup.cycleCount))
+              : ctx.l.settingsAddNamedBody(name, _periods(backup.cycleCount)),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('Cancel'),
+            child: Text(ctx.l.cancel),
           ),
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(_Incoming.replace),
-            child: const Text('Replace everything'),
+            child: Text(ctx.l.settingsReplaceEverything),
           ),
           FilledButton(
             onPressed: () => Navigator.of(ctx).pop(_Incoming.add),
-            child: const Text('Add as someone new'),
+            child: Text(ctx.l.settingsAddAsNew),
           ),
         ],
       ),
@@ -368,14 +360,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Future<void> _addAsSomeoneNew(BackupPerson person) async {
     final name = await showNameDialog(
       context,
-      title: 'Who is this?',
+      title: context.l.settingsWhoIsThis,
       initial: person.profile.name,
       others: widget.people,
-      hint: 'A name to tell them apart on this phone.',
+      hint: context.l.settingsWhoIsThisHint,
     );
     if (name == null || name.isEmpty) return;
     final id = await widget.backups.addPerson(person, name: name);
-    _say('$name added.');
+    if (mounted) _say(context.l.settingsPersonAdded(name));
     if (mounted) Navigator.of(context).pop(ShowPersonAction(id));
   }
 
@@ -392,57 +384,62 @@ class _SettingsScreenState extends State<SettingsScreen> {
     await widget.notifications.cancelAll();
     // Groups came with the backup, so they were in use: show them.
     if (backup.groups.isNotEmpty) await SettingsService.setGroupsEnabled(true);
-    _say('Done. Ebb has been updated.');
+    if (mounted) _say(context.l.settingsRestored);
     // The person on screen may not exist in the restored data.
     if (mounted) Navigator.of(context).pop();
   }
 
   Future<bool> _confirmReplace(Backup backup, Backup current) => confirm(
     context,
-    title: 'Replace what’s in Ebb?',
+    title: context.l.settingsReplaceTitle,
     body: [
-      'Saved ${DateFormat.yMMMd().format(backup.exportedOn)}, with '
-          '${_periods(backup.cycleCount)}'
-          '${backup.people.length > 1 ? ' for ${backup.people.length} people' : ''}.',
+      backup.people.length > 1
+          ? context.l.settingsReplaceSavedPeople(
+              backup.people.length,
+              DateFormat.yMMMd().format(backup.exportedOn),
+              _periods(backup.cycleCount),
+            )
+          : context.l.settingsReplaceSaved(
+              DateFormat.yMMMd().format(backup.exportedOn),
+              _periods(backup.cycleCount),
+            ),
       if (current.cycleCount > 0 || current.dayCount > 0)
-        'It replaces everything in Ebb now, including '
-            '${_periods(current.cycleCount)} on this phone.',
+        context.l.settingsReplaceCurrent(_periods(current.cycleCount)),
     ].join('\n\n'),
-    action: 'Replace',
+    action: context.l.settingsReplace,
   );
 
-  static String _periods(int n) => n == 1 ? '1 period' : '$n periods';
+  String _periods(int n) => context.l.settingsPeriodCount(n);
 
   Future<void> _eraseEverything() async {
     final confirmed = await confirm(
       context,
-      title: 'Delete all data?',
-      body:
-          'Every cycle and note${_hasPeople ? ', for everyone on this phone,' : ''} '
-          'will be permanently erased. Ebb keeps no other copy, so this '
-          'cannot be undone unless you have saved a backup file.',
-      action: 'Delete everything',
+      title: context.l.settingsDeleteAllTitle,
+      body: _hasPeople
+          ? context.l.settingsDeleteAllBodyEveryone
+          : context.l.settingsDeleteAllBody,
+      action: context.l.settingsDeleteEverything,
     );
     if (!confirmed) return;
 
     await EbbDatabase.instance.deleteAllData();
     await SettingsService.forgetEveryone();
     await widget.notifications.cancelAll();
-    _say('All data deleted.');
+    if (mounted) _say(context.l.settingsAllDeleted);
     if (mounted) Navigator.of(context).pop();
   }
 
   Future<void> _rename() async {
     final name = await showNameDialog(
       context,
-      title: _who.isOwner ? 'Your name' : 'Rename',
+      title: _who.isOwner ? context.l.settingsYourName : context.l.settingsRename,
       initial: _name,
       others: widget.people.where((p) => p.id != widget.profile.id).toList(),
       // The owner is "You" until they choose otherwise; others need a name
       // to be told apart.
       optional: _who.isOwner,
       hint: _who.isOwner
-          ? 'Shown in the list of people. Leave empty to appear as “You”.'
+          ? context.l.settingsYourNameHint
           : null,
     );
     if (name == null) return;
@@ -455,17 +452,46 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final label = Who.label(widget.profile);
     final confirmed = await confirm(
       context,
-      title: 'Remove $label from this phone?',
-      body:
-          'Every cycle and note for $label will be permanently erased. '
-          'Nobody else’s history is affected.',
-      action: 'Remove',
+      title: context.l.settingsRemoveTitle(label),
+      body: context.l.settingsRemoveBody(label),
+      action: context.l.remove,
     );
     if (!confirmed) return;
 
     await removePerson(widget.profile.id!, widget.notifications);
-    _say('$label removed.');
+    if (mounted) _say(context.l.settingsPersonRemoved(label));
     if (mounted) Navigator.of(context).pop();
+  }
+
+  /// The phone's language, or one of Ebb's by its own name. Phone-wide,
+  /// whoever's settings these are.
+  Future<void> _chooseLanguage() async {
+    final current = chosenLanguage.value;
+    final picked = await showDialog<(String?,)>(
+      context: context,
+      builder: (context) => SimpleDialog(
+        title: Text(context.l.language),
+        children: [
+          for (final (code, name) in [
+            (null, context.l.languagePhone),
+            for (final MapEntry(:key, :value) in languageNames.entries)
+              (key, value),
+          ])
+            ListTile(
+              leading: Icon(
+                code == current
+                    ? Icons.radio_button_checked
+                    : Icons.radio_button_off,
+              ),
+              title: Text(name),
+              onTap: () => Navigator.pop(context, (code,)),
+            ),
+        ],
+      ),
+    );
+    if (picked == null) return;
+    chosenLanguage.value = picked.$1;
+    await SettingsService.setLanguage(picked.$1);
   }
 
   @override
@@ -476,7 +502,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         Navigator.of(context).push(MaterialPageRoute(builder: (_) => screen));
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Settings')),
+      appBar: AppBar(title: Text(context.l.settingsTitle)),
       body: _loading
           ? const Center(child: CircularProgressIndicator())
           : ListView(
@@ -487,25 +513,29 @@ class _SettingsScreenState extends State<SettingsScreen> {
               children: [
                 Section(
                   title: !_hasPeople
-                      ? 'Your cycle'
+                      ? context.l.settingsYourCycle
                       : _who.isOwner
-                      ? 'Your settings'
-                      : 'Settings for $label',
+                      ? context.l.settingsYourSettings
+                      : context.l.settingsSettingsFor(label),
                   children: [
                     if (_hasPeople)
                       ListTile(
                         leading: const Icon(Icons.badge_outlined),
-                        title: Text(_who.isOwner ? 'Your name' : 'Name'),
-                        subtitle: Text(_name ?? 'You'),
+                        title: Text(
+                          _who.isOwner
+                              ? context.l.settingsYourName
+                              : context.l.settingsName,
+                        ),
+                        subtitle: Text(_name ?? context.l.you),
                         onTap: _rename,
                       ),
                     // A shared copy's reminders are on her own phone.
                     if (!widget.profile.isSharedCopy) ...[
                       SwitchListTile(
                         secondary: const Icon(Icons.notifications_none),
-                        title: const Text('Reminders'),
+                        title: Text(context.l.settingsReminders),
                         subtitle: Text(
-                          'A heads-up before ${_who.whose} period is expected.',
+                          context.l.settingsRemindersHint(_who.who, _who.name),
                         ),
                         value: _reminders,
                         onChanged: _setReminders,
@@ -513,12 +543,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       ListTile(
                         enabled: _reminders,
                         leading: const Icon(Icons.schedule),
-                        title: const Text('Remind me'),
-                        subtitle: Text(
-                          _leadDays == 1
-                              ? '1 day ahead'
-                              : '$_leadDays days ahead',
-                        ),
+                        title: Text(context.l.settingsRemindMe),
+                        subtitle: Text(context.l.settingsDaysAhead(_leadDays)),
                         trailing: DropdownButton<int>(
                           value: _leadDays,
                           underline: const SizedBox.shrink(),
@@ -534,7 +560,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               .map(
                                 (d) => DropdownMenuItem(
                                   value: d,
-                                  child: Text('$d day${d == 1 ? '' : 's'}'),
+                                  child: Text(context.l.settingsDays(d)),
                                 ),
                               )
                               .toList(),
@@ -546,12 +572,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     if (widget.settings.offersFertileWindow)
                       SwitchListTile(
                         secondary: const Icon(Icons.eco_outlined),
-                        title: const Text('Show fertile window estimate'),
-                        subtitle: const Text(
-                          'Off by default. An estimate from cycle timing '
-                          'only — not reliable enough to use as '
-                          'contraception.',
-                        ),
+                        title: Text(context.l.settingsFertile),
+                        subtitle: Text(context.l.settingsFertileHint),
                         value: _fertileWindow,
                         onChanged: (v) async {
                           await widget.settings.setShowFertileWindow(v);
@@ -560,11 +582,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       ),
                     SwitchListTile(
                       secondary: const Icon(Icons.dark_mode_outlined),
-                      title: const Text('Show moon phases'),
-                      subtitle: const Text(
-                        'New, first quarter, full and last '
-                        'quarter, on the calendar and charts.',
-                      ),
+                      title: Text(context.l.settingsMoon),
+                      subtitle: Text(context.l.settingsMoonHint),
                       value: _moonPhases,
                       onChanged: (v) async {
                         await widget.settings.setShowMoonPhases(v);
@@ -576,14 +595,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     if (!widget.profile.isSharedCopy) ...[
                       SwitchListTile(
                         secondary: const Icon(Icons.thermostat_outlined),
-                        title: const Text(
-                          'Track temperature and cervical mucus',
-                        ),
-                        subtitle: const Text(
-                          'On each day of the calendar, with a temperature '
-                          'chart. Recorded and drawn, never used to estimate '
-                          'anything.',
-                        ),
+                        title: Text(context.l.settingsTemperature),
+                        subtitle: Text(context.l.settingsTemperatureHint),
                         value: _temperature,
                         onChanged: (v) async {
                           await widget.settings.setTracksTemperature(v);
@@ -593,7 +606,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       if (_temperature)
                         ListTile(
                           leading: const SizedBox.shrink(),
-                          title: const Text('Temperature in'),
+                          title: Text(context.l.settingsTemperatureIn),
                           trailing: SegmentedButton<TemperatureUnit>(
                             showSelectedIcon: false,
                             segments: [
@@ -613,11 +626,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     if (!widget.profile.isSharedCopy)
                       SwitchListTile(
                         secondary: const Icon(Icons.celebration_outlined),
-                        title: const Text('Celebrate milestones'),
+                        title: Text(context.l.settingsCelebrate),
                         subtitle: Text(
-                          'A small celebration for things like a first full '
-                          'cycle or a year of history, listed in '
-                          '${_who.whose} History.',
+                          context.l.settingsCelebrateHint(_who.who, _who.name),
                         ),
                         value: _celebrations,
                         onChanged: (v) async {
@@ -628,64 +639,81 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     if (!_who.isOwner)
                       ListTile(
                         leading: const Icon(Icons.person_remove_outlined),
-                        title: Text('Remove $label from this phone'),
+                        title: Text(context.l.settingsRemovePerson(label)),
                         onTap: _removePerson,
                       ),
                   ],
                 ),
                 Section(
-                  title: 'People',
+                  title: context.l.settingsPeople,
                   children: [
                     ListTile(
                       leading: const Icon(Icons.person_add_alt),
                       title: Text(
-                        _hasPeople ? 'Add someone' : 'Track someone else too',
+                        _hasPeople
+                            ? context.l.settingsAddSomeone
+                            : context.l.settingsTrackSomeoneElse,
                       ),
                       subtitle: _hasPeople
                           ? null
-                          : const Text(
-                              'For example, a child who’s just starting.',
-                            ),
+                          : Text(context.l.settingsTrackSomeoneElseHint),
                       onTap: () =>
                           Navigator.of(context).pop(const AddPersonAction()),
                     ),
                   ],
                 ),
                 Section(
-                  title: 'Backup & moving',
+                  title: context.l.settingsBackupSection,
                   children: [
                     ListTile(
                       leading: const Icon(Icons.save_alt),
-                      title: const Text('Back up to a file'),
+                      title: Text(context.l.settingsBackUp),
                       subtitle: Text(
-                        'Save ${_hasPeople ? 'everyone’s' : 'your'} '
-                        'history to a file, wherever you choose.',
+                        _hasPeople
+                            ? context.l.settingsBackUpHintEveryone
+                            : context.l.settingsBackUpHint,
                       ),
                       onTap: _backUp,
                     ),
                     ListTile(
                       leading: const Icon(Icons.restore),
-                      title: const Text('Restore from a backup'),
-                      subtitle: const Text('Replaces what is in Ebb now.'),
+                      title: Text(context.l.settingsRestore),
+                      subtitle: Text(context.l.settingsRestoreHint),
                       onTap: _restore,
                     ),
                     ListTile(
                       leading: const Icon(Icons.qr_code_2),
-                      title: const Text('Send to another phone'),
+                      title: Text(context.l.settingsSend),
                       subtitle: Text(
-                        'Show ${_hasPeople ? 'everyone’s' : 'your'} '
-                        'history as codes for another phone to scan.',
+                        _hasPeople
+                            ? context.l.settingsSendHintEveryone
+                            : context.l.settingsSendHint,
                       ),
                       onTap: _send,
                     ),
                     ListTile(
                       leading: const Icon(Icons.qr_code_scanner),
-                      title: const Text('Receive from another phone'),
-                      subtitle: const Text(
-                        'Scan the codes to add someone, update them, or replace '
-                        'everything.',
-                      ),
+                      title: Text(context.l.settingsReceive),
+                      subtitle: Text(context.l.settingsReceiveHint),
                       onTap: _receive,
+                    ),
+                  ],
+                ),
+                Section(
+                  children: [
+                    ListTile(
+                      leading: const Icon(Icons.translate),
+                      title: Text(context.l.language),
+                      subtitle: Text(
+                        chosenLanguage.value == null
+                            ? context.l.languagePhoneIs(
+                                languageNames[context.l.localeName] ??
+                                    context.l.localeName,
+                              )
+                            : languageNames[chosenLanguage.value] ??
+                                  chosenLanguage.value!,
+                      ),
+                      onTap: _chooseLanguage,
                     ),
                   ],
                 ),
@@ -693,16 +721,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 // circles, not the parent tracking a child that most
                 // multi-person phones are.
                 Section(
-                  title: 'Advanced',
+                  title: context.l.settingsAdvanced,
                   children: [
                     SwitchListTile(
                       secondary: const Icon(Icons.groups_outlined),
-                      title: const Text('Groups'),
-                      subtitle: const Text(
-                        'For circles and clubs that track together: gather '
-                        'people under a name. Turning this off hides groups '
-                        'without deleting them.',
-                      ),
+                      title: Text(context.l.settingsGroups),
+                      subtitle: Text(context.l.settingsGroupsHint),
                       value: _groups,
                       onChanged: (v) async {
                         await SettingsService.setGroupsEnabled(v);
@@ -712,44 +736,38 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     if (_groups)
                       ListTile(
                         leading: const SizedBox(width: 24),
-                        title: const Text('Manage groups'),
+                        title: Text(context.l.settingsManageGroups),
                         trailing: const Icon(Icons.chevron_right),
                         onTap: () => open(const GroupsScreen()),
                       ),
                   ],
                 ),
                 Section(
-                  title: 'About Ebb',
+                  title: context.l.settingsAboutEbb,
                   children: [
                     ListTile(
                       leading: const Icon(Icons.help_outline),
-                      title: const Text('How Ebb works'),
-                      subtitle: const Text(
-                        'Logging, estimates, backups and more.',
-                      ),
+                      title: Text(context.l.settingsHowEbbWorks),
+                      subtitle: Text(context.l.settingsHowEbbWorksHint),
                       onTap: () => open(const HelpScreen()),
                     ),
                     ListTile(
                       leading: const Icon(Icons.lock_outline),
-                      title: const Text('Your data'),
-                      subtitle: const Text(
-                        'Where it lives and who can see it.',
-                      ),
+                      title: Text(context.l.settingsYourData),
+                      subtitle: Text(context.l.settingsYourDataHint),
                       onTap: () => open(const AboutScreen()),
                     ),
                     ListTile(
                       leading: const Icon(Icons.public),
-                      title: const Text('Website'),
+                      title: Text(context.l.settingsWebsite),
                       subtitle: const Text(websiteLabel),
                       trailing: const Icon(Icons.open_in_new),
                       onTap: () => _openLink(websiteUri),
                     ),
                     ListTile(
                       leading: const Icon(Icons.feedback_outlined),
-                      title: const Text('Send feedback'),
-                      subtitle: const Text(
-                        'A form on the website, in your browser.',
-                      ),
+                      title: Text(context.l.settingsSendFeedback),
+                      subtitle: Text(context.l.settingsSendFeedbackHint),
                       trailing: const Icon(Icons.open_in_new),
                       onTap: () => _openLink(feedbackUri),
                     ),
@@ -763,7 +781,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         color: error,
                       ),
                       title: Text(
-                        'Delete all data',
+                        context.l.settingsDeleteAll,
                         style: TextStyle(color: error),
                       ),
                       onTap: _eraseEverything,
@@ -776,7 +794,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   Padding(
                     padding: const EdgeInsets.only(top: 24),
                     child: Text(
-                      'Ebb $_version\nMade by SuperDaveLab',
+                      context.l.settingsVersion(_version!),
                       textAlign: TextAlign.center,
                       style: Theme.of(context).textTheme.bodySmall,
                     ),

@@ -9,6 +9,7 @@ import 'package:ebb/data/qr_transfer.dart';
 import 'package:ebb/models/profile.dart';
 import 'package:ebb/services/notification_service.dart';
 import 'package:ebb/services/person_removal.dart';
+import 'package:ebb/ui/language.dart';
 import 'package:ebb/ui/layout.dart';
 import 'package:ebb/ui/qr_code_view.dart';
 import 'package:ebb/ui/section.dart';
@@ -134,19 +135,16 @@ class _SendScreenState extends State<SendScreen> {
     final remove = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text('Remove $name from this phone?'),
-        content: Text(
-          'If $name’s history arrived on the other phone, it can come off '
-          'this one. You can also keep it here as well.',
-        ),
+        title: Text(ctx.l.shareRemoveTitle(name)),
+        content: Text(ctx.l.shareRemoveBody(name)),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('Keep'),
+            child: Text(ctx.l.shareKeep),
           ),
           FilledButton(
             onPressed: () => Navigator.of(ctx).pop(true),
-            child: const Text('Remove'),
+            child: Text(ctx.l.remove),
           ),
         ],
       ),
@@ -155,8 +153,9 @@ class _SendScreenState extends State<SendScreen> {
     if (remove) {
       await removePerson(only.id!, widget.notifications);
       if (!mounted) return;
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('$name removed.')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(context.l.shareRemoved(name))),
+      );
     }
     Navigator.of(context).pop(remove);
   }
@@ -170,7 +169,7 @@ class _SendScreenState extends State<SendScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Send to another phone')),
+      appBar: AppBar(title: Text(context.l.shareTitle)),
       // From "how much", back goes to "who" when there was a choice of who.
       body: PopScope(
         canPop: _stage != _Stage.what || widget.people.length == 1,
@@ -197,7 +196,7 @@ class _SendScreenState extends State<SendScreen> {
         Padding(
           padding: const EdgeInsets.fromLTRB(24, 8, 24, 0),
           child: Text(
-            'What would you like to send?',
+            context.l.shareWhatToSend,
             style: theme.textTheme.titleLarge,
           ),
         ),
@@ -205,15 +204,15 @@ class _SendScreenState extends State<SendScreen> {
           children: [
             ListTile(
               leading: const Icon(Icons.groups_outlined),
-              title: const Text('Everyone'),
-              subtitle: const Text('Moving to a new phone.'),
+              title: Text(context.l.shareEveryone),
+              subtitle: Text(context.l.shareEveryoneHint),
               trailing: const Icon(Icons.chevron_right),
               onTap: () => _choose(null),
             ),
           ],
         ),
         Section(
-          title: 'Just one person',
+          title: context.l.shareJustOne,
           children: [
             // A shared copy is someone else's history from her phone. It
             // isn't this phone's to pass on: she sends her own.
@@ -222,12 +221,12 @@ class _SendScreenState extends State<SendScreen> {
                 leading: const Icon(Icons.person_outline),
                 title: Text(
                   p.id == EbbDatabase.primaryProfileId
-                      ? 'Just your history'
-                      : 'Just ${Who.label(p)}',
+                      ? context.l.shareJustYours
+                      : context.l.shareJustName(Who.label(p)),
                 ),
                 subtitle: p.id == EbbDatabase.primaryProfileId
                     ? null
-                    : Text('For ${Who.label(p)}’s own phone.'),
+                    : Text(context.l.shareForTheirPhone(Who.label(p))),
                 trailing: const Icon(Icons.chevron_right),
                 onTap: () => _choose(p),
               ),
@@ -237,8 +236,7 @@ class _SendScreenState extends State<SendScreen> {
           Padding(
             padding: const EdgeInsets.fromLTRB(24, 12, 24, 0),
             child: Text(
-              'People imported from other phones aren’t offered here: each '
-              'person shares only their own history.',
+              context.l.shareCopiesNotOffered,
               style: theme.textTheme.bodySmall?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
               ),
@@ -252,9 +250,7 @@ class _SendScreenState extends State<SendScreen> {
   Widget _howMuch(BuildContext context) {
     final theme = Theme.of(context);
     final only = _only!;
-    final whose = only.id == EbbDatabase.primaryProfileId
-        ? 'your'
-        : Who(only).whose;
+    final who = Who(only);
 
     Widget choice({
       required bool selected,
@@ -281,44 +277,43 @@ class _SendScreenState extends State<SendScreen> {
         Padding(
           padding: const EdgeInsets.fromLTRB(24, 8, 24, 0),
           child: Text(
-            'How much of $whose history?',
+            context.l.shareHowMuch(who.who, who.name),
             style: theme.textTheme.titleLarge,
           ),
         ),
         Padding(
           padding: const EdgeInsets.fromLTRB(24, 8, 24, 0),
           child: Text(
-            'Sending everything suits a new phone. Sharing with a group, you '
-            'might send less. Nothing is removed from this phone.',
+            context.l.shareHowMuchHint,
             style: theme.textTheme.bodyMedium?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
             ),
           ),
         ),
         Section(
-          title: 'How far back',
+          title: context.l.shareHowFarBack,
           children: [
             for (final span in SendSpan.values)
               choice(
                 selected: _span == span,
-                title: span.label,
+                title: _spanLabel(context, span),
                 onTap: () => setState(() => _span = span),
               ),
           ],
         ),
         Section(
-          title: 'What to include',
+          title: context.l.shareWhatToInclude,
           children: [
             choice(
               selected: !_periodsOnly,
-              title: 'Periods and daily entries',
-              subtitle: 'Notes, ratings, feelings and flow too.',
+              title: context.l.shareWithDays,
+              subtitle: context.l.shareWithDaysHint,
               onTap: () => setState(() => _periodsOnly = false),
             ),
             choice(
               selected: _periodsOnly,
-              title: 'Periods only',
-              subtitle: 'Just when each period started and ended.',
+              title: context.l.sharePeriodsOnly,
+              subtitle: context.l.sharePeriodsOnlyHint,
               onTap: () => setState(() => _periodsOnly = true),
             ),
           ],
@@ -327,7 +322,7 @@ class _SendScreenState extends State<SendScreen> {
           padding: const EdgeInsets.fromLTRB(16, 24, 16, 0),
           child: FilledButton(
             onPressed: () => _send(only),
-            child: const Text('Show the codes'),
+            child: Text(context.l.shareShowCodes),
           ),
         ),
       ],
@@ -341,10 +336,10 @@ class _SendScreenState extends State<SendScreen> {
       return const Center(child: CircularProgressIndicator());
     }
     if (backup.cycleCount == 0 && backup.dayCount == 0) {
-      return const Center(
+      return Center(
         child: Padding(
-          padding: EdgeInsets.all(32),
-          child: Text('Nothing to send yet.', textAlign: TextAlign.center),
+          padding: const EdgeInsets.all(32),
+          child: Text(context.l.shareNothing, textAlign: TextAlign.center),
         ),
       );
     }
@@ -362,8 +357,7 @@ class _SendScreenState extends State<SendScreen> {
       ),
       children: [
         Text(
-          'On the other phone, open Ebb, go to Settings → Receive from another '
-          'phone, and point the camera at this screen.',
+          context.l.shareHowToReceive,
           style: theme.textTheme.bodyMedium,
         ),
         const SizedBox(height: 20),
@@ -374,7 +368,7 @@ class _SendScreenState extends State<SendScreen> {
         const SizedBox(height: 16),
         if (_frames.length > 1) ...[
           Text(
-            'Code ${_index + 1} of ${_frames.length}',
+            context.l.shareCodeOf(_index + 1, _frames.length),
             textAlign: TextAlign.center,
             style: theme.textTheme.titleMedium,
           ),
@@ -384,57 +378,84 @@ class _SendScreenState extends State<SendScreen> {
             children: [
               IconButton(
                 icon: const Icon(Icons.chevron_left),
-                tooltip: 'Previous code',
+                tooltip: context.l.sharePreviousCode,
                 onPressed: () => _step(-1),
               ),
               IconButton.filledTonal(
                 icon: Icon(_playing ? Icons.pause : Icons.play_arrow),
-                tooltip: _playing ? 'Pause' : 'Play',
+                tooltip: _playing
+                    ? context.l.sharePause
+                    : context.l.sharePlay,
                 onPressed: _togglePlaying,
               ),
               IconButton(
                 icon: const Icon(Icons.chevron_right),
-                tooltip: 'Next code',
+                tooltip: context.l.shareNextCode,
                 onPressed: () => _step(1),
               ),
             ],
           ),
           const SizedBox(height: 8),
           Text(
-            'The codes change on their own. The other phone collects them in '
-            'any order.',
+            context.l.shareCodesChange,
             textAlign: TextAlign.center,
             style: muted,
           ),
         ],
         const SizedBox(height: 16),
-        Text(_summary(backup), textAlign: TextAlign.center, style: muted),
+        Text(
+          _summary(context, backup),
+          textAlign: TextAlign.center,
+          style: muted,
+        ),
         const SizedBox(height: 20),
-        FilledButton.tonal(onPressed: _done, child: const Text('Done')),
+        FilledButton.tonal(onPressed: _done, child: Text(context.l.done)),
       ],
     );
   }
 
-  String _summary(Backup b) {
-    final periods = b.cycleCount == 1 ? '1 period' : '${b.cycleCount} periods';
+  String _summary(BuildContext context, Backup b) {
+    final l = context.l;
+    final periods = l.sharePeriodCount(b.cycleCount);
     final only = _only;
     if (only == null) {
-      final people = b.people.length > 1
-          ? ' for ${b.people.length} people'
-          : '';
-      return 'Everything in Ebb: $periods$people.';
+      return b.people.length > 1
+          ? l.shareSummaryEverythingPeople(periods, b.people.length)
+          : l.shareSummaryEverything(periods);
     }
-    final whose = only.id == EbbDatabase.primaryProfileId
-        ? 'Your'
-        : '${Who.label(only)}’s';
-    final what = _periodsOnly ? 'periods' : 'history';
-    final when = switch (_span) {
-      SendSpan.everything => '',
-      SendSpan.latest => ', latest period only',
-      _ => ' from ${_span.label.toLowerCase()}',
+    final w = Who(only);
+    return switch ((_periodsOnly, _span)) {
+      (false, SendSpan.everything) =>
+        l.shareSummaryHistoryAll(w.who, w.name, periods),
+      (false, SendSpan.latest) =>
+        l.shareSummaryHistoryLatest(w.who, w.name, periods),
+      (false, SendSpan.year) =>
+        l.shareSummaryHistoryYear(w.who, w.name, periods),
+      (false, SendSpan.months6) =>
+        l.shareSummaryHistoryMonths(w.who, w.name, periods, 6),
+      (false, SendSpan.months3) =>
+        l.shareSummaryHistoryMonths(w.who, w.name, periods, 3),
+      (true, SendSpan.everything) =>
+        l.shareSummaryPeriodsAll(w.who, w.name, periods),
+      (true, SendSpan.latest) =>
+        l.shareSummaryPeriodsLatest(w.who, w.name, periods),
+      (true, SendSpan.year) =>
+        l.shareSummaryPeriodsYear(w.who, w.name, periods),
+      (true, SendSpan.months6) =>
+        l.shareSummaryPeriodsMonths(w.who, w.name, periods, 6),
+      (true, SendSpan.months3) =>
+        l.shareSummaryPeriodsMonths(w.who, w.name, periods, 3),
     };
-    return '$whose $what$when: $periods.';
   }
 }
+
+/// How far back [span] reaches, as the choice reads.
+String _spanLabel(BuildContext context, SendSpan span) => switch (span) {
+  SendSpan.everything => context.l.shareSpanEverything,
+  SendSpan.year => context.l.shareSpanYear,
+  SendSpan.months6 => context.l.shareSpanMonths(6),
+  SendSpan.months3 => context.l.shareSpanMonths(3),
+  SendSpan.latest => context.l.shareSpanLatest,
+};
 
 enum _Stage { who, what, codes }

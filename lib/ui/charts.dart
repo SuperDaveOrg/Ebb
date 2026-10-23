@@ -8,6 +8,7 @@ import 'package:ebb/domain/day_charts.dart';
 import 'package:ebb/domain/moon.dart';
 import 'package:ebb/domain/temperature.dart';
 import 'package:ebb/models/day_log.dart';
+import 'package:ebb/ui/language.dart';
 import 'package:ebb/ui/moon_icon.dart';
 import 'package:ebb/ui/theme.dart';
 
@@ -64,11 +65,15 @@ class RatingTimelineChart extends StatelessWidget {
     final fmt = DateFormat.yMMMd();
     final top = moons == null ? 8.0 : 22.0;
 
+    final first = fmt.format(days.first.date);
+    final last = fmt.format(days.last.date);
     return Semantics(
-      label:
-          'Day ratings from ${fmt.format(days.first.date)} to '
-          '${fmt.format(days.last.date)}: $rated rated days, with period '
-          'days shaded${moons == null ? '' : ' and moon phases marked'}.',
+      // A new language repaints the month names, which the painters
+      // wouldn't otherwise see change.
+      key: ValueKey(context.l.localeName),
+      label: moons == null
+          ? context.l.chartsRatingSummary(first, last, rated)
+          : context.l.chartsRatingSummaryMoons(first, last, rated),
       excludeSemantics: true,
       child: SizedBox(
         height: _height,
@@ -298,8 +303,9 @@ Set<MoonPhase> _phasesWithRoom(double slot) {
   };
 }
 
-final _month = DateFormat.MMM();
-final _monthYear = DateFormat.yMMM();
+// Made each time, so they follow a change of language.
+DateFormat get _month => DateFormat.MMM();
+DateFormat get _monthYear => DateFormat.yMMM();
 
 /// A tick on every month; a name on every month there's room for, keeping
 /// to calendar steps (quarters, halves) so they read naturally. The year
@@ -373,14 +379,26 @@ class GroupLanesChart extends StatelessWidget {
   static const _top = 22.0;
   static const _bottom = 24.0;
 
-  String get _summary {
+  String _summary(BuildContext context) {
+    final l = context.l;
     final fmt = DateFormat.MMMd();
+    String run(PeriodRun r) => r.estimated
+        ? l.chartsLaneRunEstimated(fmt.format(r.start), fmt.format(r.end))
+        : l.chartsLaneRun(fmt.format(r.start), fmt.format(r.end));
     final each = [
-      for (final l in lanes)
-        '${l.name}: ${l.runs.isEmpty ? 'no period days' : [for (final r in l.runs) '${fmt.format(r.start)} to ${fmt.format(r.end)}${r.estimated ? ', estimated' : ''}'].join('; ')}',
+      for (final lane in lanes)
+        l.chartsLane(
+          lane.name,
+          lane.runs.isEmpty
+              ? l.chartsLaneNone
+              : lane.runs.map(run).join('; '),
+        ),
     ];
-    return 'Periods from ${fmt.format(from)} to ${fmt.format(to)}. '
-        '${each.join('. ')}.';
+    return l.chartsLanesSummary(
+      fmt.format(from),
+      fmt.format(to),
+      each.join('. '),
+    );
   }
 
   @override
@@ -388,7 +406,8 @@ class GroupLanesChart extends StatelessWidget {
     final theme = Theme.of(context);
     final colors = EbbColors.of(context);
     return Semantics(
-      label: _summary,
+      key: ValueKey(context.l.localeName),
+      label: _summary(context),
       excludeSemantics: true,
       child: SizedBox(
         width: double.infinity,
@@ -570,7 +589,8 @@ class TemperatureChart extends StatelessWidget {
   static double get height =>
       _plotHeight + _plotGap + 2 * _rowHeight + _rowGap + _months;
 
-  String get _summary {
+  String _summary(BuildContext context) {
+    final l = context.l;
     final fmt = DateFormat.yMMMd();
     final readings = [
       for (final d in days)
@@ -580,13 +600,18 @@ class TemperatureChart extends StatelessWidget {
         .where((d) => d.mucusFeel != null || d.mucusLook != null)
         .length;
     final range = readings.isEmpty
-        ? 'no temperatures'
-        : '${readings.length} temperature${readings.length == 1 ? '' : 's'}, '
-              'from ${unit.formatWithUnit(readings.reduce(math.min))} to '
-              '${unit.formatWithUnit(readings.reduce(math.max))}';
-    return 'Temperatures from ${fmt.format(days.first.date)} to '
-        '${fmt.format(days.last.date)}: $range, cervical mucus noted on '
-        '$mucus day${mucus == 1 ? '' : 's'}, with period days shaded.';
+        ? l.chartsNoTemperatures
+        : l.chartsTemperatureRange(
+            readings.length,
+            unit.formatWithUnit(readings.reduce(math.min)),
+            unit.formatWithUnit(readings.reduce(math.max)),
+          );
+    return l.chartsTemperatureSummary(
+      fmt.format(days.first.date),
+      fmt.format(days.last.date),
+      range,
+      mucus,
+    );
   }
 
   @override
@@ -596,7 +621,8 @@ class TemperatureChart extends StatelessWidget {
     final label = _labelStyle(theme);
     final axis = temperatureAxis(days.map((d) => d.temperature).nonNulls, unit);
     return Semantics(
-      label: _summary,
+      key: ValueKey(context.l.localeName),
+      label: _summary(context),
       excludeSemantics: true,
       child: SizedBox(
         height: height,
@@ -610,6 +636,8 @@ class TemperatureChart extends StatelessWidget {
                   axis: axis,
                   unit: unit,
                   label: label,
+                  felt: context.l.chartsMucusFelt,
+                  looked: context.l.chartsMucusLooked,
                 ),
               ),
             ),
@@ -673,11 +701,16 @@ class _TemperatureAxisPainter extends CustomPainter {
     required this.axis,
     required this.unit,
     required this.label,
+    required this.felt,
+    required this.looked,
   });
 
   final (double, double) axis;
   final TemperatureUnit unit;
   final TextStyle label;
+
+  /// The mucus rows' names.
+  final String felt, looked;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -698,14 +731,14 @@ class _TemperatureAxisPainter extends CustomPainter {
     const half = TemperatureChart._rowHeight / 2;
     _text(
       canvas,
-      'Felt',
+      felt,
       label,
       const Offset(2, _TemperatureLayout.feelTop + half),
       left: true,
     );
     _text(
       canvas,
-      'Looked',
+      looked,
       label,
       const Offset(2, _TemperatureLayout.lookTop + half),
       left: true,
@@ -714,7 +747,11 @@ class _TemperatureAxisPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(_TemperatureAxisPainter old) =>
-      old.axis != axis || old.unit != unit || old.label != label;
+      old.axis != axis ||
+      old.unit != unit ||
+      old.label != label ||
+      old.felt != felt ||
+      old.looked != looked;
 }
 
 class _TemperaturePainter extends CustomPainter {

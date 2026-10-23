@@ -7,7 +7,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # NAME+CODE, and the only place the version lives. CODE is derived from NAME
 # (major*10000 + minor*100 + patch). Change it with tool/bump_version.sh, not
 # by hand. See docs/RELEASING.md.
-version: 0.8.0+800
+version: 0.9.0+900
 
 environment:
   sdk: ^3.13.4
@@ -20,6 +20,8 @@ environment:
 # versions available, run `flutter pub outdated`.
 dependencies:
   flutter:
+    sdk: flutter
+  flutter_localizations:
     sdk: flutter
 
   # The following adds the Cupertino Icons font to your application.
@@ -59,6 +61,8 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
+  # The app's words, from lib/l10n/*.arb. See docs/translating.md.
+  generate: true
 
   assets:
     - assets/brand/ebb_logo_512.png

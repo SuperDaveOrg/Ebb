@@ -12,6 +12,7 @@ import 'package:ebb/models/cycle.dart';
 import 'package:ebb/models/person_group.dart';
 import 'package:ebb/ui/charts.dart';
 import 'package:ebb/ui/date_span.dart';
+import 'package:ebb/ui/language.dart';
 import 'package:ebb/ui/layout.dart';
 import 'package:ebb/ui/section.dart';
 import 'package:ebb/ui/wording.dart';
@@ -93,7 +94,7 @@ class _GroupScreenState extends State<GroupScreen> {
     final (from, to) = _span.resolve(_earliest);
 
     return Scaffold(
-      appBar: AppBar(title: Text(group?.name ?? 'Group')),
+      appBar: AppBar(title: Text(group?.name ?? context.l.groupsGroup)),
       body: _loading
           ? const Center(child: CircularProgressIndicator())
           : group == null || _members.isEmpty
@@ -101,9 +102,7 @@ class _GroupScreenState extends State<GroupScreen> {
               child: Padding(
                 padding: const EdgeInsets.all(32),
                 child: Text(
-                  'No one is in this group yet. Add them in Settings → '
-                  'Advanced → Manage groups: tick people already on this '
-                  'phone, or add someone from their phone.',
+                  context.l.groupsNoMembers,
                   textAlign: TextAlign.center,
                   style: theme.textTheme.bodyLarge,
                 ),
@@ -127,7 +126,7 @@ class _GroupScreenState extends State<GroupScreen> {
                   ),
                 ),
                 Section(
-                  title: 'Periods',
+                  title: context.l.groupsPeriods,
                   children: [
                     Padding(
                       padding: const EdgeInsets.all(16),
@@ -148,10 +147,7 @@ class _GroupScreenState extends State<GroupScreen> {
                           ),
                           const SizedBox(height: 12),
                           Text(
-                            'Each bar is a period; an outline is one whose '
-                            'end wasn’t logged, drawn at the usual length. '
-                            'Solid lines run down from each full moon, '
-                            'dashed ones from each new moon.',
+                            context.l.groupsChartHint,
                             style: theme.textTheme.bodySmall?.copyWith(
                               color: theme.colorScheme.onSurfaceVariant,
                             ),

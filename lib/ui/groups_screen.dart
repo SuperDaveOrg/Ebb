@@ -8,6 +8,7 @@ import 'package:ebb/models/profile.dart';
 import 'package:ebb/services/person_removal.dart';
 import 'package:ebb/ui/confirm.dart';
 import 'package:ebb/ui/group_receive.dart';
+import 'package:ebb/ui/language.dart';
 import 'package:ebb/ui/layout.dart';
 import 'package:ebb/ui/people.dart';
 import 'package:ebb/ui/section.dart';
@@ -53,12 +54,12 @@ class _GroupsScreenState extends State<GroupsScreen> {
 
   Future<String?> _askName({String? initial, int? except}) => showNameDialog(
     context,
-    title: initial == null ? 'New group' : 'Rename group',
+    title: initial == null ? context.l.groupsNew : context.l.groupsRename,
     others: const [],
     initial: initial,
-    hint: 'For example, the name of your circle or club.',
+    hint: context.l.groupsNameHint,
     maxLength: PersonGroup.maxNameLength,
-    takenMessage: 'There’s already a group with that name.',
+    takenMessage: context.l.groupsNameTaken,
     taken: (name) => _all.any(
       (g) => g.id != except && g.name.toLowerCase() == name.toLowerCase(),
     ),
@@ -92,20 +93,20 @@ class _GroupsScreenState extends State<GroupsScreen> {
       for (final p in _people)
         if (g.memberIds.contains(p.id)) Who.label(p),
     ];
-    return names.isEmpty ? 'No one yet' : names.join(', ');
+    return names.isEmpty ? context.l.groupsNoOneYet : names.join(', ');
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Scaffold(
-      appBar: AppBar(title: const Text('Groups')),
+      appBar: AppBar(title: Text(context.l.groupsTitle)),
       floatingActionButton: _loading
           ? null
           : FloatingActionButton.extended(
               onPressed: _add,
               icon: const Icon(Icons.group_add_outlined),
-              label: const Text('New group'),
+              label: Text(context.l.groupsNew),
             ),
       body: _loading
           ? const Center(child: CircularProgressIndicator())
@@ -114,9 +115,7 @@ class _GroupsScreenState extends State<GroupsScreen> {
               child: Padding(
                 padding: const EdgeInsets.all(32),
                 child: Text(
-                  'A group gathers people on this phone under one name — a '
-                  'circle or club that tracks together. Someone can be in '
-                  'more than one, and deleting a group never deletes anyone.',
+                  context.l.groupsIntro,
                   textAlign: TextAlign.center,
                   style: theme.textTheme.bodyLarge,
                 ),
@@ -215,11 +214,9 @@ class _GroupEditorState extends State<_GroupEditor> {
   Future<void> _addNew() async {
     final name = await showNameDialog(
       context,
-      title: 'Add someone to $_name',
+      title: context.l.groupsAddSomeoneTo(_name),
       others: _people,
-      hint:
-          'Tracked on this phone: you log and change their history here. '
-          'Someone who tracks on their own phone can be imported instead.',
+      hint: context.l.groupsAddSomeoneHint,
     );
     if (name == null || name.isEmpty) return;
     final id = await ProfileRepository().add(Profile(name: name));
@@ -237,12 +234,9 @@ class _GroupEditorState extends State<_GroupEditor> {
       final name = Who.label(p);
       final ok = await confirm(
         context,
-        title: 'Take $name out of $_name?',
-        body:
-            '$name was imported from their phone and isn’t in any other group, '
-            'so the imported history comes off this phone too. $name can '
-            'send it again to rejoin.',
-        action: 'Take out',
+        title: context.l.groupsTakeOutTitle(name, _name),
+        body: context.l.groupsTakeOutBody(name),
+        action: context.l.groupsTakeOut,
       );
       if (!ok) return;
       await removeSharedCopy(p.id!);
@@ -258,13 +252,11 @@ class _GroupEditorState extends State<_GroupEditor> {
     final names = going.map(Who.label).join(', ');
     final ok = await confirm(
       context,
-      title: 'Delete $_name?',
+      title: context.l.groupsDeleteTitle(_name),
       body: going.isEmpty
-          ? 'Only the group goes. Everyone in it stays on this phone, with '
-                'all their history.'
-          : 'The people imported only into this group come off this phone '
-                'too: $names. Everyone else stays, with all their history.',
-      action: 'Delete group',
+          ? context.l.groupsDeleteBodyNone
+          : context.l.groupsDeleteBodySome(names),
+      action: context.l.groupsDeleteGroup,
     );
     if (!ok) return;
     for (final p in going) {
@@ -285,7 +277,7 @@ class _GroupEditorState extends State<_GroupEditor> {
         actions: [
           IconButton(
             icon: const Icon(Icons.edit_outlined),
-            tooltip: 'Rename',
+            tooltip: context.l.groupsRenameTooltip,
             onPressed: _rename,
           ),
         ],
@@ -297,7 +289,7 @@ class _GroupEditorState extends State<_GroupEditor> {
         ),
         children: [
           Section(
-            title: 'Who’s in it',
+            title: context.l.groupsWhoIsIn,
             children: [
               for (final p in _people)
                 // Which kind of member each is: tracked here, and changed
@@ -309,9 +301,10 @@ class _GroupEditorState extends State<_GroupEditor> {
                   title: Text(Who.label(p)),
                   subtitle: Text(
                     p.isSharedCopy
-                        ? 'Imported · read-only, as of '
-                              '${fmt.format(p.sharedOn!)}'
-                        : 'Tracked on this phone',
+                        ? context.l.groupsImportedAsOf(
+                            fmt.format(p.sharedOn!),
+                          )
+                        : context.l.groupsTrackedHere,
                   ),
                   value: _members.contains(p.id),
                   onChanged: (on) => _toggle(p, on ?? false),
@@ -322,23 +315,18 @@ class _GroupEditorState extends State<_GroupEditor> {
           // this phone; or someone who tracks on their own phone and
           // provides it, read-only, to the group.
           Section(
-            title: 'Add to the group',
+            title: context.l.groupsAddTo,
             children: [
               ListTile(
                 leading: const Icon(Icons.person_add_alt),
-                title: const Text('Add someone new'),
-                subtitle: const Text(
-                  'Tracked on this phone: you log their periods here.',
-                ),
+                title: Text(context.l.groupsAddNew),
+                subtitle: Text(context.l.groupsAddNewHint),
                 onTap: _addNew,
               ),
               ListTile(
                 leading: const Icon(Icons.qr_code_scanner),
-                title: const Text('Import from their phone'),
-                subtitle: const Text(
-                  'They keep tracking on their own phone and send it here, '
-                  'read-only. Importing them again brings them up to date.',
-                ),
+                title: Text(context.l.groupsImportFromPhone),
+                subtitle: Text(context.l.groupsImportFromPhoneHint),
                 onTap: _addFromPhone,
               ),
             ],
@@ -348,7 +336,7 @@ class _GroupEditorState extends State<_GroupEditor> {
               ListTile(
                 leading: Icon(Icons.delete_outline, color: error),
                 title: Text(
-                  'Delete this group',
+                  context.l.groupsDeleteThis,
                   style: TextStyle(color: error),
                 ),
                 onTap: _delete,

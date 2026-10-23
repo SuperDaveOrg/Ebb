@@ -74,16 +74,17 @@ void main() {
     test('the owner is "you", even after choosing a name', () {
       for (final name in [null, 'Dana']) {
         final who = Who(Profile(id: owner, name: name));
-        expect(who.whose, 'your');
-        expect(who.mine, 'My');
+        expect(who.who, 'you');
+        expect(strings.notifTodayTitle(who.who, who.name),
+            'Period expected today');
       }
     });
 
     test('anyone else is called by name, never a pronoun', () {
       final who = Who(const Profile(id: sam, name: 'Sam'));
-      expect(who.whose, 'Sam’s');
-      expect(who.whoseCap, 'Sam’s');
-      expect(who.mine, 'Sam’s');
+      expect(who.who, 'other');
+      expect(strings.notifTodayTitle(who.who, who.name),
+          'Sam’s period expected today');
     });
 
     test('the switcher shows the owner as "You" until named', () {

@@ -6,15 +6,7 @@ import 'package:ebb/domain/dates.dart';
 ///
 /// Shown on the calendar for interest only. Ebb makes no claim that they
 /// have anything to do with a cycle, and nothing here feeds the predictor.
-enum MoonPhase {
-  newMoon('New moon'),
-  firstQuarter('First quarter'),
-  full('Full moon'),
-  lastQuarter('Last quarter');
-
-  const MoonPhase(this.label);
-  final String label;
-}
+enum MoonPhase { newMoon, firstQuarter, full, lastQuarter }
 
 /// One principal phase and the instant it happens, in UTC.
 class MoonEvent {
