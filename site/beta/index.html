@@ -1,0 +1,335 @@
+<!doctype html>
+<!--
+  ebb.superdavelab.com/beta/ — a preview of the next version, for testers
+  checking it before it's released, translations above all. Linked from the
+  main page only while there's a preview, and not in the sitemap. Built by
+  tool/deploy_site.sh, which fills the double-brace placeholders from the
+  newest signed snapshot build in dist/release/ and keeps either the BETA or
+  the NO-BETA block below. Edit this file, not the copy in dist/site/.
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Ebb preview — help check it in your language</title>
+  <meta name="description" content="A preview of the next Ebb, for people helping check its translations before it's released." />
+  <meta name="robots" content="noindex" />
+  <link rel="icon" href="../assets/logo.png" type="image/png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=Fraunces:opsz,wght,SOFT@9..144,500..700,100&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css?v={{CSS_HASH}}" />
+  <style>
+    .words { width: 100%; border-collapse: collapse; font-size: 0.97rem; }
+    .words th, .words td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+    .words th { color: var(--muted); font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; }
+    .words td:first-child { font-weight: 650; white-space: nowrap; }
+    .table-card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 10px 12px; overflow-x: auto; }
+    .langs { display: flex; flex-wrap: wrap; gap: 8px; list-style: none; padding: 0; margin: 0 0 18px; }
+    .langs li { padding: 5px 13px; border-radius: 999px; background: var(--wash-teal); font-weight: 600; font-size: 0.93rem; }
+    .feedback-form select {
+      font: inherit; color: var(--ink); background: var(--paper);
+      border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; width: 100%;
+    }
+    .feedback-form select:focus { outline: 2px solid var(--navy); outline-offset: 1px; }
+    @media (max-width: 600px) { .words td:first-child { white-space: normal; } }
+  </style>
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="wrap">
+      <a class="brand pill" href="../" aria-label="Ebb home">
+        <img src="../assets/logo.png" alt="" width="44" height="44" />
+        <span>Ebb</span>
+      </a>
+      <nav class="pill" aria-label="Sections">
+        <a href="#check">What to check</a>
+        <a href="#words">The key words</a>
+        <a href="#report">Report</a>
+        <a class="nav-cta" href="#download">Download preview</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="hero wrap">
+      <div>
+        <p class="eyebrow">Preview of the next version</p>
+        <h1>Help check Ebb in your language.</h1>
+        <p class="lede">
+          Ebb is a free, private period tracker that keeps everything on the
+          phone. It has just learned six new languages, and before they reach
+          everyone, each one needs a native speaker to read it in the real
+          app. Thank you for helping.
+        </p>
+        <ul class="langs" aria-label="Languages to check">
+          <li lang="de">Deutsch</li>
+          <li lang="es">Español</li>
+          <li lang="fr">Français</li>
+          <li lang="it">Italiano</li>
+          <li lang="pt-PT">Português (Portugal)</li>
+          <li lang="ru">Русский</li>
+        </ul>
+        <div class="hero-cta">
+          <a class="btn" href="#download">Download the preview</a>
+          <a class="btn btn-ghost" href="#check">What to check</a>
+        </div>
+      </div>
+      <div class="hero-shot">
+        <img src="../assets/screenshots/1_home.png" alt="Ebb's home screen: day 10 of the cycle on a ring, with the next period expected between two dates" width="1080" height="2424" />
+      </div>
+    </section>
+
+    <section class="alt" id="download">
+      <div class="wrap download">
+        <!-- NO-BETA -->
+        <div class="release">
+          <span class="badge">No preview right now</span>
+          <h2>Nothing to test at the moment</h2>
+          <p class="note">
+            Everything from the last preview is in the released version,
+            Ebb {{VERSION}}. Thank you if you helped check it. The next
+            preview will appear here.
+          </p>
+          <a class="btn" href="../#download">Get Ebb {{VERSION}}</a>
+        </div>
+        <!-- /NO-BETA -->
+        <!-- BETA -->
+        <div class="release">
+          <span class="badge">Preview · not yet released</span>
+          <h2>Ebb {{BETA_VERSION}}</h2>
+          <p class="note">Built {{BETA_BUILT}} · Android 7.0 or newer</p>
+          <a class="btn" href="../downloads/{{BETA_APK_FILE}}" download>Download preview APK <small>{{BETA_APK_SIZE}}</small></a>
+          <dl>
+            <dt>File</dt><dd>{{BETA_APK_FILE}}</dd>
+            <dt>SHA-256</dt><dd><code>{{BETA_APK_SHA256}}</code></dd>
+            <dt>Signed by</dt><dd>SuperDaveLab, the same key as every release</dd>
+            <dt>Source</dt><dd><a href="https://github.com/SuperDaveOrg/Ebb/commit/{{BETA_COMMIT}}">Built from commit {{BETA_COMMIT_SHORT}}</a></dd>
+          </dl>
+        </div>
+        <div>
+          <h3>Installing</h3>
+          <ol class="steps">
+            <li>Tap <strong>Download preview APK</strong> on your phone. Chrome warns that the <strong>file might be harmful</strong>, as it does for every app from outside the Play Store. Tap <strong>Download anyway</strong>.</li>
+            <li>Open the download and tap <strong>Install</strong> (or <strong>Update</strong>, if you already have Ebb). The first time, your phone may ask you to allow Chrome to <strong>install unknown apps</strong>.</li>
+            <li>If you see <strong>App blocked to protect your device</strong>, tap <strong>More details</strong>, then <strong>Install anyway</strong>.</li>
+            <li>Open Ebb and allow notifications, so you can check the reminders too.</li>
+          </ol>
+          <p class="note">
+            A preview installs over the released app and keeps its history,
+            and the next release installs over the preview. A preview can have
+            bugs the release doesn't: if you track your own cycle in Ebb, save
+            <em>Back up to a file</em> in Settings before installing.
+          </p>
+        </div>
+        <!-- /BETA -->
+      </div>
+    </section>
+
+    <section id="check">
+      <div class="wrap">
+        <h2>What to check</h2>
+        <p class="section-lede">
+          About half an hour, at your own pace. You don't need a cycle of your
+          own to help: add a pretend person and make up their history. Ebb
+          keeps everything on the phone, and you can delete it all afterwards
+          in Settings.
+        </p>
+        <div class="grid">
+          <div class="card">
+            <span class="mark"></span>
+            <h3>1. Switch to your language</h3>
+            <p>Ebb follows the phone's language. To pick one just for Ebb, go to <strong>Settings → Language</strong>. Check that the first screen and the menus read naturally.</p>
+          </div>
+          <div class="card">
+            <span class="mark"></span>
+            <h3>2. Log some history</h3>
+            <p>Log a period starting today, then add a few past ones in <strong>History</strong>. Read the home screen as it changes: the day of the cycle, and when the next period is expected.</p>
+          </div>
+          <div class="card">
+            <span class="mark"></span>
+            <h3>3. The calendar and a day</h3>
+            <p>Tap a day on the calendar. Try flow, the rating, the faces for feelings and a note. In Settings, turn on temperature and cervical mucus, and look at those too.</p>
+          </div>
+          <div class="card">
+            <span class="mark"></span>
+            <h3>4. Estimates and charts</h3>
+            <p>Read how Ebb words its estimate and how sure it is. Open <strong>Charts</strong>. In Settings, turn on the fertile window and moon phases and read what they say.</p>
+          </div>
+          <div class="card">
+            <span class="mark"></span>
+            <h3>5. Someone else, and reminders</h3>
+            <p>Add a second person in Settings, so you see the sentences that name someone. Set reminders a day or two ahead of an expected period and read them when they arrive.</p>
+          </div>
+          <div class="card">
+            <span class="mark"></span>
+            <h3>6. Settings and help</h3>
+            <p>Read Settings top to bottom, <strong>How Ebb works</strong> and <strong>Your data</strong>. Try a backup and a restore, and read every question Ebb asks before it changes something.</p>
+          </div>
+        </div>
+        <p class="note" style="margin-top: 26px">
+          Beyond wrong words, tell us about anything that sounds machine-made,
+          too formal or too casual, text that's cut off or doesn't fit, and
+          places that are still in English. (The name Ebb, and anything you
+          typed yourself, stay as they are.)
+        </p>
+      </div>
+    </section>
+
+    <section class="alt" id="words">
+      <div class="wrap">
+        <h2>The words that matter most</h2>
+        <p class="section-lede">
+          Ebb is careful about what it claims to know. A translation that turns
+          an estimate into a promise, or blurs a period into a cycle, changes
+          what the app says. Please check your language keeps each of these
+          meanings, everywhere it appears.
+        </p>
+        <div class="table-card">
+          <table class="words">
+            <thead><tr><th>In English</th><th>What it must mean</th></tr></thead>
+            <tbody>
+              <tr><td>period</td><td>The days of bleeding. The plain, everyday word, never a euphemism or slang.</td></tr>
+              <tr><td>cycle</td><td>From the first day of one period to the first day of the next.</td></tr>
+              <tr><td>expected / likely between</td><td>An estimate, never a promise. Ebb gives a range and says how sure it is.</td></tr>
+              <tr><td>late</td><td>The period hasn't started by when it was expected. A plain fact, never alarming.</td></tr>
+              <tr><td>fertile window estimate</td><td>A rough estimate from cycle timing alone. It must never sound reliable enough for contraception.</td></tr>
+              <tr><td>spotting</td><td>Light bleeding, logged apart from a period's flow.</td></tr>
+              <tr><td>cervical mucus</td><td>The usual term in your language, as a doctor or a fertility-awareness guide would use it.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="note" style="margin-top: 22px">
+          Ebb speaks plainly and calmly, in any language. Periods are ordinary,
+          so if a sentence sounds embarrassed, secretive or clinical, that's
+          worth reporting. And Ebb never gives medical advice: if a sentence
+          reads like it's telling someone what their body means, that's a
+          mistake too.
+        </p>
+      </div>
+    </section>
+
+    <section id="report">
+      <div class="wrap feedback">
+        <div>
+          <h2>Tell us what you found</h2>
+          <p class="section-lede">
+            One message per problem is easiest, but a list is fine too. Write
+            in English or in your own language.
+          </p>
+          <p class="note">
+            For each problem, the most useful things are: the screen it's on,
+            what it says now, and what it should say. A screenshot helps;
+            email it to us, as the form can't take attachments. Please use
+            made-up history in screenshots, never your own.
+          </p>
+          <p class="note">
+            Only what you type here is sent, by email, to SuperDaveLab. Nothing
+            from the app is included. Leave your email out if you'd rather not
+            be asked follow-up questions.
+          </p>
+          <p class="note">Email instead: <a href="mailto:feedback@superdavelab.com?subject=Ebb%20preview">feedback@superdavelab.com</a></p>
+        </div>
+        <form class="feedback-form" id="feedback-form" novalidate>
+          <label>Language you checked
+            <select name="language">
+              <option value="Deutsch">Deutsch</option>
+              <option value="Español">Español</option>
+              <option value="Français">Français</option>
+              <option value="Italiano">Italiano</option>
+              <option value="Português (Portugal)">Português (Portugal)</option>
+              <option value="Русский">Русский</option>
+              <option value="English">English</option>
+              <option value="Other">Something else (say which)</option>
+            </select>
+          </label>
+          <label>What you found
+            <textarea name="message" rows="7" maxlength="4800" required></textarea>
+          </label>
+          <div class="row">
+            <label><span>Name <small>(optional)</small></span>
+              <input name="name" autocomplete="name" maxlength="200" />
+            </label>
+            <label><span>Email <small>(optional, for questions)</small></span>
+              <input name="email" type="email" autocomplete="email" />
+            </label>
+          </div>
+          <!-- Hidden from people; bots fill it in, and the server then sends nothing. -->
+          <div class="hp" aria-hidden="true">
+            <label>Leave this empty <input name="website" tabindex="-1" autocomplete="off" /></label>
+          </div>
+          <button class="btn" type="submit">Send</button>
+          <p class="form-status" role="status" aria-live="polite"></p>
+          <noscript><p class="note">The form needs JavaScript. Email feedback@superdavelab.com instead.</p></noscript>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <span>© {{YEAR}} SuperDaveLab · Ebb is free software under the GNU GPL.</span>
+      <span>
+        <a href="../">Ebb</a> ·
+        <a href="https://github.com/SuperDaveOrg/Ebb">Source on GitHub</a> ·
+        <a href="https://superdavelab.com/">SuperDaveLab</a>
+      </span>
+    </div>
+  </footer>
+
+  <script>
+    // Sends the report to SuperDaveLab's API, which emails it on, as the main
+    // page's feedback form does. The API has no preview field, so the language
+    // and build lead the message.
+    (() => {
+      const form = document.getElementById('feedback-form');
+      if (!form) return;
+      const status = form.querySelector('.form-status');
+      const button = form.querySelector('button[type="submit"]');
+      const failed = "That didn't go through. Please try again, or email feedback@superdavelab.com.";
+      const say = (text, kind) => { status.textContent = text; status.dataset.kind = kind || ''; };
+      const field = (name) => String(new FormData(form).get(name) || '').trim();
+
+      form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const message = field('message');
+        if (!message) {
+          say('Please write what you found first.', 'error');
+          form.elements.message.focus();
+          return;
+        }
+        button.disabled = true;
+        say('Sending…');
+        try {
+          const response = await fetch('https://ledgersprout.superdavelab.com/api/feedback', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              product: 'ebb',
+              source: 'website',
+              message: `[Preview {{BETA_LABEL}}, language: ${field('language')}]\n\n${message}`,
+              name: field('name'),
+              email: field('email'),
+              website: field('website'),
+            }),
+          });
+          if (response.ok) {
+            const language = form.elements.language.value;
+            form.reset();
+            form.elements.language.value = language;
+            say('Thank you. Your report is on its way.', 'ok');
+          } else {
+            const body = await response.json().catch(() => ({}));
+            say(typeof body.detail === 'string' ? body.detail : failed, 'error');
+          }
+        } catch {
+          say(failed, 'error');
+        } finally {
+          button.disabled = false;
+        }
+      });
+    })();
+  </script>
+</body>
+</html>
