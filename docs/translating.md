@@ -34,11 +34,58 @@ Not translated, on purpose: the brand name, the backup file's field names
 (they're the public format), file names, the emoji faces, and anything the
 user typed — names and notes.
 
+## Translating on Weblate
+
+The easiest way to help is [Hosted Weblate](https://hosted.weblate.org/projects/ebb/),
+a web editor that needs no Git or Flutter. Sign in, pick a language, and
+fix what reads wrongly. Under most strings a note says which screen it's
+on and what it must mean; the `description` entries in `app_en.arb` are
+those notes, so add one whenever a new string could be misread. Weblate
+checks placeholders, `select` and plural forms as you type (ICU
+MessageFormat), and translators can comment on a string, or on the English.
+
+| Component | Files | What it is |
+|---|---|---|
+| App | `lib/l10n/app_*.arb` | Every word in the app. |
+| Store listing | `fastlane/metadata/android/*/` | The title and descriptions F-Droid shows. |
+
+**How changes come back.** Weblate commits each translator's work under
+their own name and opens a pull request against `main` (one per
+component, updated until it's merged). To merge one:
+
+1. CI runs the usual checks; `flutter test test/translations_test.dart`
+   is the one that matters here.
+2. If it adds a language, do steps 2 and 3 below first; the test fails
+   until the language is in both lists. Merge a new language once it's
+   complete: `gen-l10n` quietly fills gaps with English, which is exactly
+   what the test is there to refuse.
+3. Merge with a merge commit, not a squash. Weblate matches its commits
+   against `main`, and a squash leaves it to rebase.
+4. Run `flutter gen-l10n`, which rewrites the generated `.dart` files in
+   `lib/l10n/`, and commit them.
+
+Don't edit a translated `.arb` on `main` while Weblate has unmerged
+changes; lock the component on Weblate first (Manage → Repository
+maintenance), or the two conflict. The English still changes here, in
+`app_en.arb`: Weblate picks it up on the next push to `main` and marks the
+affected translations for attention.
+
+**Weblate settings**, should they ever need recreating: the same as
+Nexpill's, recorded in its `docs/translating.md`. Project `ebb`, licence
+GPL-3.0-or-later, source language English, repository
+`https://github.com/SuperDaveOrg/Ebb.git` on `main` through the Hosted
+Weblate GitHub app. App component: ARB file, mask `lib/l10n/app_*.arb`,
+base `lib/l10n/app_en.arb`, JSON indent 2, base file not editable. Store
+listing: App store metadata files, mask `fastlane/metadata/android/*`,
+base and new-translation template `fastlane/metadata/android/en-US`, BCP
+language codes with hyphen, key filter `^(?!changelogs/)`.
+
 ## Adding a language
 
-1. Copy `lib/l10n/app_en.arb` to `app_<code>.arb`, set `"@@locale"`, delete
-   the `@` entries (only the template needs them), and translate every
-   message.
+1. On Weblate, open the App component and choose *Start new translation*.
+   It creates `lib/l10n/app_<code>.arb` and the usual pull request. (By
+   hand instead: copy `app_en.arb` to `app_<code>.arb`, set `"@@locale"`,
+   delete the `@` entries, and translate every message.)
 2. Add the language, by its own name, to `languageNames` in
    `lib/ui/language.dart`.
 3. Add it to `android/app/src/main/res/xml/locales_config.xml`.
@@ -92,7 +139,7 @@ Other rules:
 | Language | State |
 |---|---|
 | English | The source. |
-| German | First draft, written with an AI assistant. **Needs review by a native speaker before release**, like every language below. |
+| German | First draft, written with an AI assistant. **Needs review by a native speaker before release**, like every language below; the place to do it is [Weblate](https://hosted.weblate.org/projects/ebb/). |
 | Spanish | The same. |
 | French | The same. |
 | Italian | The same. |
@@ -100,4 +147,6 @@ Other rules:
 | Russian | The same. |
 
 Testers find the current preview at ebb.superdavelab.com/beta/; see
-"Previews" in [RELEASING.md](RELEASING.md).
+"Previews" in [RELEASING.md](RELEASING.md). Checking in the running app and
+fixing on Weblate go together: the preview shows the words in place, Weblate
+is where the fix goes.
