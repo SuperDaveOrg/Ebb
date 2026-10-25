@@ -3,6 +3,7 @@ import 'package:flutter_zxing/flutter_zxing.dart';
 
 import 'package:ebb/data/backup.dart';
 import 'package:ebb/data/qr_transfer.dart';
+import 'package:ebb/ui/language.dart';
 import 'package:ebb/ui/layout.dart';
 
 /// Scans the codes shown by another phone's Send screen. Pops with the
@@ -28,11 +29,9 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
     final result = _receiver.add(text);
     setState(() {
       _notice = switch (result) {
-        FrameResult.notEbb => "That code isn't from Ebb.",
-        FrameResult.newerVersion =>
-          'The other phone has a newer version of Ebb. Update this one first.',
-        FrameResult.restarted =>
-          'The other phone started over. Collecting the new codes.',
+        FrameResult.notEbb => context.l.shareNotEbb,
+        FrameResult.newerVersion => context.l.shareNewerVersion,
+        FrameResult.restarted => context.l.shareRestarted,
         FrameResult.added || FrameResult.duplicate => null,
       };
     });
@@ -47,7 +46,7 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
     } on BackupFormatException catch (e) {
       _startOver(e.message);
     } on FormatException {
-      _startOver("Some codes didn't read cleanly. Let's scan them again.");
+      _startOver(context.l.shareUnreadable);
     }
   }
 
@@ -61,11 +60,7 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
 
   void _onCamera(Object? controller, Exception? error) {
     if (error == null) return;
-    setState(
-      () => _cameraProblem =
-          'Ebb needs the camera to read the codes. You can allow it in the '
-          'system settings for Ebb.',
-    );
+    setState(() => _cameraProblem = context.l.shareNeedsCamera);
   }
 
   @override
@@ -75,15 +70,15 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
 
     final String status;
     if (r.total == 0) {
-      status = 'Point the camera at the code on the other phone.';
+      status = context.l.sharePointCamera;
     } else if (r.total == 1) {
-      status = 'Reading…';
+      status = context.l.shareReading;
     } else {
-      status = '${r.received} of ${r.total} codes received';
+      status = context.l.shareCodesReceived(r.received, r.total);
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Receive from another phone')),
+      appBar: AppBar(title: Text(context.l.shareReceiveTitle)),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -100,7 +95,7 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
                     if (r.missing.isNotEmpty && r.received > 0) ...[
                       const SizedBox(height: 6),
                       Text(
-                        'Still needed: ${r.missing.join(', ')}',
+                        context.l.shareStillNeeded(r.missing.join(', ')),
                         style: theme.textTheme.bodySmall?.copyWith(
                           color: theme.colorScheme.onSurfaceVariant,
                         ),

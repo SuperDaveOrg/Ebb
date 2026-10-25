@@ -5,6 +5,7 @@ import 'package:ebb/data/group_repository.dart';
 import 'package:ebb/data/profile_repository.dart';
 import 'package:ebb/domain/dates.dart';
 import 'package:ebb/models/profile.dart';
+import 'package:ebb/ui/wording.dart';
 import 'package:sqflite/sqflite.dart';
 
 /// Moves the whole database to and from a [Backup].
@@ -111,7 +112,7 @@ class BackupService {
       var name = person.profile.name;
       if (i > 0 && name == null) {
         do {
-          name = 'Person ${++n}';
+          name = strings.backupUnnamedPerson(++n);
         } while (!taken.add(name.toLowerCase()));
       }
       names.add(name);

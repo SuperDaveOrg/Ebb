@@ -7,12 +7,15 @@ import 'package:ebb/domain/day_charts.dart';
 import 'package:ebb/domain/moon.dart';
 import 'package:ebb/domain/predictor.dart';
 import 'package:ebb/domain/temperature.dart';
+import 'package:ebb/l10n/app_localizations.dart';
 import 'package:ebb/models/cycle.dart';
 import 'package:ebb/models/day_log.dart';
 import 'package:ebb/services/settings_service.dart';
 import 'package:ebb/ui/charts.dart';
 import 'package:ebb/ui/date_span.dart';
+import 'package:ebb/ui/day_log_words.dart';
 import 'package:ebb/ui/face_picker.dart';
+import 'package:ebb/ui/language.dart';
 import 'package:ebb/ui/layout.dart';
 import 'package:ebb/ui/section.dart';
 
@@ -29,12 +32,14 @@ class ChartsScreen extends StatefulWidget {
     super.key,
     required this.repository,
     required this.settings,
-    this.title = 'Charts',
+    this.title,
   });
 
   final CycleRepository repository;
   final SettingsService settings;
-  final String title;
+
+  /// "Charts" when null.
+  final String? title;
 
   @override
   State<ChartsScreen> createState() => _ChartsScreenState();
@@ -99,7 +104,7 @@ class _ChartsScreenState extends State<ChartsScreen> {
     final marks = CalendarMarks(_cycles, _prediction);
 
     return Scaffold(
-      appBar: AppBar(title: Text(widget.title)),
+      appBar: AppBar(title: Text(widget.title ?? context.l.chartsTitle)),
       body: _loading
           ? const Center(child: CircularProgressIndicator())
           : ListView(
@@ -164,10 +169,10 @@ class _ChartsScreenState extends State<ChartsScreen> {
     final days = ratingTimeline(marks, logs, from: from, to: to);
     final bars = _style == TimelineStyle.bars;
     return Section(
-      title: 'Day rating',
+      title: context.l.chartsDayRating,
       children: [
         if (days.every((d) => d.rating == null))
-          _empty(context, 'No days in this range have a rating yet.')
+          _empty(context, context.l.chartsNoRatings)
         else
           _padded(
             Column(
@@ -178,16 +183,16 @@ class _ChartsScreenState extends State<ChartsScreen> {
                   child: SegmentedButton<TimelineStyle>(
                     showSelectedIcon: false,
                     style: _compact(context),
-                    segments: const [
+                    segments: [
                       ButtonSegment(
                         value: TimelineStyle.bars,
-                        icon: Icon(Icons.bar_chart),
-                        label: Text('Bars'),
+                        icon: const Icon(Icons.bar_chart),
+                        label: Text(context.l.chartsBars),
                       ),
                       ButtonSegment(
                         value: TimelineStyle.line,
-                        icon: Icon(Icons.show_chart),
-                        label: Text('Line'),
+                        icon: const Icon(Icons.show_chart),
+                        label: Text(context.l.chartsLine),
                       ),
                     ],
                     selected: {_style},
@@ -204,9 +209,12 @@ class _ChartsScreenState extends State<ChartsScreen> {
                 const SizedBox(height: 8),
                 _caption(
                   context,
-                  '${bars ? 'Each bar is one day’s rating' : 'Each point is one day’s rating, joined to the next day’s when both were rated'}, '
-                  '1 to 5. Period days are shaded.'
-                  '${_showMoon ? ' Moons mark the moon’s phases; over a long range, only the new and full moons, or just the full ones.' : ''}',
+                  [
+                    bars
+                        ? context.l.chartsRatingCaptionBars
+                        : context.l.chartsRatingCaptionLine,
+                    if (_showMoon) context.l.chartsRatingCaptionMoon,
+                  ].join(' '),
                 ),
               ],
             ),
@@ -224,7 +232,7 @@ class _ChartsScreenState extends State<ChartsScreen> {
   ) {
     final days = temperatureTimeline(marks, logs, from: from, to: to);
     return Section(
-      title: 'Temperature and cervical mucus',
+      title: context.l.chartsTemperatureTitle,
       children: [
         if (!days.any(
           (d) =>
@@ -232,11 +240,7 @@ class _ChartsScreenState extends State<ChartsScreen> {
               d.mucusFeel != null ||
               d.mucusLook != null,
         ))
-          _empty(
-            context,
-            'Nothing logged in this range yet. Tap a day on the calendar to '
-            'add a temperature or cervical mucus.',
-          )
+          _empty(context, context.l.chartsTemperatureEmpty)
         else
           _padded(
             Column(
@@ -246,11 +250,7 @@ class _ChartsScreenState extends State<ChartsScreen> {
                 const SizedBox(height: 8),
                 _caption(
                   context,
-                  'Each point is one day’s temperature, in ${_unit.symbol}, '
-                  'joined to the next day’s when both were taken. A hollow '
-                  'point may have been affected, and isn’t joined. Below, '
-                  'cervical mucus: taller bars are wetter (felt) and clearer '
-                  'and stretchier (looked). Period days are shaded.',
+                  context.l.chartsTemperatureCaption(_unit.symbol),
                 ),
               ],
             ),
@@ -275,7 +275,7 @@ class _ChartsScreenState extends State<ChartsScreen> {
           );
     final total = groups.fold(0, (n, g) => n + g.days);
     return Section(
-      title: 'Feelings',
+      title: context.l.chartsFeelings,
       children: [
         _padded(
           Column(
@@ -285,14 +285,14 @@ class _ChartsScreenState extends State<ChartsScreen> {
                 SegmentedButton<_FeelingsBy>(
                   showSelectedIcon: false,
                   style: _compact(context),
-                  segments: const [
+                  segments: [
                     ButtonSegment(
                       value: _FeelingsBy.periods,
-                      label: Text('Around periods'),
+                      label: Text(context.l.chartsAroundPeriods),
                     ),
                     ButtonSegment(
                       value: _FeelingsBy.moon,
-                      label: Text('Around the moon'),
+                      label: Text(context.l.chartsAroundMoon),
                     ),
                   ],
                   selected: {_feelingsBy},
@@ -304,12 +304,8 @@ class _ChartsScreenState extends State<ChartsScreen> {
               if (total == 0)
                 Text(
                   byMoon
-                      ? 'Once you’ve picked how you felt on some days in this '
-                            'range, this shows which feelings came around full '
-                            'and new moons.'
-                      : 'Once you’ve picked how you felt on some days in this '
-                            'range, and a period has started since, this shows '
-                            'which feelings came when.',
+                      ? context.l.chartsFeelingsEmptyMoon
+                      : context.l.chartsFeelingsEmptyPeriods,
                   style: Theme.of(context).textTheme.bodyMedium,
                 )
               else ...[
@@ -320,10 +316,8 @@ class _ChartsScreenState extends State<ChartsScreen> {
                 _caption(
                   context,
                   byMoon
-                      ? 'How many days each face was picked.'
-                      : 'How many days each face was picked. Days since the '
-                            'latest period started aren’t counted until the '
-                            'next one does.',
+                      ? context.l.chartsFeelingsCaptionMoon
+                      : context.l.chartsFeelingsCaptionPeriods,
                 ),
               ],
             ],
@@ -340,17 +334,49 @@ class _FeelingGroup extends StatelessWidget {
 
   final FeelingGroup group;
 
-  String _name(DayFeeling f) => f.named?.label ?? faceName(f.emoji);
+  String _name(DayFeeling f) => f.named?.word ?? faceName(f.emoji);
+
+  String _title(AppLocalizations l) => switch (group.kind) {
+    FeelingDays.duringPeriod => l.chartsGroupDuringPeriod,
+    FeelingDays.beforePeriod => l.chartsGroupBeforePeriod,
+    FeelingDays.restOfCycle ||
+    FeelingDays.restOfMonth => l.chartsGroupOtherDays,
+    FeelingDays.nearFullMoon => l.chartsGroupFullMoon,
+    FeelingDays.nearNewMoon => l.chartsGroupNewMoon,
+  };
+
+  /// Which days the group covers, briefly: "the 5 days before".
+  String _detail(AppLocalizations l) {
+    final span = group.span;
+    return switch (group.kind) {
+      FeelingDays.duringPeriod => span == null
+          ? l.chartsDetailLoggedPeriodDays
+          : l.chartsDetailUsuallyDays(span),
+      FeelingDays.beforePeriod => l.chartsDetailDaysBefore(span!),
+      FeelingDays.restOfCycle => l.chartsDetailRestOfCycle,
+      FeelingDays.nearFullMoon || FeelingDays.nearNewMoon => span == 0
+          ? l.chartsDetailDayItself
+          : l.chartsDetailDayEitherSide(span!),
+      FeelingDays.restOfMonth => l.chartsDetailRestOfMonth,
+    };
+  }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final g = group;
-    String times(int n) => '$n day${n == 1 ? '' : 's'}';
+    final l = context.l;
+    final title = _title(l), detail = _detail(l);
     return Semantics(
-      label:
-          '${g.title}, ${g.detail}: '
-          '${g.counts.isEmpty ? 'none yet' : g.counts.map((c) => '${_name(c.$1)} on ${times(c.$2)}').join(', ')}',
+      label: l.chartsFeelingGroupSummary(
+        title,
+        detail,
+        g.counts.isEmpty
+            ? l.chartsFeelingGroupNone
+            : g.counts
+                  .map((c) => l.chartsFeelingCount(_name(c.$1), c.$2))
+                  .join(', '),
+      ),
       excludeSemantics: true,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -358,9 +384,9 @@ class _FeelingGroup extends StatelessWidget {
           Text.rich(
             TextSpan(
               children: [
-                TextSpan(text: g.title),
+                TextSpan(text: title),
                 TextSpan(
-                  text: '  (${g.detail})',
+                  text: '  ($detail)',
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: theme.colorScheme.onSurfaceVariant,
                   ),
@@ -372,7 +398,7 @@ class _FeelingGroup extends StatelessWidget {
           const SizedBox(height: 8),
           if (g.counts.isEmpty)
             Text(
-              'None yet.',
+              l.chartsNoneYet,
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
               ),

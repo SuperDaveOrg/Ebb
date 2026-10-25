@@ -12,7 +12,9 @@ import 'package:ebb/models/cycle.dart';
 import 'package:ebb/models/day_log.dart';
 import 'package:ebb/services/settings_service.dart';
 import 'package:ebb/ui/cycle_editor.dart';
+import 'package:ebb/ui/day_log_words.dart';
 import 'package:ebb/ui/face_picker.dart';
+import 'package:ebb/ui/language.dart';
 import 'package:ebb/ui/layout.dart';
 import 'package:ebb/ui/moon_icon.dart';
 import 'package:ebb/ui/theme.dart';
@@ -26,14 +28,16 @@ class CalendarScreen extends StatefulWidget {
     required this.who,
     required this.repository,
     required this.settings,
-    this.title = 'Calendar',
+    this.title,
     this.readOnly = false,
   });
 
   final Who who;
   final CycleRepository repository;
   final SettingsService settings;
-  final String title;
+
+  /// "Calendar" unless given.
+  final String? title;
 
   /// For a shared copy: days can be looked at, not logged.
   final bool readOnly;
@@ -190,7 +194,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(widget.title)),
+      appBar: AppBar(title: Text(widget.title ?? context.l.calendarTitle)),
       body: _loading
           ? const Center(child: CircularProgressIndicator())
           : Column(
@@ -305,7 +309,7 @@ class _Month extends StatelessWidget {
   final Map<String, MoonEvent> moons;
   final void Function(DateTime) onTap;
 
-  static final _title = DateFormat.yMMMM();
+  static DateFormat get _title => DateFormat.yMMMM();
 
   @override
   Widget build(BuildContext context) {
@@ -438,23 +442,26 @@ class _Cell extends StatelessWidget {
             ? theme.colorScheme.onSurfaceVariant
             : theme.colorScheme.onSurface);
 
+    final l = context.l;
     final meaning = switch (info.mark) {
-      DayMark.period => ', period',
-      DayMark.periodUnrecorded => ', period, end not logged',
-      DayMark.likelyStart => ', next period likely',
-      DayMark.fertile => ', estimated fertile window',
-      DayMark.none => '',
+      DayMark.period => l.calendarCellPeriod,
+      DayMark.periodUnrecorded => l.calendarCellPeriodUnlogged,
+      DayMark.likelyStart => l.calendarCellLikely,
+      DayMark.fertile => l.calendarCellFertile,
+      DayMark.none => null,
     };
     return Semantics(
       button: true,
       excludeSemantics: true,
-      label:
-          '${DateFormat.MMMMEEEEd().format(date)}'
-          '${isToday ? ', today' : ''}$meaning'
-          '${moon == null ? '' : ', ${moon!.label.toLowerCase()}'}'
-          '${rating == null ? '' : ', rated $rating'}'
-          '${feeling == null ? '' : ', felt ${_feelingName(feeling)}'}'
-          '${hasNote ? ', has a note' : ''}',
+      label: [
+        DateFormat.MMMMEEEEd().format(date),
+        if (isToday) l.calendarCellToday,
+        ?meaning,
+        if (moon case final m?) l.calendarCellMoon(m.name),
+        if (rating != null) l.calendarCellRated(rating),
+        if (feeling != null) l.calendarCellFelt(_feelingName(feeling)),
+        if (hasNote) l.calendarCellNote,
+      ].join(', '),
       child: InkWell(
         onTap: onTap,
         customBorder: const CircleBorder(),
@@ -637,6 +644,7 @@ class _Key extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colors = EbbColors.of(context);
+    final l = context.l;
 
     Widget entry(Widget swatch, String text) => Row(
       mainAxisSize: MainAxisSize.min,
@@ -670,18 +678,19 @@ class _Key extends StatelessWidget {
             spacing: 18,
             runSpacing: 8,
             children: [
-              entry(pill(fill: colors.period), 'Period'),
+              entry(pill(fill: colors.period), l.calendarKeyPeriod),
               if (showUnrecorded)
-                entry(pill(border: colors.period), 'End not logged'),
-              if (showLikely) entry(pill(fill: colors.window), 'Likely start'),
+                entry(pill(border: colors.period), l.calendarKeyEndNotLogged),
+              if (showLikely)
+                entry(pill(fill: colors.window), l.calendarKeyLikely),
               if (showFertile)
                 entry(
                   pill(fill: theme.colorScheme.primaryContainer),
-                  'Fertile (estimate)',
+                  l.calendarKeyFertile,
                 ),
               entry(
                 pill(border: theme.colorScheme.primary, round: true),
-                'Today',
+                l.calendarKeyToday,
               ),
             ],
           ),
@@ -862,7 +871,7 @@ class _DaySheet extends StatefulWidget {
 }
 
 class _DaySheetState extends State<_DaySheet> {
-  static final _range = DateFormat.MMMd();
+  static DateFormat get _range => DateFormat.MMMd();
 
   late Flow _flow = widget.log?.flow ?? Flow.none;
   late int? _rating = widget.log?.rating;
@@ -976,28 +985,29 @@ class _DaySheetState extends State<_DaySheet> {
   );
 
   String get _status {
-    final who = widget.who;
+    final l = context.l;
+    final w = widget.who;
     final info = widget.info;
     final p = widget.prediction;
     final cycle = info.cycle;
     final n = cycle == null ? 0 : daysBetween(cycle.start, widget.day) + 1;
     final window = p.earliest == null
         ? ''
-        : '${who.whoseCap} next period is likely to start between '
-              '${_range.format(p.earliest!)} and ${_range.format(p.latest!)}.';
+        : l.calendarStatusWindow(
+            w.who,
+            w.name,
+            _range.format(p.earliest!),
+            _range.format(p.latest!),
+          );
     return switch (info.mark) {
-      DayMark.period =>
-        'Day $n of ${who.whose} period'
-            '${cycle!.excluded ? ', in a cycle not counted in predictions' : ''}.',
-      DayMark.periodUnrecorded =>
-        'Day $n of ${who.whose} cycle. The end of '
-            'this period wasn’t logged, so it’s drawn at the usual length.',
+      DayMark.period => cycle!.excluded
+          ? l.calendarStatusPeriodDayExcluded(w.who, w.name, n)
+          : l.calendarStatusPeriodDay(w.who, w.name, n),
+      DayMark.periodUnrecorded => l.calendarStatusUnlogged(w.who, w.name, n),
       DayMark.likelyStart => window,
-      DayMark.fertile =>
-        'In the estimated fertile window. Not reliable '
-            'enough to use as contraception.',
+      DayMark.fertile => l.calendarStatusFertile,
       DayMark.none when info.cycleDay != null =>
-        'Day ${info.cycleDay} of ${who.whose} cycle.',
+        l.calendarStatusCycleDay(w.who, w.name, info.cycleDay!),
       _ => '',
     };
   }
@@ -1039,6 +1049,7 @@ class _DaySheetState extends State<_DaySheet> {
   List<Widget> _temperatureAndMucus(EdgeInsets side) {
     final theme = Theme.of(context);
     final unit = widget.unit;
+    final l = context.l;
     final small = theme.textTheme.bodyMedium?.copyWith(
       color: theme.colorScheme.onSurfaceVariant,
     );
@@ -1047,7 +1058,7 @@ class _DaySheetState extends State<_DaySheet> {
       Padding(
         padding: side + const EdgeInsets.only(top: 16),
         child: Text(
-          'Temperature, ${unit.symbol}',
+          l.calendarTemperatureHeading(unit.symbol),
           style: theme.textTheme.titleSmall,
         ),
       ),
@@ -1059,9 +1070,13 @@ class _DaySheetState extends State<_DaySheet> {
           decoration: InputDecoration(
             hintText: unit.format(36.5),
             errorText: _temperatureInvalid
-                ? 'Enter a temperature from ${unit.range}'
+                ? l.calendarTemperatureRange(
+                    unit.format(minTemperature),
+                    unit.format(maxTemperature),
+                    unit.symbol,
+                  )
                 : null,
-            helperText: 'On waking, before getting up',
+            helperText: l.calendarTemperatureHelper,
           ),
           onChanged: (_) => setState(() {}),
         ),
@@ -1073,16 +1088,16 @@ class _DaySheetState extends State<_DaySheet> {
         onChanged: hasTemperature
             ? (v) => setState(() => _disturbed = v ?? false)
             : null,
-        title: const Text('Something may have affected it'),
-        subtitle: const Text('Illness, little sleep, alcohol, taken late'),
+        title: Text(l.calendarTemperatureAffected),
+        subtitle: Text(l.calendarTemperatureAffectedHint),
       ),
       Padding(
         padding: side + const EdgeInsets.only(top: 8),
-        child: Text('Cervical mucus', style: theme.textTheme.titleSmall),
+        child: Text(l.calendarMucus, style: theme.textTheme.titleSmall),
       ),
       Padding(
         padding: side + const EdgeInsets.only(top: 8),
-        child: Text('How it felt', style: small),
+        child: Text(l.calendarMucusFelt, style: small),
       ),
       Padding(
         padding: side + const EdgeInsets.only(top: 6),
@@ -1095,7 +1110,7 @@ class _DaySheetState extends State<_DaySheet> {
       ),
       Padding(
         padding: side + const EdgeInsets.only(top: 10),
-        child: Text('How it looked', style: small),
+        child: Text(l.calendarMucusLooked, style: small),
       ),
       Padding(
         padding: side + const EdgeInsets.only(top: 6),
@@ -1112,7 +1127,8 @@ class _DaySheetState extends State<_DaySheet> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final who = widget.who;
+    final l = context.l;
+    final w = widget.who;
     final isToday = isSameDay(widget.day, today());
     final status = _status;
     final inPeriod =
@@ -1137,18 +1153,21 @@ class _DaySheetState extends State<_DaySheet> {
                   children: [
                     Expanded(
                       child: Text(
-                        '${isToday ? 'Today, ' : ''}'
-                        '${DateFormat.MMMMEEEEd().format(widget.day)}',
+                        isToday
+                            ? l.calendarDayToday(
+                                DateFormat.MMMMEEEEd().format(widget.day),
+                              )
+                            : DateFormat.MMMMEEEEd().format(widget.day),
                         style: theme.textTheme.titleLarge,
                       ),
                     ),
                     IconButton(
-                      tooltip: 'Previous day',
+                      tooltip: l.calendarPreviousDay,
                       icon: const Icon(Icons.chevron_left),
                       onPressed: widget.onPrevious,
                     ),
                     IconButton(
-                      tooltip: 'Next day',
+                      tooltip: l.calendarNextDay,
                       icon: const Icon(Icons.chevron_right),
                       onPressed: widget.onNext,
                     ),
@@ -1173,8 +1192,10 @@ class _DaySheetState extends State<_DaySheet> {
                       MoonIcon(moon.phase, size: 14),
                       const SizedBox(width: 8),
                       Text(
-                        '${moon.phase.label}, '
-                        '${DateFormat.jm().format(moon.at.toLocal())}',
+                        l.calendarMoonAt(
+                          moon.phase.word,
+                          DateFormat.jm().format(moon.at.toLocal()),
+                        ),
                         style: theme.textTheme.bodyMedium?.copyWith(
                           color: theme.colorScheme.onSurfaceVariant,
                         ),
@@ -1189,7 +1210,7 @@ class _DaySheetState extends State<_DaySheet> {
                 Padding(
                   padding: side + const EdgeInsets.only(bottom: 24, top: 8),
                   child: Text(
-                    'Days still to come can’t be logged yet.',
+                    l.calendarFutureDay,
                     style: theme.textTheme.bodyMedium,
                   ),
                 )
@@ -1200,17 +1221,18 @@ class _DaySheetState extends State<_DaySheet> {
                   ListTile(
                     contentPadding: side,
                     leading: const Icon(Icons.water_drop_outlined),
-                    title: Text('Mark as the day ${who.whose} period started'),
+                    title: Text(l.calendarMarkStarted(w.who, w.name)),
                     onTap: () => _done(_Started()),
                   ),
                 if (moves != null)
                   ListTile(
                     contentPadding: side,
                     leading: const Icon(Icons.water_drop_outlined),
-                    title: const Text('Make this the first day of the period'),
+                    title: Text(l.calendarMoveStart),
                     subtitle: Text(
-                      'Moves its start from '
-                      '${DateFormat.MMMEd().format(moves.start)}',
+                      l.calendarMoveStartFrom(
+                        DateFormat.MMMEd().format(moves.start),
+                      ),
                     ),
                     onTap: () => _done(_MovedStart(moves)),
                   ),
@@ -1220,8 +1242,8 @@ class _DaySheetState extends State<_DaySheet> {
                     leading: const Icon(Icons.check),
                     title: Text(
                       ends.end == null
-                          ? 'Mark as the day ${who.whose} period ended'
-                          : 'Make this the last day of the period',
+                          ? l.calendarMarkEnded(w.who, w.name)
+                          : l.calendarMakeLastDay,
                     ),
                     onTap: () => _done(_Ended(ends)),
                   ),
@@ -1229,14 +1251,14 @@ class _DaySheetState extends State<_DaySheet> {
                   ListTile(
                     contentPadding: side,
                     leading: const Icon(Icons.edit_outlined),
-                    title: const Text('Edit this period'),
+                    title: Text(l.calendarEditPeriod),
                     onTap: () => _done(_Edit(widget.info.cycle!)),
                   ),
                 const Divider(height: 24),
                 Padding(
                   padding: side,
                   child: Text(
-                    'Rate ${who.whose} day, 1–5',
+                    l.calendarRateDay(w.who, w.name),
                     style: theme.textTheme.titleSmall,
                   ),
                 ),
@@ -1250,7 +1272,7 @@ class _DaySheetState extends State<_DaySheet> {
                 Padding(
                   padding: side + const EdgeInsets.only(top: 16),
                   child: Text(
-                    'How did ${who.subject} feel?',
+                    l.calendarHowFelt(w.who, w.name),
                     style: theme.textTheme.titleSmall,
                   ),
                 ),
@@ -1263,14 +1285,17 @@ class _DaySheetState extends State<_DaySheet> {
                 ),
                 Padding(
                   padding: side + const EdgeInsets.only(top: 16),
-                  child: Text('Flow', style: theme.textTheme.titleSmall),
+                  child: Text(
+                    l.calendarFlow,
+                    style: theme.textTheme.titleSmall,
+                  ),
                 ),
                 Padding(
                   padding: side + const EdgeInsets.only(top: 8),
                   child: _choices(
                     Flow.values.skip(1).toList(),
                     _flow == Flow.none ? null : _flow,
-                    (f) => f.label,
+                    (f) => f.word,
                     (f) => setState(() => _flow = f ?? Flow.none),
                   ),
                 ),
@@ -1283,7 +1308,7 @@ class _DaySheetState extends State<_DaySheet> {
                     maxLines: 4,
                     maxLength: 500,
                     textCapitalization: TextCapitalization.sentences,
-                    decoration: const InputDecoration(labelText: 'Note'),
+                    decoration: InputDecoration(labelText: l.calendarNote),
                   ),
                 ),
                 Padding(
@@ -1293,14 +1318,14 @@ class _DaySheetState extends State<_DaySheet> {
                       Expanded(
                         child: TextButton(
                           onPressed: () => Navigator.of(context).pop(),
-                          child: const Text('Cancel'),
+                          child: Text(l.cancel),
                         ),
                       ),
                       const SizedBox(width: 12),
                       Expanded(
                         child: FilledButton(
                           onPressed: _temperatureInvalid ? null : () => _done(),
-                          child: const Text('Save'),
+                          child: Text(l.save),
                         ),
                       ),
                     ],
@@ -1317,7 +1342,7 @@ class _DaySheetState extends State<_DaySheet> {
 
 /// What a screen reader says for a feeling: "anxious", "smiling cat".
 String _feelingName(DayFeeling f) =>
-    (f.named?.label ?? faceName(f.emoji)).toLowerCase();
+    midSentence(f.named?.word ?? faceName(f.emoji));
 
 /// What was logged on a day of a shared copy, to read rather than change.
 class _LoggedDay extends StatelessWidget {
@@ -1334,19 +1359,28 @@ class _LoggedDay extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final words = context.l;
     final l = log;
     final lines = <String>[
       if (l?.rating case final r?)
-        'Rated $r of 5, ${ratingNames[r - 1].toLowerCase()}',
-      if (l?.feeling case final f?) 'Felt ${f.emoji} ${_feelingName(f)}',
+        words.calendarLoggedRated(r, ratingNamesInline[r - 1]),
+      if (l?.feeling case final f?)
+        words.calendarLoggedFelt(f.emoji, _feelingName(f)),
       if (l != null && l.flow != Flow.none)
-        'Flow: ${l.flow.label.toLowerCase()}',
+        words.calendarLoggedFlow(l.flow.name),
       if (l?.temperature case final t?)
-        'Temperature: ${unit.formatWithUnit(t)}'
-            '${l!.temperatureDisturbed ? ', may have been affected' : ''}',
+        l!.temperatureDisturbed
+            ? words.calendarLoggedTemperatureAffected(unit.formatWithUnit(t))
+            : words.calendarLoggedTemperature(unit.formatWithUnit(t)),
       if (l != null && (l.mucusFeel != null || l.mucusLook != null))
-        'Cervical mucus: ${[if (l.mucusFeel case final f?) f.label.toLowerCase(), if (l.mucusLook case final k?) k.label.toLowerCase()].join(', ')}',
-      if (l?.notes case final n? when n.trim().isNotEmpty) '“${n.trim()}”',
+        words.calendarLoggedMucus(
+          [
+            if (l.mucusFeel case final f?) f.inline,
+            if (l.mucusLook case final k?) k.inline,
+          ].join(', '),
+        ),
+      if (l?.notes case final n? when n.trim().isNotEmpty)
+        words.calendarLoggedNote(n.trim()),
     ];
     return Padding(
       padding: padding + const EdgeInsets.only(top: 8, bottom: 24),
@@ -1355,7 +1389,7 @@ class _LoggedDay extends StatelessWidget {
         children: [
           if (lines.isEmpty)
             Text(
-              'Nothing logged this day.',
+              words.calendarNothingLogged,
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
               ),
@@ -1371,7 +1405,7 @@ class _LoggedDay extends StatelessWidget {
             alignment: Alignment.centerRight,
             child: TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Close'),
+              child: Text(words.close),
             ),
           ),
         ],

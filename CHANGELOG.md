@@ -9,6 +9,14 @@ turns that section into the release's own when it's cut.
 
 ## [Unreleased]
 
+### Added
+- Ebb in German, Spanish, French, Italian, Portuguese (Portugal) and
+  Russian, as well as English. It follows the phone's language, or pick one
+  in Settings → Language (or, on Android 13 and later, in the phone's
+  settings for the app). Reminders are in the same language. The
+  translations are new: if you speak one of them, the preview at
+  ebb.superdavelab.com/beta/ says how to help check it.
+
 ## [0.8.0] - 2026-10-22
 
 ### Added

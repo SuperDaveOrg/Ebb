@@ -68,10 +68,6 @@ enum TemperatureUnit {
     final c = roundTemperature(toCelsius(v));
     return isTemperature(c) ? c : null;
   }
-
-  /// The accepted range, for an error message: "34.00 to 43.00 °C".
-  String get range =>
-      '${format(minTemperature)} to ${format(maxTemperature)} $symbol';
 }
 
 /// The span the chart's axis covers, in [unit]: the readings with a little

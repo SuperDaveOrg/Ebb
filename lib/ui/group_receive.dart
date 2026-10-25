@@ -3,11 +3,11 @@ import 'package:intl/intl.dart';
 
 import 'package:ebb/data/backup.dart';
 import 'package:ebb/data/backup_service.dart';
-import 'package:ebb/data/database.dart';
 import 'package:ebb/data/group_repository.dart';
 import 'package:ebb/data/profile_repository.dart';
 import 'package:ebb/models/person_group.dart';
 import 'package:ebb/ui/confirm.dart';
+import 'package:ebb/ui/language.dart';
 import 'package:ebb/ui/people.dart';
 import 'package:ebb/ui/receive_screen.dart';
 import 'package:ebb/ui/wording.dart';
@@ -38,16 +38,12 @@ Future<bool> receiveIntoGroup(
     await showDialog<void>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('That’s more than one person'),
-        content: const Text(
-          'These codes hold a whole phone’s history. To join a group, each '
-          'person sends just their own: on their phone, Settings → Send to '
-          'another phone → Just your history.',
-        ),
+        title: Text(ctx.l.groupsMoreThanOne),
+        content: Text(ctx.l.groupsMoreThanOneBody),
         actions: [
           FilledButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('OK'),
+            child: Text(ctx.l.ok),
           ),
         ],
       ),
@@ -57,33 +53,25 @@ Future<bool> receiveIntoGroup(
 
   final person = backup.people.single;
   final sent = DateFormat.yMMMd().format(backup.exportedOn);
-  final periods = backup.cycleCount == 1
-      ? '1 period'
-      : '${backup.cycleCount} periods';
+  final periods = context.l.sharePeriodCount(backup.cycleCount);
   final groups = GroupRepository();
   final known = await service.personWithUid(person.profile.uid);
   if (!context.mounted) return false;
 
   if (known != null) {
-    final name = known.id == EbbDatabase.primaryProfileId
-        ? 'your history'
-        : Who.label(known);
+    final w = Who(known);
     final ok = await confirm(
       context,
-      title: 'Update $name?',
+      title: context.l.groupsUpdateTitle(w.who, w.name),
       body: known.isSharedCopy
-          ? 'This is ${Who(known).whose} history again, sent $sent: '
-                '$periods. It replaces the copy on this phone.'
-          : 'This is ${Who(known).whose} history, sent $sent: $periods. '
-                'It replaces what’s on this phone for '
-                '${known.name ?? 'you'}, including anything logged here '
-                'since.',
-      action: 'Update $name',
+          ? context.l.groupsUpdateCopyBody(w.who, w.name, sent, periods)
+          : context.l.groupsUpdateBody(w.who, w.name, sent, periods),
+      action: context.l.groupsUpdateAction(w.who, w.name),
     );
     if (!ok) return false;
     await service.updatePerson(known.id!, person, sentOn: backup.exportedOn);
     await groups.addMember(group.id!, known.id!);
-    say('${Who.label(known)} updated.');
+    if (context.mounted) say(context.l.groupsUpdated(Who.label(known)));
     return true;
   }
 
@@ -91,12 +79,10 @@ Future<bool> receiveIntoGroup(
   if (!context.mounted) return false;
   final name = await showNameDialog(
     context,
-    title: 'Import into ${group.name}',
+    title: context.l.groupsImportInto(group.name),
     initial: person.profile.name,
     others: everyone,
-    hint:
-        '$periods, sent $sent. Imported read-only: it can’t be changed '
-        'here, and is brought up to date when it’s sent again.',
+    hint: context.l.groupsImportHint(periods, sent),
   );
   if (name == null || name.isEmpty) return false;
   final id = await service.addPerson(
@@ -105,6 +91,6 @@ Future<bool> receiveIntoGroup(
     sharedOn: backup.exportedOn,
   );
   await groups.addMember(group.id!, id);
-  say('$name imported into ${group.name}.');
+  if (context.mounted) say(context.l.groupsImported(name, group.name));
   return true;
 }

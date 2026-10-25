@@ -9,6 +9,7 @@ import 'package:ebb/models/cycle.dart';
 import 'package:ebb/services/settings_service.dart';
 import 'package:ebb/ui/celebration.dart';
 import 'package:ebb/ui/cycle_editor.dart';
+import 'package:ebb/ui/language.dart';
 import 'package:ebb/ui/layout.dart';
 import 'package:ebb/ui/section.dart';
 import 'package:ebb/ui/theme.dart';
@@ -20,7 +21,7 @@ class HistoryScreen extends StatefulWidget {
     required this.repository,
     required this.settings,
     this.isOwner = true,
-    this.title = 'History',
+    this.title,
     this.readOnly = false,
   });
 
@@ -29,7 +30,9 @@ class HistoryScreen extends StatefulWidget {
 
   /// Only the owner has the phone's backup among her milestones.
   final bool isOwner;
-  final String title;
+
+  /// Null for the plain "History".
+  final String? title;
 
   /// For a shared copy: cycles can be looked at, not added or changed.
   final bool readOnly;
@@ -39,7 +42,7 @@ class HistoryScreen extends StatefulWidget {
 }
 
 class _HistoryScreenState extends State<HistoryScreen> {
-  static final _day = DateFormat.MMMEd();
+  static DateFormat get _day => DateFormat.MMMEd();
 
   List<Cycle> _cycles = const [];
 
@@ -112,13 +115,13 @@ class _HistoryScreenState extends State<HistoryScreen> {
     }
 
     return Scaffold(
-      appBar: AppBar(title: Text(widget.title)),
+      appBar: AppBar(title: Text(widget.title ?? context.l.homeHistory)),
       floatingActionButton: _loading || widget.readOnly
           ? null
           : FloatingActionButton.extended(
               onPressed: _addPast,
               icon: const Icon(Icons.add),
-              label: const Text('Add past period'),
+              label: Text(context.l.homeAddPastPeriod),
             ),
       body: _loading
           ? const Center(child: CircularProgressIndicator())
@@ -127,8 +130,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
               child: Padding(
                 padding: const EdgeInsets.all(32),
                 child: Text(
-                  'No cycles recorded yet. If you remember when recent '
-                  'periods started, adding them gives Ebb a head start.',
+                  context.l.homeHistoryEmpty,
                   textAlign: TextAlign.center,
                   style: theme.textTheme.bodyLarge,
                 ),
@@ -148,7 +150,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   ),
                 if (_milestones.isNotEmpty)
                   Section(
-                    title: 'Milestones',
+                    title: context.l.homeMilestones,
                     children: [
                       for (final m in _milestones)
                         ListTile(
@@ -171,23 +173,21 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
     final String detail;
     if (periodLength != null) {
-      detail = '$periodLength-day period';
+      detail = context.l.homePeriodLength(periodLength);
     } else if (i == 0 && cycle.inProgressOn(today())) {
-      detail = 'Period in progress';
+      detail = context.l.homePeriodInProgress;
     } else {
-      detail = 'End not recorded';
+      detail = context.l.homeEndNotRecorded;
     }
 
     // A gap long enough that a period in it probably went unlogged. Only a
     // hint: nothing is assumed about the history itself.
     final String? gap = length != null
         ? (_prediction.spansUnloggedPeriod(length)
-              ? 'A long gap. If a period here wasn’t logged, add it with '
-                    '“Add past period”.'
+              ? context.l.homeLongGap
               : null)
         : (_prediction.unloggedCycles > 0
-              ? 'Nothing logged since. If a period was missed, add it with '
-                    '“Add past period”.'
+              ? context.l.homeNothingSince
               : null);
     final notes = cycle.notes;
 
@@ -207,7 +207,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    cycle.excluded ? '$detail · not counted' : detail,
+                    cycle.excluded ? context.l.homeNotCounted(detail) : detail,
                     style: theme.textTheme.bodySmall,
                   ),
                   const SizedBox(height: 8),
@@ -256,14 +256,19 @@ class _HistoryScreenState extends State<HistoryScreen> {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Text('$length', style: theme.textTheme.titleLarge),
-                  Text('day cycle', style: theme.textTheme.bodySmall),
+                  Text(
+                    context.l.homeDayCycle,
+                    style: theme.textTheme.bodySmall,
+                  ),
                 ],
               )
             else
               // "Current" only while it plausibly is; once Ebb assumes
               // periods went unlogged since, it's just the latest one logged.
               Text(
-                _prediction.unloggedCycles > 0 ? 'Last logged' : 'Current',
+                _prediction.unloggedCycles > 0
+                    ? context.l.homeLastLogged
+                    : context.l.homeCurrent,
                 style: theme.textTheme.labelMedium,
               ),
           ],

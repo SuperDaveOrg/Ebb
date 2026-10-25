@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'package:ebb/ui/language.dart';
+
 /// Asks before doing something that can't be taken back. True only when
 /// [action] is tapped; Cancel or dismissing the dialog gives false.
 Future<bool> confirm(
@@ -16,7 +18,7 @@ Future<bool> confirm(
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('Cancel'),
+            child: Text(ctx.l.cancel),
           ),
           FilledButton(
             onPressed: () => Navigator.of(ctx).pop(true),

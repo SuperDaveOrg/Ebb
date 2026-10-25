@@ -114,15 +114,10 @@ void main() {
     final groups = feelingsAroundPeriods(cycles, logs, marks);
 
     test('sorts each day by where it falls', () {
-      expect(groups.map((g) => g.title), [
-        'During a period',
-        'Just before a period',
-        'Other days',
-      ]);
-      expect(groups.map((g) => g.detail), [
-        'logged period days',
-        'the 5 days before',
-        'the rest of the cycle',
+      expect(groups.map((g) => (g.kind, g.span)), [
+        (FeelingDays.duringPeriod, null),
+        (FeelingDays.beforePeriod, 5),
+        (FeelingDays.restOfCycle, null),
       ]);
       expect(
         feelingsAroundPeriods(
@@ -130,8 +125,8 @@ void main() {
           logs,
           marks,
           usualPeriodLength: 5,
-        ).first.detail,
-        'usually 5 days',
+        ).first.span,
+        5,
       );
       expect(groups[0].counts, [(DayFeeling.named(Feeling.tired), 1)]);
       expect(groups[1].counts, [
@@ -169,13 +164,13 @@ void main() {
         on(addDays(fullMoon, 3), feeling: Feeling.calm),
         on(addDays(newMoon, -1), feeling: Feeling.tired),
       ]);
-      expect(groups.map((g) => (g.title, g.days)), [
-        ('Around a full moon', 2),
-        ('Around a new moon', 1),
-        ('Other days', 1),
+      expect(groups.map((g) => (g.kind, g.days)), [
+        (FeelingDays.nearFullMoon, 2),
+        (FeelingDays.nearNewMoon, 1),
+        (FeelingDays.restOfMonth, 1),
       ]);
       expect(groups[0].counts, [(DayFeeling.named(Feeling.energetic), 2)]);
-      expect(groups[0].detail, 'the day, ±1 day');
+      expect(groups[0].span, 1);
     });
   });
 }

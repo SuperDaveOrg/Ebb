@@ -6,18 +6,17 @@ import 'package:ebb/domain/cycle_rules.dart';
 import 'package:ebb/domain/dates.dart';
 import 'package:ebb/models/cycle.dart';
 import 'package:ebb/ui/confirm.dart';
+import 'package:ebb/ui/language.dart';
+import 'package:ebb/ui/wording.dart';
 
 /// Plain-language wording for each [CycleProblem].
 String describeCycleProblem(CycleProblem problem) => switch (problem) {
-  CycleProblem.startInFuture => "The start date can't be in the future.",
-  CycleProblem.endInFuture => "The end date can't be in the future.",
-  CycleProblem.endBeforeStart => 'The end date is before the start date.',
-  CycleProblem.duplicateStart =>
-    'A period starting on that day is already recorded.',
-  CycleProblem.overlapsPrevious =>
-    'This overlaps the period before it. Check the earlier entry’s end date.',
-  CycleProblem.overlapsNext =>
-    'This overlaps the period after it. Check the end date.',
+  CycleProblem.startInFuture => strings.homeProblemStartInFuture,
+  CycleProblem.endInFuture => strings.homeProblemEndInFuture,
+  CycleProblem.endBeforeStart => strings.homeProblemEndBeforeStart,
+  CycleProblem.duplicateStart => strings.homeProblemDuplicateStart,
+  CycleProblem.overlapsPrevious => strings.homeProblemOverlapsPrevious,
+  CycleProblem.overlapsNext => strings.homeProblemOverlapsNext,
 };
 
 /// Opens the editor for [cycle], or for a new past period when [cycle] is
@@ -51,11 +50,11 @@ Future<void> editCycle(
   Future<void> delete() async {
     final confirmed = await confirm(
       context,
-      title: 'Delete this cycle?',
-      body:
-          'The entry starting ${DateFormat.yMMMd().format(cycle.start)} will '
-          'be removed. This cannot be undone.',
-      action: 'Delete',
+      title: context.l.homeDeleteCycleTitle,
+      body: context.l.homeDeleteCycleBody(
+        DateFormat.yMMMd().format(cycle.start),
+      ),
+      action: context.l.delete,
     );
     if (!confirmed || cycle.id == null) return;
     await repository.deleteCycle(cycle.id!);
@@ -88,7 +87,7 @@ class _CycleEditor extends StatefulWidget {
 }
 
 class _CycleEditorState extends State<_CycleEditor> {
-  static final _fmt = DateFormat.yMMMEd();
+  static DateFormat get _fmt => DateFormat.yMMMEd();
 
   late DateTime _start;
   DateTime? _end;
@@ -137,7 +136,7 @@ class _CycleEditorState extends State<_CycleEditor> {
       initialDate: _start,
       firstDate: DateTime(2000),
       lastDate: today(),
-      helpText: 'First day of the period',
+      helpText: context.l.homeFirstDayOfPeriod,
     );
     if (picked != null) setState(() => _start = dateOnly(picked));
   }
@@ -151,7 +150,7 @@ class _CycleEditorState extends State<_CycleEditor> {
       initialDate: end != null && !end.isBefore(_start) ? end : _start,
       firstDate: _start,
       lastDate: today(),
-      helpText: 'Last day of the period',
+      helpText: context.l.homeLastDayOfPeriod,
     );
     if (picked != null) setState(() => _end = dateOnly(picked));
   }
@@ -173,45 +172,43 @@ class _CycleEditorState extends State<_CycleEditor> {
               Padding(
                 padding: const EdgeInsets.fromLTRB(24, 0, 24, 8),
                 child: Text(
-                  _isNew ? 'Add a past period' : 'Edit period',
+                  _isNew
+                      ? context.l.homeAddPastPeriodTitle
+                      : context.l.homeEditPeriod,
                   style: theme.textTheme.titleLarge,
                 ),
               ),
               ListTile(
                 contentPadding: const EdgeInsets.symmetric(horizontal: 24),
                 leading: const Icon(Icons.water_drop_outlined),
-                title: const Text('Started'),
+                title: Text(context.l.homeStarted),
                 subtitle: Text(_fmt.format(_start)),
                 onTap: _pickStart,
               ),
               ListTile(
                 contentPadding: const EdgeInsets.fromLTRB(24, 0, 12, 0),
                 leading: const Icon(Icons.check),
-                title: const Text('Ended'),
+                title: Text(context.l.homeEnded),
                 subtitle: Text(
                   end != null
                       ? _fmt.format(end)
                       : _stillGoing
-                      ? 'Still going'
-                      : 'Not recorded',
+                      ? context.l.homeStillGoing
+                      : context.l.homeNotRecorded,
                 ),
                 onTap: _pickEnd,
                 trailing: end == null
                     ? null
                     : IconButton(
                         icon: const Icon(Icons.close),
-                        tooltip: 'Clear end date',
+                        tooltip: context.l.homeClearEnd,
                         onPressed: () => setState(() => _end = null),
                       ),
               ),
               SwitchListTile(
                 contentPadding: const EdgeInsets.symmetric(horizontal: 24),
-                title: const Text('Count this cycle in predictions'),
-                subtitle: const Text(
-                  'Turn off for a cycle that doesn’t reflect the usual rhythm — '
-                  'illness, a medication change, a pregnancy loss. It stays in '
-                  'your history either way.',
-                ),
+                title: Text(context.l.homeCountInPredictions),
+                subtitle: Text(context.l.homeCountInPredictionsHint),
                 value: !_excluded,
                 onChanged: (v) => setState(() => _excluded = !v),
               ),
@@ -224,10 +221,10 @@ class _CycleEditorState extends State<_CycleEditor> {
                   maxLength: 500,
                   textCapitalization: TextCapitalization.sentences,
                   decoration: InputDecoration(
-                    labelText: 'Note',
+                    labelText: context.l.homeNote,
                     helperText: _excluded
-                        ? 'Why it isn’t counted, so it’s easy to remember later.'
-                        : 'Anything worth remembering about this one.',
+                        ? context.l.homeNoteExcludedHint
+                        : context.l.homeNoteHint,
                     helperMaxLines: 2,
                   ),
                 ),
@@ -251,7 +248,7 @@ class _CycleEditorState extends State<_CycleEditor> {
                     Expanded(
                       child: TextButton(
                         onPressed: () => Navigator.of(context).pop(),
-                        child: const Text('Cancel'),
+                        child: Text(context.l.cancel),
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -260,7 +257,7 @@ class _CycleEditorState extends State<_CycleEditor> {
                         onPressed: problem == null
                             ? () => Navigator.of(context).pop(_candidate)
                             : null,
-                        child: const Text('Save'),
+                        child: Text(context.l.save),
                       ),
                     ),
                   ],
@@ -279,7 +276,7 @@ class _CycleEditorState extends State<_CycleEditor> {
                         widget.onDelete!();
                       },
                       icon: const Icon(Icons.delete_outline),
-                      label: const Text('Delete this period'),
+                      label: Text(context.l.homeDeletePeriod),
                     ),
                   ),
                 ),

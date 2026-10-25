@@ -2,18 +2,26 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import 'package:ebb/domain/dates.dart';
+import 'package:ebb/ui/language.dart';
 
 /// The ranges offered in the date menu.
 enum SpanChoice {
-  months3('Last 3 months', 91),
-  months6('Last 6 months', 182),
-  year('Last year', 365),
-  all('Everything', null),
-  custom('Choose dates…', null);
+  months3(91),
+  months6(182),
+  year(365),
+  all(null),
+  custom(null);
 
-  const SpanChoice(this.label, this.days);
-  final String label;
+  const SpanChoice(this.days);
   final int? days;
+
+  String label(BuildContext context) => switch (this) {
+    months3 => context.l.homeSpanMonths3,
+    months6 => context.l.homeSpanMonths6,
+    year => context.l.homeSpanYear,
+    all => context.l.homeSpanAll,
+    custom => context.l.homeSpanCustom,
+  };
 }
 
 /// Which days a chart covers: a choice from the menu, and the dates picked
@@ -72,7 +80,7 @@ class DateSpanButton extends StatelessWidget {
     final fmt = from.year == to.year ? DateFormat.MMMd() : DateFormat.yMMMd();
     final label = span.choice == SpanChoice.custom
         ? '${fmt.format(from)} – ${fmt.format(to)}'
-        : span.choice.label;
+        : span.choice.label(context);
     return MenuAnchor(
       menuChildren: [
         for (final c in SpanChoice.values)
@@ -80,7 +88,7 @@ class DateSpanButton extends StatelessWidget {
             leadingIcon: Icon(span.choice == c ? Icons.check : null, size: 20),
             // Choosing dates again stays possible while they're chosen.
             onPressed: () => _pick(context, c),
-            child: Text(c.label),
+            child: Text(c.label(context)),
           ),
       ],
       builder: (context, menu, _) => OutlinedButton.icon(

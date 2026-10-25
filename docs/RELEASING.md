@@ -135,6 +135,33 @@ snapshot or debug-signed build), and rsyncs it to
 `root@davekoons.com:/var/www/ebb`. Like LedgerSprout's deploy script, it never
 deletes anything on the server, so earlier APKs stay downloadable.
 
+### Previews
+
+`ebb.superdavelab.com/beta/` (`site/beta/`) offers a **preview** of the next
+version to testers, above all native speakers checking translations.
+"Preview" on the pages, so it isn't confused with the release's "Public
+beta"; the URL stays `/beta/`. It offers the newest **snapshot**: a build of
+an untagged commit, signed with the release key, built after the current
+release. The main page asks for testers and links to it only while there's
+one; once the release is newer, the page says there's no preview and the
+main page's call for testers goes.
+
+```bash
+tool/bump_version.sh minor          # on the branch, so the preview is labelled 0.9.0-<commit>
+git push origin <branch>            # the page links to the commit on GitHub
+tool/build_release.sh --ref <branch>
+tool/deploy_site.sh
+```
+
+`bump_version.sh` also turns CHANGELOG.md's "Unreleased" section into the
+new version's; for a preview, put it back (`git checkout CHANGELOG.md`), so
+the entries stay under Unreleased until the release is cut.
+
+A preview has the same version code as the release it leads up to, so
+testers update from the current release to the preview, and from the preview
+to that release, keeping their history. Reports from the preview page's form
+arrive as Ebb website feedback, starting `[Preview <version>, language: …]`.
+
 `tool/build_release.sh` builds in a clean temporary checkout of exactly that
 tag, runs `flutter analyze` and `flutter test`, builds one APK per ABI and
 one universal APK, and then **refuses** them all if any one:

@@ -200,17 +200,33 @@
 
     <section id="download">
       <div class="wrap download">
-        <div class="release">
-          <span class="badge">Public beta</span>
-          <h2>Ebb {{VERSION}} for Android</h2>
-          <p class="note">Released {{RELEASE_DATE}} · Android 7.0 or newer</p>
-          <a class="btn" href="downloads/{{APK_FILE}}" download>Download APK <small>{{APK_SIZE}}</small></a>
-          <dl>
-            <dt>File</dt><dd>{{APK_FILE}}</dd>
-            <dt>SHA-256</dt><dd><code>{{APK_SHA256}}</code></dd>
-            <dt>Signed by</dt><dd>SuperDaveLab</dd>
-            <dt>Source</dt><dd><a href="https://github.com/SuperDaveOrg/Ebb/tree/v{{VERSION}}">Built from tag v{{VERSION}}</a></dd>
-          </dl>
+        <div>
+          <div class="release">
+            <span class="badge">Public beta</span>
+            <h2>Ebb {{VERSION}} for Android</h2>
+            <p class="note">Released {{RELEASE_DATE}} · Android 7.0 or newer</p>
+            <a class="btn" href="downloads/{{APK_FILE}}" download>Download APK <small>{{APK_SIZE}}</small></a>
+            <dl>
+              <dt>File</dt><dd>{{APK_FILE}}</dd>
+              <dt>SHA-256</dt><dd><code>{{APK_SHA256}}</code></dd>
+              <dt>Signed by</dt><dd>SuperDaveLab</dd>
+              <dt>Source</dt><dd><a href="https://github.com/SuperDaveOrg/Ebb/tree/v{{VERSION}}">Built from tag v{{VERSION}}</a></dd>
+            </dl>
+          </div>
+          <!-- BETA -->
+          <div class="beta-callout">
+            <p class="eyebrow">Testers wanted</p>
+            <h3>Speak German, Spanish, French, Italian, Portuguese or Russian?</h3>
+            <p>
+              The next version of Ebb speaks all six, and each translation
+              needs a native speaker to read it before it reaches everyone.
+              Half an hour of your eyes makes sure Ebb sounds natural, plain
+              and calm in your language, and never promises more than it
+              knows.
+            </p>
+            <a class="btn btn-ghost" href="beta/">Try the preview and help check it</a>
+          </div>
+          <!-- /BETA -->
         </div>
         <div>
           <h3>Installing</h3>
@@ -317,6 +333,9 @@
             included. Leave your email out if you don't need a reply.
           </p>
           <p class="note">Prefer email? <a href="mailto:feedback@superdavelab.com">feedback@superdavelab.com</a></p>
+          <!-- BETA -->
+          <p class="note">Checking a translation? The <a href="beta/">preview page</a> says what to look for, and has its own form.</p>
+          <!-- /BETA -->
         </div>
         <form class="feedback-form" id="feedback-form" novalidate>
           <label>Message

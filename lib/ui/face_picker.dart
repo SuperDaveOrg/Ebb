@@ -3,73 +3,91 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 import 'package:ebb/models/day_log.dart';
+import 'package:ebb/ui/day_log_words.dart';
+import 'package:ebb/ui/language.dart';
+import 'package:ebb/ui/wording.dart';
 
 /// What each day rating, 1 to 5, is called by a screen reader. On screen
 /// it's the number: faces are kept for feelings, so a face on the calendar
 /// always means the same thing.
-const ratingNames = ['Rough', 'Not great', 'Okay', 'Good', 'Great'];
+List<String> get ratingNames => [
+  strings.faceRatingRough,
+  strings.faceRatingNotGreat,
+  strings.faceRatingOkay,
+  strings.faceRatingGood,
+  strings.faceRatingGreat,
+];
+
+/// The same, as they read mid-sentence: "2, not great".
+List<String> get ratingNamesInline => [
+  strings.faceRatingRoughInline,
+  strings.faceRatingNotGreatInline,
+  strings.faceRatingOkayInline,
+  strings.faceRatingGoodInline,
+  strings.faceRatingGreatInline,
+];
 
 /// Faces beyond the named feelings, for whatever they mean to her. Stored
 /// as the emoji, so this list can grow without touching the backup format.
 /// The names are only for screen readers.
 ///
 /// Nothing newer than Emoji 11, so they draw on Android 9 and later.
-const moreFaces = [
-  ('😺', 'Smiling cat'),
-  ('😸', 'Grinning cat'),
-  ('😹', 'Cat with tears of joy'),
-  ('😻', 'Cat with heart eyes'),
-  ('😼', 'Smirking cat'),
-  ('😽', 'Kissing cat'),
-  ('🙀', 'Weary cat'),
-  ('😿', 'Crying cat'),
-  ('😾', 'Pouting cat'),
-  ('👽', 'Alien'),
-  ('👾', 'Space invader'),
-  ('🤖', 'Robot'),
-  ('👻', 'Ghost'),
-  ('💀', 'Skull'),
-  ('🤡', 'Clown'),
-  ('😈', 'Devil'),
-  ('🦄', 'Unicorn'),
-  ('🐸', 'Frog'),
-  ('🥳', 'Partying'),
-  ('😎', 'Cool'),
-  ('🤓', 'Nerdy'),
-  ('😇', 'Angelic'),
-  ('🤗', 'Hugging'),
-  ('🤪', 'Silly'),
-  ('🙃', 'Upside down'),
-  ('😏', 'Smirking'),
-  ('😬', 'Grimacing'),
-  ('🙄', 'Eye roll'),
-  ('😶', 'Speechless'),
-  ('🥺', 'Pleading'),
-  ('😭', 'Sobbing'),
-  ('😱', 'Screaming'),
-  ('😳', 'Flushed'),
-  ('🤯', 'Overwhelmed'),
-  ('🥴', 'Woozy'),
-  ('🤒', 'Unwell'),
-  ('🤕', 'Hurting'),
-  ('🤢', 'Queasy'),
-  ('🥵', 'Too hot'),
-  ('🥶', 'Too cold'),
-  ('💖', 'Sparkling heart'),
-  ('💔', 'Broken heart'),
-  ('🔥', 'Fire'),
-  ('🌈', 'Rainbow'),
-  ('☀️', 'Sun'),
-  ('🌧️', 'Rain'),
-  ('⛈️', 'Storm'),
-  ('🌸', 'Blossom'),
-  ('🍫', 'Chocolate'),
-  ('🛌', 'In bed'),
+List<(String, String)> get moreFaces => [
+  ('😺', strings.faceSmilingCat),
+  ('😸', strings.faceGrinningCat),
+  ('😹', strings.faceCatTearsOfJoy),
+  ('😻', strings.faceCatHeartEyes),
+  ('😼', strings.faceSmirkingCat),
+  ('😽', strings.faceKissingCat),
+  ('🙀', strings.faceWearyCat),
+  ('😿', strings.faceCryingCat),
+  ('😾', strings.facePoutingCat),
+  ('👽', strings.faceAlien),
+  ('👾', strings.faceSpaceInvader),
+  ('🤖', strings.faceRobot),
+  ('👻', strings.faceGhost),
+  ('💀', strings.faceSkull),
+  ('🤡', strings.faceClown),
+  ('😈', strings.faceDevil),
+  ('🦄', strings.faceUnicorn),
+  ('🐸', strings.faceFrog),
+  ('🥳', strings.facePartying),
+  ('😎', strings.faceCool),
+  ('🤓', strings.faceNerdy),
+  ('😇', strings.faceAngelic),
+  ('🤗', strings.faceHugging),
+  ('🤪', strings.faceSilly),
+  ('🙃', strings.faceUpsideDown),
+  ('😏', strings.faceSmirking),
+  ('😬', strings.faceGrimacing),
+  ('🙄', strings.faceEyeRoll),
+  ('😶', strings.faceSpeechless),
+  ('🥺', strings.facePleading),
+  ('😭', strings.faceSobbing),
+  ('😱', strings.faceScreaming),
+  ('😳', strings.faceFlushed),
+  ('🤯', strings.faceOverwhelmed),
+  ('🥴', strings.faceWoozy),
+  ('🤒', strings.faceUnwell),
+  ('🤕', strings.faceHurting),
+  ('🤢', strings.faceQueasy),
+  ('🥵', strings.faceTooHot),
+  ('🥶', strings.faceTooCold),
+  ('💖', strings.faceSparklingHeart),
+  ('💔', strings.faceBrokenHeart),
+  ('🔥', strings.faceFire),
+  ('🌈', strings.faceRainbow),
+  ('☀️', strings.faceSun),
+  ('🌧️', strings.faceRain),
+  ('⛈️', strings.faceStorm),
+  ('🌸', strings.faceBlossom),
+  ('🍫', strings.faceChocolate),
+  ('🛌', strings.faceInBed),
 ];
 
 /// What a screen reader says for a face that isn't a named feeling.
 String faceName(String emoji) =>
-    moreFaces.where((f) => f.$1 == emoji).firstOrNull?.$2 ?? 'Other face';
+    moreFaces.where((f) => f.$1 == emoji).firstOrNull?.$2 ?? strings.faceOther;
 
 /// How the day went, 1 to 5, with the ends named.
 class DayRatingPicker extends StatelessWidget {
@@ -93,7 +111,11 @@ class DayRatingPicker extends StatelessWidget {
         FacePicker<int>(
           options: [
             for (var r = DayLog.minRating; r <= DayLog.maxRating; r++)
-              (r, '$r', '$r, ${ratingNames[r - 1].toLowerCase()}'),
+              (
+                r,
+                '$r',
+                context.l.faceRatingOption(r, ratingNamesInline[r - 1]),
+              ),
           ],
           selected: rating,
           onChanged: onChanged,
@@ -149,7 +171,7 @@ class FeelingPicker extends StatelessWidget {
           horizontal: 16,
           vertical: 24,
         ),
-        title: const Text('More faces'),
+        title: Text(context.l.faceMoreFaces),
         content: SizedBox(
           width: double.maxFinite,
           child: SingleChildScrollView(
@@ -166,7 +188,7 @@ class FeelingPicker extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('Cancel'),
+            child: Text(context.l.cancel),
           ),
         ],
       ),
@@ -184,7 +206,7 @@ class FeelingPicker extends StatelessWidget {
         FacePicker<DayFeeling>(
           options: [
             for (final named in Feeling.values)
-              (DayFeeling.named(named), named.emoji, named.label),
+              (DayFeeling.named(named), named.emoji, named.word),
           ],
           selected: feeling,
           onChanged: onChanged,
@@ -203,7 +225,11 @@ class FeelingPicker extends StatelessWidget {
             ],
             TextButton.icon(
               icon: const Icon(Icons.add_reaction_outlined),
-              label: Text(other == null ? 'More faces' : 'A different face'),
+              label: Text(
+                other == null
+                    ? context.l.faceMoreFaces
+                    : context.l.faceDifferentFace,
+              ),
               onPressed: () => _more(context, other),
             ),
           ],

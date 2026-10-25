@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
+import 'package:ebb/ui/language.dart';
 import 'package:ebb/ui/theme.dart';
 
 /// The home screen's centrepiece: the current cycle as a ring.
@@ -20,6 +21,7 @@ class CycleRing extends StatelessWidget {
     required this.windowEnd,
     required this.inPeriod,
     required this.label,
+    required this.semanticLabel,
     this.size = 248,
   });
 
@@ -39,6 +41,10 @@ class CycleRing extends StatelessWidget {
 
   /// Under the number: "of your cycle", "of Sam’s period".
   final String label;
+
+  /// The whole thing as one phrase for screen readers: "Day 12 of your
+  /// cycle".
+  final String semanticLabel;
   final double size;
 
   @override
@@ -46,7 +52,7 @@ class CycleRing extends StatelessWidget {
     final theme = Theme.of(context);
     final colors = EbbColors.of(context);
     return Semantics(
-      label: 'Day $day $label',
+      label: semanticLabel,
       excludeSemantics: true,
       child: SizedBox.square(
         dimension: size,
@@ -69,7 +75,7 @@ class CycleRing extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text('DAY', style: theme.textTheme.labelSmall),
+                Text(context.l.homeRingDay, style: theme.textTheme.labelSmall),
                 Text('$day', style: theme.textTheme.displayLarge),
                 const SizedBox(height: 2),
                 Text(
