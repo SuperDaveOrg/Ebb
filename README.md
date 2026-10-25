@@ -107,6 +107,18 @@ Early. Working: logging (including after the fact), prediction, history,
 excluding an unusual cycle from predictions, local reminders, backup and
 restore, phone-to-phone transfer, and tracking more than one person.
 
+## Help translate Ebb
+
+Ebb speaks German, Spanish, French, Italian, Portuguese (Portugal) and
+Russian, each a first draft that needs a native speaker before release. Fix
+the words yourself on [Hosted Weblate](https://hosted.weblate.org/engage/ebb/),
+in the browser with no Git needed, or check them in the running app: the
+preview and what to look for are at
+[ebb.superdavelab.com/beta](https://ebb.superdavelab.com/beta/). A language Ebb
+doesn't speak yet is welcome too; see [docs/translating.md](docs/translating.md).
+
+<a href="https://hosted.weblate.org/engage/ebb/"><img src="https://hosted.weblate.org/widget/ebb/svg-badge.svg" alt="Translation status"></a>
+
 ## Building
 
 Requires the Flutter SDK and the Android SDK.

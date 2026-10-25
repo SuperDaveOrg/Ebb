@@ -949,7 +949,13 @@
     "description": "Button and screen title: the list of every recorded cycle."
   },
   "homeCharts": "Charts",
+  "@homeCharts": {
+    "description": "Tooltip and menu item on the home screen that opens the charts screen."
+  },
   "homeSettings": "Settings",
+  "@homeSettings": {
+    "description": "Tooltip of the home screen button that opens Settings."
+  },
   "homeCalendarOf": "{who, select, you{Your calendar} other{{name}’s calendar}}",
   "@homeCalendarOf": {
     "description": "Calendar screen title when more than one person is tracked. who is 'you' for the phone's owner or 'other' for someone else they track; name is that person's name.",
@@ -1390,6 +1396,9 @@
   "homeCountInPredictions": "Count this cycle in predictions",
   "homeCountInPredictionsHint": "Turn off for a cycle that doesn’t reflect the usual rhythm — illness, a medication change, a pregnancy loss. It stays in your history either way.",
   "homeNote": "Note",
+  "@homeNote": {
+    "description": "Label of the note field when editing a period from the home screen."
+  },
   "homeNoteExcludedHint": "Why it isn’t counted, so it’s easy to remember later.",
   "homeNoteHint": "Anything worth remembering about this one.",
   "homeDeletePeriod": "Delete this period",
@@ -1452,8 +1461,14 @@
     "description": "The last 12 months, not the previous calendar year."
   },
   "homeSpanAll": "Everything",
+  "@homeSpanAll": {
+    "description": "How far back the home screen's charts and history go: all of it."
+  },
   "homeSpanCustom": "Choose dates…",
   "settingsTitle": "Settings",
+  "@settingsTitle": {
+    "description": "Title of the Settings screen."
+  },
   "settingsNotificationsOff": "Notifications are turned off for Ebb in system settings.",
   "settingsNoBrowser": "No browser to open it with. Visit {website} instead.",
   "@settingsNoBrowser": {
@@ -1471,6 +1486,9 @@
   "settingsFileTooLarge": "That file is too large to be an Ebb backup.",
   "settingsFileUnreadable": "That file couldn't be read.",
   "settingsNotABackup": "This file isn't an Ebb backup.",
+  "@settingsNotABackup": {
+    "description": "Message shown in Settings after picking a file to restore that isn't an Ebb backup."
+  },
   "settingsPeriodCount": "{count, plural, one{{count} period} other{{count} periods}}",
   "@settingsPeriodCount": {
     "description": "A number of periods (menstrual periods), used inside other messages.",
@@ -1660,12 +1678,16 @@
   "settingsAllDeleted": "All data deleted.",
   "settingsYourName": "Your name",
   "settingsRename": "Rename",
+  "@settingsRename": {
+    "description": "Settings item that renames a person you track (not yourself)."
+  },
   "settingsYourNameHint": "Shown in the list of people. Leave empty to appear as “You”.",
   "@settingsYourNameHint": {
     "description": "“You” must match how the owner is labelled in the list of people (the \"you\" message)."
   },
   "settingsRemoveTitle": "Remove {name} from this phone?",
   "@settingsRemoveTitle": {
+    "description": "Title of the question before removing a tracked person and their history from this phone. {name} is typed by the user.",
     "placeholders": {
       "name": {
         "type": "String"
@@ -1682,6 +1704,7 @@
   },
   "settingsPersonRemoved": "{name} removed.",
   "@settingsPersonRemoved": {
+    "description": "Confirmation in Settings after a tracked person was removed. {name} is typed by the user.",
     "placeholders": {
       "name": {
         "type": "String"
@@ -1715,7 +1738,13 @@
     }
   },
   "settingsName": "Name",
+  "@settingsName": {
+    "description": "Label of the name field in Settings for a person you track."
+  },
   "settingsReminders": "Reminders",
+  "@settingsReminders": {
+    "description": "Settings item that opens the reminder settings."
+  },
   "settingsRemindersHint": "{who, select, you{A heads-up before your period is expected.} other{A heads-up before {name}’s period is expected.}}",
   "@settingsRemindersHint": {
     "description": "who is \"you\" for the phone's owner, \"other\" for someone else they track; name is that person's name.",
@@ -1778,6 +1807,9 @@
   },
   "settingsPeople": "People",
   "settingsAddSomeone": "Add someone",
+  "@settingsAddSomeone": {
+    "description": "Settings item: start tracking another person on this phone."
+  },
   "settingsTrackSomeoneElse": "Track someone else too",
   "settingsTrackSomeoneElseHint": "For example, a child who’s just starting.",
   "@settingsTrackSomeoneElseHint": {
@@ -1793,6 +1825,9 @@
   "settingsRestore": "Restore from a backup",
   "settingsRestoreHint": "Replaces what is in Ebb now.",
   "settingsSend": "Send to another phone",
+  "@settingsSend": {
+    "description": "Settings item that opens the Send to another phone screen (history as QR codes)."
+  },
   "settingsSendHint": "Show your history as codes for another phone to scan.",
   "@settingsSendHint": {
     "description": "The codes are QR codes."
@@ -1802,9 +1837,15 @@
     "description": "The codes are QR codes."
   },
   "settingsReceive": "Receive from another phone",
+  "@settingsReceive": {
+    "description": "Settings item that opens the Receive from another phone screen."
+  },
   "settingsReceiveHint": "Scan the codes to add someone, update them, or replace everything.",
   "settingsAdvanced": "Advanced",
   "settingsGroups": "Groups",
+  "@settingsGroups": {
+    "description": "Settings item that opens the Groups screen."
+  },
   "settingsGroupsHint": "For circles and clubs that track together: gather people under a name. Turning this off hides groups without deleting them.",
   "settingsManageGroups": "Manage groups",
   "settingsAboutEbb": "About Ebb",
@@ -1879,6 +1920,9 @@
     "description": "A topic on the \"How Ebb works\" help screen. Words in quotation marks name buttons and settings elsewhere in the app: use exactly the same translation as those."
   },
   "settingsHelpGroupsTitle": "Groups",
+  "@settingsHelpGroupsTitle": {
+    "description": "Heading of the help topic about groups."
+  },
   "settingsHelpGroupsBody": "For circles and clubs that track together. Turn them on in Settings → Advanced, then make a group and choose who’s in it. “See … together” in the list of people shows everyone side by side, with the moon.\n\nA group can have two kinds of member. Someone added to it is tracked on this phone, and you log for them here. Someone imported keeps tracking on their own phone and provides their history to the group: it stays theirs, and can’t be changed on anyone else’s phone.\n\nTo be imported, send just your history (Settings → Send to another phone) — as much or as little as you like, with or without your daily notes. The other phone imports it from the group: Manage groups → the group → Import from their phone. Importing you again brings it up to date.\n\nImported history belongs to its group. Taking someone imported out of their last group, or deleting that group, takes their history off the phone too. And it can’t be sent on: only your own history can.",
   "@settingsHelpGroupsBody": {
     "description": "A topic on the \"How Ebb works\" help screen. Words in quotation marks name buttons and settings elsewhere in the app: use exactly the same translation as those."
@@ -1889,11 +1933,17 @@
     "description": "A topic on the \"How Ebb works\" help screen. Words in quotation marks name buttons and settings elsewhere in the app: use exactly the same translation as those."
   },
   "settingsHelpTemperatureTitle": "Temperature and cervical mucus",
+  "@settingsHelpTemperatureTitle": {
+    "description": "Heading of the help topic about waking temperature and cervical mucus."
+  },
   "settingsHelpTemperatureBody": "Turn on “Track temperature and cervical mucus” in Settings, and each day on the calendar has room for your waking temperature and how cervical mucus felt and looked. If something may have thrown a reading off — illness, little sleep, alcohol, taking it late — tick the box under it.\n\nCharts shows the temperatures as a line, with mucus underneath and periods shaded, in °C or °F (Settings).\n\nEbb records and draws these, and that’s all. It doesn’t look for a rise or work out fertile days from them, and its fertile-window estimate still comes from cycle timing alone. If you follow a method such as the sympto-thermal method, the chart is there for you to read by its rules.",
   "@settingsHelpTemperatureBody": {
     "description": "A topic on the \"How Ebb works\" help screen. Words in quotation marks name buttons and settings elsewhere in the app: use exactly the same translation as those."
   },
   "settingsHelpRemindersTitle": "Reminders",
+  "@settingsHelpRemindersTitle": {
+    "description": "Heading of the help topic about reminders."
+  },
   "settingsHelpRemindersBody": "A heads-up a few days before your period is expected, and another on the day. Choose how far ahead in Settings.\n\nThey’re scheduled on the phone itself, so they arrive with no signal and in airplane mode.\n\nEbb sets them each time you open it, from the latest estimate. The phone keeps them through restarts, but Ebb can’t update them while it’s closed, so open it now and then — logging a period is enough.\n\nAndroid may deliver them a little after the usual time to save battery. If Ebb is force-stopped, or a battery saver restricts it, they may not arrive until you next open Ebb.",
   "@settingsHelpRemindersBody": {
     "description": "A topic on the \"How Ebb works\" help screen. Words in quotation marks name buttons and settings elsewhere in the app: use exactly the same translation as those."
@@ -1951,6 +2001,7 @@
   },
   "shareRemoved": "{name} removed.",
   "@shareRemoved": {
+    "description": "Confirmation on the Send screen after a person's history was removed, having been sent to their own phone. {name} is typed by the user.",
     "placeholders": {
       "name": {
         "type": "String"
@@ -2320,6 +2371,7 @@
   },
   "groupsUpdated": "{name} updated.",
   "@groupsUpdated": {
+    "description": "Confirmation after receiving an update to someone's history in a group. {name} is a person's name, or \"You\".",
     "placeholders": {
       "name": {
         "type": "String"
@@ -2380,6 +2432,9 @@
     "description": "A group with no members."
   },
   "groupsTitle": "Groups",
+  "@groupsTitle": {
+    "description": "Title of the Groups screen."
+  },
   "groupsIntro": "A group gathers people on this phone under one name — a circle or club that tracks together. Someone can be in more than one, and deleting a group never deletes anyone.",
   "groupsAddSomeoneTo": "Add someone to {group}",
   "@groupsAddSomeoneTo": {
@@ -2433,6 +2488,9 @@
   },
   "groupsDeleteGroup": "Delete group",
   "groupsRenameTooltip": "Rename",
+  "@groupsRenameTooltip": {
+    "description": "Tooltip of the rename button on the Groups screen."
+  },
   "groupsWhoIsIn": "Who’s in it",
   "@groupsWhoIsIn": {
     "description": "Section heading: the group’s members."
@@ -2474,6 +2532,9 @@
     "description": "Heading over people who are in no group."
   },
   "peopleAddSomeone": "Add someone",
+  "@peopleAddSomeone": {
+    "description": "Item in the people chooser: start tracking another person on this phone."
+  },
   "peopleTrackSomeoneElse": "Track someone else",
   "@peopleTrackSomeoneElse": {
     "description": "Title of the dialog that adds a person."
@@ -2489,6 +2550,9 @@
     }
   },
   "backupNotEbb": "This file isn't an Ebb backup.",
+  "@backupNotEbb": {
+    "description": "Error raised while reading a backup file that isn't an Ebb backup; shown where the restore failed."
+  },
   "backupNewer": "This backup was made by a newer version of Ebb. Update Ebb, then try again.",
   "backupNoOne": "This backup has no one in it.",
   "backupSameId": "This backup looks damaged: two people in it have the same id.",

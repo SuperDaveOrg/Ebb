@@ -1397,13 +1397,13 @@ abstract class AppLocalizations {
   /// **'History'**
   String get homeHistory;
 
-  /// No description provided for @homeCharts.
+  /// Tooltip and menu item on the home screen that opens the charts screen.
   ///
   /// In en, this message translates to:
   /// **'Charts'**
   String get homeCharts;
 
-  /// No description provided for @homeSettings.
+  /// Tooltip of the home screen button that opens Settings.
   ///
   /// In en, this message translates to:
   /// **'Settings'**
@@ -1877,7 +1877,7 @@ abstract class AppLocalizations {
   /// **'Turn off for a cycle that doesn’t reflect the usual rhythm — illness, a medication change, a pregnancy loss. It stays in your history either way.'**
   String get homeCountInPredictionsHint;
 
-  /// No description provided for @homeNote.
+  /// Label of the note field when editing a period from the home screen.
   ///
   /// In en, this message translates to:
   /// **'Note'**
@@ -1991,7 +1991,7 @@ abstract class AppLocalizations {
   /// **'Last year'**
   String get homeSpanYear;
 
-  /// No description provided for @homeSpanAll.
+  /// How far back the home screen's charts and history go: all of it.
   ///
   /// In en, this message translates to:
   /// **'Everything'**
@@ -2003,7 +2003,7 @@ abstract class AppLocalizations {
   /// **'Choose dates…'**
   String get homeSpanCustom;
 
-  /// No description provided for @settingsTitle.
+  /// Title of the Settings screen.
   ///
   /// In en, this message translates to:
   /// **'Settings'**
@@ -2057,7 +2057,7 @@ abstract class AppLocalizations {
   /// **'That file couldn\'t be read.'**
   String get settingsFileUnreadable;
 
-  /// No description provided for @settingsNotABackup.
+  /// Message shown in Settings after picking a file to restore that isn't an Ebb backup.
   ///
   /// In en, this message translates to:
   /// **'This file isn\'t an Ebb backup.'**
@@ -2247,7 +2247,7 @@ abstract class AppLocalizations {
   /// **'Your name'**
   String get settingsYourName;
 
-  /// No description provided for @settingsRename.
+  /// Settings item that renames a person you track (not yourself).
   ///
   /// In en, this message translates to:
   /// **'Rename'**
@@ -2259,7 +2259,7 @@ abstract class AppLocalizations {
   /// **'Shown in the list of people. Leave empty to appear as “You”.'**
   String get settingsYourNameHint;
 
-  /// No description provided for @settingsRemoveTitle.
+  /// Title of the question before removing a tracked person and their history from this phone. {name} is typed by the user.
   ///
   /// In en, this message translates to:
   /// **'Remove {name} from this phone?'**
@@ -2271,7 +2271,7 @@ abstract class AppLocalizations {
   /// **'Every cycle and note for {name} will be permanently erased. Nobody else’s history is affected.'**
   String settingsRemoveBody(String name);
 
-  /// No description provided for @settingsPersonRemoved.
+  /// Confirmation in Settings after a tracked person was removed. {name} is typed by the user.
   ///
   /// In en, this message translates to:
   /// **'{name} removed.'**
@@ -2301,13 +2301,13 @@ abstract class AppLocalizations {
   /// **'Settings for {name}'**
   String settingsSettingsFor(String name);
 
-  /// No description provided for @settingsName.
+  /// Label of the name field in Settings for a person you track.
   ///
   /// In en, this message translates to:
   /// **'Name'**
   String get settingsName;
 
-  /// No description provided for @settingsReminders.
+  /// Settings item that opens the reminder settings.
   ///
   /// In en, this message translates to:
   /// **'Reminders'**
@@ -2397,7 +2397,7 @@ abstract class AppLocalizations {
   /// **'People'**
   String get settingsPeople;
 
-  /// No description provided for @settingsAddSomeone.
+  /// Settings item: start tracking another person on this phone.
   ///
   /// In en, this message translates to:
   /// **'Add someone'**
@@ -2451,7 +2451,7 @@ abstract class AppLocalizations {
   /// **'Replaces what is in Ebb now.'**
   String get settingsRestoreHint;
 
-  /// No description provided for @settingsSend.
+  /// Settings item that opens the Send to another phone screen (history as QR codes).
   ///
   /// In en, this message translates to:
   /// **'Send to another phone'**
@@ -2469,7 +2469,7 @@ abstract class AppLocalizations {
   /// **'Show everyone’s history as codes for another phone to scan.'**
   String get settingsSendHintEveryone;
 
-  /// No description provided for @settingsReceive.
+  /// Settings item that opens the Receive from another phone screen.
   ///
   /// In en, this message translates to:
   /// **'Receive from another phone'**
@@ -2487,7 +2487,7 @@ abstract class AppLocalizations {
   /// **'Advanced'**
   String get settingsAdvanced;
 
-  /// No description provided for @settingsGroups.
+  /// Settings item that opens the Groups screen.
   ///
   /// In en, this message translates to:
   /// **'Groups'**
@@ -2703,7 +2703,7 @@ abstract class AppLocalizations {
   /// **'Illness, a medication change or a pregnancy loss can throw one cycle right off, and it would pull the estimate with it.\n\nIn History, tap that period and turn off “Count this cycle in predictions”. It stays in your history; the estimate just ignores it. Add a note there too, so you remember why.'**
   String get settingsHelpExcludeBody;
 
-  /// No description provided for @settingsHelpGroupsTitle.
+  /// Heading of the help topic about groups.
   ///
   /// In en, this message translates to:
   /// **'Groups'**
@@ -2727,7 +2727,7 @@ abstract class AppLocalizations {
   /// **'Tap any day on the calendar to rate it from 1 to 5, and to pick a face for how you felt. Both are optional; tap a choice again to clear it.\n\nCharts (the chart icon) shows each day’s rating over the dates you choose, with periods shaded, and which feelings came during and before periods. With moon phases turned on in Settings, the moon is there too.\n\nThe charts show what you logged. They don’t say what it means — that’s yours to judge.'**
   String get settingsHelpRatingsBody;
 
-  /// No description provided for @settingsHelpTemperatureTitle.
+  /// Heading of the help topic about waking temperature and cervical mucus.
   ///
   /// In en, this message translates to:
   /// **'Temperature and cervical mucus'**
@@ -2739,7 +2739,7 @@ abstract class AppLocalizations {
   /// **'Turn on “Track temperature and cervical mucus” in Settings, and each day on the calendar has room for your waking temperature and how cervical mucus felt and looked. If something may have thrown a reading off — illness, little sleep, alcohol, taking it late — tick the box under it.\n\nCharts shows the temperatures as a line, with mucus underneath and periods shaded, in °C or °F (Settings).\n\nEbb records and draws these, and that’s all. It doesn’t look for a rise or work out fertile days from them, and its fertile-window estimate still comes from cycle timing alone. If you follow a method such as the sympto-thermal method, the chart is there for you to read by its rules.'**
   String get settingsHelpTemperatureBody;
 
-  /// No description provided for @settingsHelpRemindersTitle.
+  /// Heading of the help topic about reminders.
   ///
   /// In en, this message translates to:
   /// **'Reminders'**
@@ -2841,7 +2841,7 @@ abstract class AppLocalizations {
   /// **'Keep'**
   String get shareKeep;
 
-  /// No description provided for @shareRemoved.
+  /// Confirmation on the Send screen after a person's history was removed, having been sent to their own phone. {name} is typed by the user.
   ///
   /// In en, this message translates to:
   /// **'{name} removed.'**
@@ -3204,7 +3204,7 @@ abstract class AppLocalizations {
   /// **'{who, select, you{This is your history, sent {sent}: {periods}. It replaces what’s on this phone for you, including anything logged here since.} other{This is {name}’s history, sent {sent}: {periods}. It replaces what’s on this phone for {name}, including anything logged here since.}}'**
   String groupsUpdateBody(String who, String name, String sent, String periods);
 
-  /// No description provided for @groupsUpdated.
+  /// Confirmation after receiving an update to someone's history in a group. {name} is a person's name, or "You".
   ///
   /// In en, this message translates to:
   /// **'{name} updated.'**
@@ -3282,7 +3282,7 @@ abstract class AppLocalizations {
   /// **'No one yet'**
   String get groupsNoOneYet;
 
-  /// No description provided for @groupsTitle.
+  /// Title of the Groups screen.
   ///
   /// In en, this message translates to:
   /// **'Groups'**
@@ -3348,7 +3348,7 @@ abstract class AppLocalizations {
   /// **'Delete group'**
   String get groupsDeleteGroup;
 
-  /// No description provided for @groupsRenameTooltip.
+  /// Tooltip of the rename button on the Groups screen.
   ///
   /// In en, this message translates to:
   /// **'Rename'**
@@ -3432,7 +3432,7 @@ abstract class AppLocalizations {
   /// **'Not in a group'**
   String get peopleNotInGroup;
 
-  /// No description provided for @peopleAddSomeone.
+  /// Item in the people chooser: start tracking another person on this phone.
   ///
   /// In en, this message translates to:
   /// **'Add someone'**
@@ -3456,7 +3456,7 @@ abstract class AppLocalizations {
   /// **'Person {number}'**
   String backupUnnamedPerson(int number);
 
-  /// No description provided for @backupNotEbb.
+  /// Error raised while reading a backup file that isn't an Ebb backup; shown where the restore failed.
   ///
   /// In en, this message translates to:
   /// **'This file isn\'t an Ebb backup.'**
