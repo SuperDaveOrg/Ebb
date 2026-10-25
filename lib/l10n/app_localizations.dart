@@ -114,67 +114,67 @@ abstract class AppLocalizations {
   /// **'You'**
   String get you;
 
-  /// No description provided for @ok.
+  /// Button that dismisses a plain notice, such as the dialog saying the scanned codes hold more than one person.
   ///
   /// In en, this message translates to:
   /// **'OK'**
   String get ok;
 
-  /// No description provided for @cancel.
+  /// Button that closes a dialog or editor without doing anything: used in every dialog in the app.
   ///
   /// In en, this message translates to:
   /// **'Cancel'**
   String get cancel;
 
-  /// No description provided for @save.
+  /// Button that keeps what was entered: in the period editor, the calendar day's sheet and the name dialogs.
   ///
   /// In en, this message translates to:
   /// **'Save'**
   String get save;
 
-  /// No description provided for @delete.
+  /// Button in the 'Delete this cycle?' dialog that confirms deleting it.
   ///
   /// In en, this message translates to:
   /// **'Delete'**
   String get delete;
 
-  /// No description provided for @remove.
+  /// Button that confirms taking someone off this phone: in that person's Settings, and after sending their history to their own phone.
   ///
   /// In en, this message translates to:
   /// **'Remove'**
   String get remove;
 
-  /// No description provided for @close.
+  /// Button at the foot of a day's sheet for an imported, read-only copy of someone's history, which only shows what was logged.
   ///
   /// In en, this message translates to:
   /// **'Close'**
   String get close;
 
-  /// No description provided for @done.
+  /// Button at the foot of the Send screen, under the codes, for when the other phone has scanned them.
   ///
   /// In en, this message translates to:
   /// **'Done'**
   String get done;
 
-  /// No description provided for @back.
+  /// Generic button label. Not used on any screen at present.
   ///
   /// In en, this message translates to:
   /// **'Back'**
   String get back;
 
-  /// No description provided for @next.
+  /// Generic button label. Not used on any screen at present.
   ///
   /// In en, this message translates to:
   /// **'Next'**
   String get next;
 
-  /// No description provided for @edit.
+  /// Generic button label. Not used on any screen at present.
   ///
   /// In en, this message translates to:
   /// **'Edit'**
   String get edit;
 
-  /// No description provided for @add.
+  /// Generic button label. Not used on any screen at present.
   ///
   /// In en, this message translates to:
   /// **'Add'**
@@ -210,7 +210,7 @@ abstract class AppLocalizations {
   /// **'Cycle reminders'**
   String get notifChannelName;
 
-  /// No description provided for @notifChannelDescription.
+  /// Description of the Android notification channel, shown under notifChannelName in the phone's notification settings.
   ///
   /// In en, this message translates to:
   /// **'Heads-up before your period is expected, and a nudge to log it.'**
@@ -222,7 +222,7 @@ abstract class AppLocalizations {
   /// **'{who, select, you{Period expected soon} other{{name}’s period expected soon}}'**
   String notifUpcomingTitle(String who, String name);
 
-  /// No description provided for @notifUpcomingTomorrow.
+  /// Reminder body the day before a period is expected, used when the heads-up is set to 1 day ahead. who is 'you' for the phone's owner or 'other' for someone else they track; name is that person's name.
   ///
   /// In en, this message translates to:
   /// **'{who, select, you{Ebb expects your period to start tomorrow.} other{Ebb expects {name}’s period to start tomorrow.}}'**
@@ -234,13 +234,13 @@ abstract class AppLocalizations {
   /// **'{who, select, you{Ebb expects your period in about {days} days.} other{Ebb expects {name}’s period in about {days} days.}}'**
   String notifUpcomingInDays(String who, String name, int days);
 
-  /// No description provided for @notifTodayTitle.
+  /// Reminder title on the day a period is expected. who is 'you' for the phone's owner or 'other' for someone else they track; name is that person's name.
   ///
   /// In en, this message translates to:
   /// **'{who, select, you{Period expected today} other{{name}’s period expected today}}'**
   String notifTodayTitle(String who, String name);
 
-  /// No description provided for @notifTodayBody.
+  /// Reminder body on the day a period is expected; tapping the notification opens Ebb.
   ///
   /// In en, this message translates to:
   /// **'Tap to log how things are going.'**
@@ -354,13 +354,13 @@ abstract class AppLocalizations {
   /// **'{who, select, you{Day {day} of your period, in a cycle not counted in predictions.} other{Day {day} of {name}’s period, in a cycle not counted in predictions.}}'**
   String calendarStatusPeriodDayExcluded(String who, String name, int day);
 
-  /// No description provided for @calendarStatusUnlogged.
+  /// On a day's sheet: a day of a period whose end was never logged, so Ebb draws it at the usual period length. day counts from the period's first day. who is 'you' for the phone's owner or 'other' for someone else they track; name is that person's name.
   ///
   /// In en, this message translates to:
   /// **'{who, select, you{Day {day} of your cycle. The end of this period wasn’t logged, so it’s drawn at the usual length.} other{Day {day} of {name}’s cycle. The end of this period wasn’t logged, so it’s drawn at the usual length.}}'**
   String calendarStatusUnlogged(String who, String name, int day);
 
-  /// No description provided for @calendarStatusFertile.
+  /// On a day's sheet: the day falls in the estimated fertile window. Keep the caution: the estimate is from cycle timing alone and must never read as reliable contraception.
   ///
   /// In en, this message translates to:
   /// **'In the estimated fertile window. Not reliable enough to use as contraception.'**
@@ -378,13 +378,13 @@ abstract class AppLocalizations {
   /// **'Today, {date}'**
   String calendarDayToday(String date);
 
-  /// No description provided for @calendarPreviousDay.
+  /// Tooltip of the arrow on a day's sheet that moves to the day before.
   ///
   /// In en, this message translates to:
   /// **'Previous day'**
   String get calendarPreviousDay;
 
-  /// No description provided for @calendarNextDay.
+  /// Tooltip of the arrow on a day's sheet that moves to the day after.
   ///
   /// In en, this message translates to:
   /// **'Next day'**
@@ -396,7 +396,7 @@ abstract class AppLocalizations {
   /// **'{phase}, {time}'**
   String calendarMoonAt(String phase, String time);
 
-  /// No description provided for @calendarFutureDay.
+  /// On a day's sheet for a day after today, in place of the logging controls.
   ///
   /// In en, this message translates to:
   /// **'Days still to come can’t be logged yet.'**
@@ -432,7 +432,7 @@ abstract class AppLocalizations {
   /// **'Make this the last day of the period'**
   String get calendarMakeLastDay;
 
-  /// No description provided for @calendarEditPeriod.
+  /// Button on a day's sheet, on a period day: opens the editor for that period.
   ///
   /// In en, this message translates to:
   /// **'Edit this period'**
@@ -492,7 +492,7 @@ abstract class AppLocalizations {
   /// **'Illness, little sleep, alcohol, taken late'**
   String get calendarTemperatureAffectedHint;
 
-  /// No description provided for @calendarMucus.
+  /// Heading on a day's sheet above the cervical mucus choices ('How it felt', 'How it looked'). Use the usual term in the language, as a doctor or a fertility-awareness guide would.
   ///
   /// In en, this message translates to:
   /// **'Cervical mucus'**
@@ -552,13 +552,13 @@ abstract class AppLocalizations {
   /// **'“{note}”'**
   String calendarLoggedNote(String note);
 
-  /// No description provided for @calendarNothingLogged.
+  /// On a day's sheet for an imported, read-only copy of someone's history: no entry was made for that day.
   ///
   /// In en, this message translates to:
   /// **'Nothing logged this day.'**
   String get calendarNothingLogged;
 
-  /// No description provided for @calendarMoonNew.
+  /// The moon phase, on a day's sheet beside the time it happens and wherever phases are named.
   ///
   /// In en, this message translates to:
   /// **'New moon'**
@@ -570,7 +570,7 @@ abstract class AppLocalizations {
   /// **'First quarter'**
   String get calendarMoonFirstQuarter;
 
-  /// No description provided for @calendarMoonFull.
+  /// The moon phase, on a day's sheet beside the time it happens and wherever phases are named.
   ///
   /// In en, this message translates to:
   /// **'Full moon'**
@@ -666,55 +666,55 @@ abstract class AppLocalizations {
   /// **'Happy'**
   String get dayFeelingHappy;
 
-  /// No description provided for @dayFeelingCalm.
+  /// A named feeling, shown with its face on the calendar day's 'How did you feel?' row and counted in the feelings chart. A kind of feeling, not a score.
   ///
   /// In en, this message translates to:
   /// **'Calm'**
   String get dayFeelingCalm;
 
-  /// No description provided for @dayFeelingLoving.
+  /// A named feeling, shown with its face on the calendar day's 'How did you feel?' row and counted in the feelings chart. A kind of feeling, not a score.
   ///
   /// In en, this message translates to:
   /// **'Loving'**
   String get dayFeelingLoving;
 
-  /// No description provided for @dayFeelingEnergetic.
+  /// A named feeling, shown with its face on the calendar day's 'How did you feel?' row and counted in the feelings chart. A kind of feeling, not a score.
   ///
   /// In en, this message translates to:
   /// **'Energetic'**
   String get dayFeelingEnergetic;
 
-  /// No description provided for @dayFeelingTired.
+  /// A named feeling, shown with its face on the calendar day's 'How did you feel?' row and counted in the feelings chart. A kind of feeling, not a score.
   ///
   /// In en, this message translates to:
   /// **'Tired'**
   String get dayFeelingTired;
 
-  /// No description provided for @dayFeelingSad.
+  /// A named feeling, shown with its face on the calendar day's 'How did you feel?' row and counted in the feelings chart. A kind of feeling, not a score.
   ///
   /// In en, this message translates to:
   /// **'Sad'**
   String get dayFeelingSad;
 
-  /// No description provided for @dayFeelingAnxious.
+  /// A named feeling, shown with its face on the calendar day's 'How did you feel?' row and counted in the feelings chart. A kind of feeling, not a score.
   ///
   /// In en, this message translates to:
   /// **'Anxious'**
   String get dayFeelingAnxious;
 
-  /// No description provided for @dayFeelingIrritable.
+  /// A named feeling, shown with its face on the calendar day's 'How did you feel?' row and counted in the feelings chart. A kind of feeling, not a score. Irritable: easily annoyed.
   ///
   /// In en, this message translates to:
   /// **'Irritable'**
   String get dayFeelingIrritable;
 
-  /// No description provided for @dayFeelingAngry.
+  /// A named feeling, shown with its face on the calendar day's 'How did you feel?' row and counted in the feelings chart. A kind of feeling, not a score.
   ///
   /// In en, this message translates to:
   /// **'Angry'**
   String get dayFeelingAngry;
 
-  /// No description provided for @dayFeelingConfused.
+  /// A named feeling, shown with its face on the calendar day's 'How did you feel?' row and counted in the feelings chart. A kind of feeling, not a score.
   ///
   /// In en, this message translates to:
   /// **'Confused'**
@@ -732,7 +732,7 @@ abstract class AppLocalizations {
   /// **'Day rating'**
   String get chartsDayRating;
 
-  /// No description provided for @chartsNoRatings.
+  /// In the day-rating section of the Charts screen, when no day in the chosen date range has a rating.
   ///
   /// In en, this message translates to:
   /// **'No days in this range have a rating yet.'**
@@ -750,13 +750,13 @@ abstract class AppLocalizations {
   /// **'Line'**
   String get chartsLine;
 
-  /// No description provided for @chartsRatingCaptionBars.
+  /// Caption under the day-rating chart when it is drawn as bars.
   ///
   /// In en, this message translates to:
   /// **'Each bar is one day’s rating, 1 to 5. Period days are shaded.'**
   String get chartsRatingCaptionBars;
 
-  /// No description provided for @chartsRatingCaptionLine.
+  /// Caption under the day-rating chart when it is drawn as a line.
   ///
   /// In en, this message translates to:
   /// **'Each point is one day’s rating, joined to the next day’s when both were rated, 1 to 5. Period days are shaded.'**
@@ -774,7 +774,7 @@ abstract class AppLocalizations {
   /// **'Temperature and cervical mucus'**
   String get chartsTemperatureTitle;
 
-  /// No description provided for @chartsTemperatureEmpty.
+  /// In the temperature section of the Charts screen, when no temperature or cervical mucus was logged in the chosen range.
   ///
   /// In en, this message translates to:
   /// **'Nothing logged in this range yet. Tap a day on the calendar to add a temperature or cervical mucus.'**
@@ -804,25 +804,25 @@ abstract class AppLocalizations {
   /// **'Around the moon'**
   String get chartsAroundMoon;
 
-  /// No description provided for @chartsFeelingsEmptyMoon.
+  /// In the feelings section of the Charts screen, grouped around the moon, when no day in the range has a feeling yet.
   ///
   /// In en, this message translates to:
   /// **'Once you’ve picked how you felt on some days in this range, this shows which feelings came around full and new moons.'**
   String get chartsFeelingsEmptyMoon;
 
-  /// No description provided for @chartsFeelingsEmptyPeriods.
+  /// In the feelings section, grouped around periods, when there is nothing to count yet: no feelings picked, or none before a period that has started since.
   ///
   /// In en, this message translates to:
   /// **'Once you’ve picked how you felt on some days in this range, and a period has started since, this shows which feelings came when.'**
   String get chartsFeelingsEmptyPeriods;
 
-  /// No description provided for @chartsFeelingsCaptionMoon.
+  /// Caption under the feelings chart when it is grouped around the moon.
   ///
   /// In en, this message translates to:
   /// **'How many days each face was picked.'**
   String get chartsFeelingsCaptionMoon;
 
-  /// No description provided for @chartsFeelingsCaptionPeriods.
+  /// Caption under the feelings chart when it is grouped around periods. Days after the latest period started wait until the next period shows where they fall.
   ///
   /// In en, this message translates to:
   /// **'How many days each face was picked. Days since the latest period started aren’t counted until the next one does.'**
@@ -1091,295 +1091,295 @@ abstract class AppLocalizations {
   /// **'Smiling cat'**
   String get faceSmilingCat;
 
-  /// No description provided for @faceGrinningCat.
+  /// Screen-reader name of the 😸 emoji face, in the 'More faces' dialog, which someone can pick for how they felt.
   ///
   /// In en, this message translates to:
   /// **'Grinning cat'**
   String get faceGrinningCat;
 
-  /// No description provided for @faceCatTearsOfJoy.
+  /// Screen-reader name of the 😹 emoji face, in the 'More faces' dialog, which someone can pick for how they felt.
   ///
   /// In en, this message translates to:
   /// **'Cat with tears of joy'**
   String get faceCatTearsOfJoy;
 
-  /// No description provided for @faceCatHeartEyes.
+  /// Screen-reader name of the 😻 emoji face, in the 'More faces' dialog, which someone can pick for how they felt.
   ///
   /// In en, this message translates to:
   /// **'Cat with heart eyes'**
   String get faceCatHeartEyes;
 
-  /// No description provided for @faceSmirkingCat.
+  /// Screen-reader name of the 😼 emoji face, in the 'More faces' dialog, which someone can pick for how they felt.
   ///
   /// In en, this message translates to:
   /// **'Smirking cat'**
   String get faceSmirkingCat;
 
-  /// No description provided for @faceKissingCat.
+  /// Screen-reader name of the 😽 emoji face, in the 'More faces' dialog, which someone can pick for how they felt.
   ///
   /// In en, this message translates to:
   /// **'Kissing cat'**
   String get faceKissingCat;
 
-  /// No description provided for @faceWearyCat.
+  /// Screen-reader name of the 🙀 emoji face, in the 'More faces' dialog, which someone can pick for how they felt.
   ///
   /// In en, this message translates to:
   /// **'Weary cat'**
   String get faceWearyCat;
 
-  /// No description provided for @faceCryingCat.
+  /// Screen-reader name of the 😿 emoji face, in the 'More faces' dialog, which someone can pick for how they felt.
   ///
   /// In en, this message translates to:
   /// **'Crying cat'**
   String get faceCryingCat;
 
-  /// No description provided for @facePoutingCat.
+  /// Screen-reader name of the 😾 emoji face, in the 'More faces' dialog, which someone can pick for how they felt.
   ///
   /// In en, this message translates to:
   /// **'Pouting cat'**
   String get facePoutingCat;
 
-  /// No description provided for @faceAlien.
+  /// Screen-reader name of the 👽 emoji face, in the 'More faces' dialog, which someone can pick for how they felt.
   ///
   /// In en, this message translates to:
   /// **'Alien'**
   String get faceAlien;
 
-  /// No description provided for @faceSpaceInvader.
+  /// Screen-reader name of the 👾 emoji face, in the 'More faces' dialog, which someone can pick for how they felt.
   ///
   /// In en, this message translates to:
   /// **'Space invader'**
   String get faceSpaceInvader;
 
-  /// No description provided for @faceRobot.
+  /// Screen-reader name of the 🤖 emoji face, in the 'More faces' dialog, which someone can pick for how they felt.
   ///
   /// In en, this message translates to:
   /// **'Robot'**
   String get faceRobot;
 
-  /// No description provided for @faceGhost.
+  /// Screen-reader name of the 👻 emoji face, in the 'More faces' dialog, which someone can pick for how they felt.
   ///
   /// In en, this message translates to:
   /// **'Ghost'**
   String get faceGhost;
 
-  /// No description provided for @faceSkull.
+  /// Screen-reader name of the 💀 emoji face, in the 'More faces' dialog, which someone can pick for how they felt.
   ///
   /// In en, this message translates to:
   /// **'Skull'**
   String get faceSkull;
 
-  /// No description provided for @faceClown.
+  /// Screen-reader name of the 🤡 emoji face, in the 'More faces' dialog, which someone can pick for how they felt.
   ///
   /// In en, this message translates to:
   /// **'Clown'**
   String get faceClown;
 
-  /// No description provided for @faceDevil.
+  /// Screen-reader name of the 😈 emoji face, in the 'More faces' dialog, which someone can pick for how they felt.
   ///
   /// In en, this message translates to:
   /// **'Devil'**
   String get faceDevil;
 
-  /// No description provided for @faceUnicorn.
+  /// Screen-reader name of the 🦄 emoji face, in the 'More faces' dialog, which someone can pick for how they felt.
   ///
   /// In en, this message translates to:
   /// **'Unicorn'**
   String get faceUnicorn;
 
-  /// No description provided for @faceFrog.
+  /// Screen-reader name of the 🐸 emoji face, in the 'More faces' dialog, which someone can pick for how they felt.
   ///
   /// In en, this message translates to:
   /// **'Frog'**
   String get faceFrog;
 
-  /// No description provided for @facePartying.
+  /// Screen-reader name of the 🥳 emoji face, in the 'More faces' dialog, which someone can pick for how they felt.
   ///
   /// In en, this message translates to:
   /// **'Partying'**
   String get facePartying;
 
-  /// No description provided for @faceCool.
+  /// Screen-reader name of the 😎 emoji face, in the 'More faces' dialog, which someone can pick for how they felt.
   ///
   /// In en, this message translates to:
   /// **'Cool'**
   String get faceCool;
 
-  /// No description provided for @faceNerdy.
+  /// Screen-reader name of the 🤓 emoji face, in the 'More faces' dialog, which someone can pick for how they felt.
   ///
   /// In en, this message translates to:
   /// **'Nerdy'**
   String get faceNerdy;
 
-  /// No description provided for @faceAngelic.
+  /// Screen-reader name of the 😇 emoji face, in the 'More faces' dialog, which someone can pick for how they felt.
   ///
   /// In en, this message translates to:
   /// **'Angelic'**
   String get faceAngelic;
 
-  /// No description provided for @faceHugging.
+  /// Screen-reader name of the 🤗 emoji face, in the 'More faces' dialog, which someone can pick for how they felt.
   ///
   /// In en, this message translates to:
   /// **'Hugging'**
   String get faceHugging;
 
-  /// No description provided for @faceSilly.
+  /// Screen-reader name of the 🤪 emoji face, in the 'More faces' dialog, which someone can pick for how they felt.
   ///
   /// In en, this message translates to:
   /// **'Silly'**
   String get faceSilly;
 
-  /// No description provided for @faceUpsideDown.
+  /// Screen-reader name of the 🙃 emoji face, in the 'More faces' dialog, which someone can pick for how they felt.
   ///
   /// In en, this message translates to:
   /// **'Upside down'**
   String get faceUpsideDown;
 
-  /// No description provided for @faceSmirking.
+  /// Screen-reader name of the 😏 emoji face, in the 'More faces' dialog, which someone can pick for how they felt.
   ///
   /// In en, this message translates to:
   /// **'Smirking'**
   String get faceSmirking;
 
-  /// No description provided for @faceGrimacing.
+  /// Screen-reader name of the 😬 emoji face, in the 'More faces' dialog, which someone can pick for how they felt.
   ///
   /// In en, this message translates to:
   /// **'Grimacing'**
   String get faceGrimacing;
 
-  /// No description provided for @faceEyeRoll.
+  /// Screen-reader name of the 🙄 emoji face, in the 'More faces' dialog, which someone can pick for how they felt.
   ///
   /// In en, this message translates to:
   /// **'Eye roll'**
   String get faceEyeRoll;
 
-  /// No description provided for @faceSpeechless.
+  /// Screen-reader name of the 😶 emoji face, in the 'More faces' dialog, which someone can pick for how they felt.
   ///
   /// In en, this message translates to:
   /// **'Speechless'**
   String get faceSpeechless;
 
-  /// No description provided for @facePleading.
+  /// Screen-reader name of the 🥺 emoji face, in the 'More faces' dialog, which someone can pick for how they felt.
   ///
   /// In en, this message translates to:
   /// **'Pleading'**
   String get facePleading;
 
-  /// No description provided for @faceSobbing.
+  /// Screen-reader name of the 😭 emoji face, in the 'More faces' dialog, which someone can pick for how they felt.
   ///
   /// In en, this message translates to:
   /// **'Sobbing'**
   String get faceSobbing;
 
-  /// No description provided for @faceScreaming.
+  /// Screen-reader name of the 😱 emoji face, in the 'More faces' dialog, which someone can pick for how they felt.
   ///
   /// In en, this message translates to:
   /// **'Screaming'**
   String get faceScreaming;
 
-  /// No description provided for @faceFlushed.
+  /// Screen-reader name of the 😳 emoji face, in the 'More faces' dialog, which someone can pick for how they felt.
   ///
   /// In en, this message translates to:
   /// **'Flushed'**
   String get faceFlushed;
 
-  /// No description provided for @faceOverwhelmed.
+  /// Screen-reader name of the 🤯 emoji face, in the 'More faces' dialog, which someone can pick for how they felt.
   ///
   /// In en, this message translates to:
   /// **'Overwhelmed'**
   String get faceOverwhelmed;
 
-  /// No description provided for @faceWoozy.
+  /// Screen-reader name of the 🥴 emoji face, in the 'More faces' dialog, which someone can pick for how they felt.
   ///
   /// In en, this message translates to:
   /// **'Woozy'**
   String get faceWoozy;
 
-  /// No description provided for @faceUnwell.
+  /// Screen-reader name of the 🤒 emoji face, in the 'More faces' dialog, which someone can pick for how they felt.
   ///
   /// In en, this message translates to:
   /// **'Unwell'**
   String get faceUnwell;
 
-  /// No description provided for @faceHurting.
+  /// Screen-reader name of the 🤕 emoji face, in the 'More faces' dialog, which someone can pick for how they felt.
   ///
   /// In en, this message translates to:
   /// **'Hurting'**
   String get faceHurting;
 
-  /// No description provided for @faceQueasy.
+  /// Screen-reader name of the 🤢 emoji face, in the 'More faces' dialog, which someone can pick for how they felt.
   ///
   /// In en, this message translates to:
   /// **'Queasy'**
   String get faceQueasy;
 
-  /// No description provided for @faceTooHot.
+  /// Screen-reader name of the 🥵 emoji face, in the 'More faces' dialog, which someone can pick for how they felt.
   ///
   /// In en, this message translates to:
   /// **'Too hot'**
   String get faceTooHot;
 
-  /// No description provided for @faceTooCold.
+  /// Screen-reader name of the 🥶 emoji face, in the 'More faces' dialog, which someone can pick for how they felt.
   ///
   /// In en, this message translates to:
   /// **'Too cold'**
   String get faceTooCold;
 
-  /// No description provided for @faceSparklingHeart.
+  /// Screen-reader name of the 💖 emoji face, in the 'More faces' dialog, which someone can pick for how they felt.
   ///
   /// In en, this message translates to:
   /// **'Sparkling heart'**
   String get faceSparklingHeart;
 
-  /// No description provided for @faceBrokenHeart.
+  /// Screen-reader name of the 💔 emoji face, in the 'More faces' dialog, which someone can pick for how they felt.
   ///
   /// In en, this message translates to:
   /// **'Broken heart'**
   String get faceBrokenHeart;
 
-  /// No description provided for @faceFire.
+  /// Screen-reader name of the 🔥 emoji face, in the 'More faces' dialog, which someone can pick for how they felt.
   ///
   /// In en, this message translates to:
   /// **'Fire'**
   String get faceFire;
 
-  /// No description provided for @faceRainbow.
+  /// Screen-reader name of the 🌈 emoji face, in the 'More faces' dialog, which someone can pick for how they felt.
   ///
   /// In en, this message translates to:
   /// **'Rainbow'**
   String get faceRainbow;
 
-  /// No description provided for @faceSun.
+  /// Screen-reader name of the ☀️ emoji face, in the 'More faces' dialog, which someone can pick for how they felt.
   ///
   /// In en, this message translates to:
   /// **'Sun'**
   String get faceSun;
 
-  /// No description provided for @faceRain.
+  /// Screen-reader name of the 🌧️ emoji face, in the 'More faces' dialog, which someone can pick for how they felt.
   ///
   /// In en, this message translates to:
   /// **'Rain'**
   String get faceRain;
 
-  /// No description provided for @faceStorm.
+  /// Screen-reader name of the ⛈️ emoji face, in the 'More faces' dialog, which someone can pick for how they felt.
   ///
   /// In en, this message translates to:
   /// **'Storm'**
   String get faceStorm;
 
-  /// No description provided for @faceBlossom.
+  /// Screen-reader name of the 🌸 emoji face, in the 'More faces' dialog, which someone can pick for how they felt.
   ///
   /// In en, this message translates to:
   /// **'Blossom'**
   String get faceBlossom;
 
-  /// No description provided for @faceChocolate.
+  /// Screen-reader name of the 🍫 emoji face, in the 'More faces' dialog, which someone can pick for how they felt.
   ///
   /// In en, this message translates to:
   /// **'Chocolate'**
   String get faceChocolate;
 
-  /// No description provided for @faceInBed.
+  /// Screen-reader name of the 🛌 emoji face, in the 'More faces' dialog, which someone can pick for how they felt.
   ///
   /// In en, this message translates to:
   /// **'In bed'**
@@ -1451,13 +1451,13 @@ abstract class AppLocalizations {
   /// **'{who, select, you{My period started today} other{{name}’s period started today}}'**
   String homePeriodStartedToday(String who, String name);
 
-  /// No description provided for @homeEndedEarlier.
+  /// Small button under 'My period ended today' on the home screen: opens a date picker for the day it ended.
   ///
   /// In en, this message translates to:
   /// **'It ended on an earlier day'**
   String get homeEndedEarlier;
 
-  /// No description provided for @homeStartedEarlier.
+  /// Small button under 'My period started today' on the home screen: opens a date picker for the day it started.
   ///
   /// In en, this message translates to:
   /// **'It started on an earlier day'**
@@ -1481,19 +1481,19 @@ abstract class AppLocalizations {
   /// **'No period logged since {date}'**
   String homeNoPeriodSince(String date);
 
-  /// No description provided for @homeMissedOne.
+  /// Detail in the home screen's cycle card, under homeNoPeriodSince, when the gap is long enough for one period to have gone unlogged.
   ///
   /// In en, this message translates to:
   /// **'Ebb has assumed a period went unlogged and estimated from there. If you remember when it started, add it to put the estimate right.'**
   String get homeMissedOne;
 
-  /// No description provided for @homeMissedSome.
+  /// Detail in the home screen's cycle card, under homeNoPeriodSince, when the gap is long enough for two or more periods to have gone unlogged.
   ///
   /// In en, this message translates to:
   /// **'Ebb has assumed some periods went unlogged and estimated from there. If you remember when any started, add them to put the estimate right.'**
   String get homeMissedSome;
 
-  /// No description provided for @homeWelcome.
+  /// Headline of the cycle card for the phone's owner when nothing is logged yet (homeNothingYet for someone else they track).
   ///
   /// In en, this message translates to:
   /// **'Welcome to Ebb'**
@@ -1523,7 +1523,7 @@ abstract class AppLocalizations {
   /// **'{who, select, you{Day {day} of your cycle} other{Day {day} of {name}’s cycle}}'**
   String homeDayOfCycle(String who, String name, int day);
 
-  /// No description provided for @homeTellEnd.
+  /// Detail under 'Day N of your period' in the cycle card while a period is in progress.
   ///
   /// In en, this message translates to:
   /// **'Let Ebb know when it ends so the estimate stays accurate.'**
@@ -1589,13 +1589,13 @@ abstract class AppLocalizations {
   /// **'Today'**
   String get homeKeyToday;
 
-  /// No description provided for @homeAddPastPeriods.
+  /// Button in the cycle card when no period is recorded yet: opens the editor for a past period.
   ///
   /// In en, this message translates to:
   /// **'Add past periods'**
   String get homeAddPastPeriods;
 
-  /// No description provided for @homeAddMissedPeriod.
+  /// Button in the cycle card when Ebb assumes a period went unlogged: opens the editor to add it.
   ///
   /// In en, this message translates to:
   /// **'Add a missed period'**
@@ -1613,37 +1613,37 @@ abstract class AppLocalizations {
   /// **'likely between {from} and {to}'**
   String homeLikelyBetween(String from, String to);
 
-  /// No description provided for @homeFertileWindow.
+  /// Heading in the 'Next period' card over the estimated fertile window's dates, shown only when the setting is on.
   ///
   /// In en, this message translates to:
   /// **'Estimated fertile window'**
   String get homeFertileWindow;
 
-  /// No description provided for @homeFertileWarning.
+  /// Under the fertile window dates. Keep the caution: not reliable as contraception.
   ///
   /// In en, this message translates to:
   /// **'An estimate based on cycle timing alone. Not reliable enough to use as contraception.'**
   String get homeFertileWarning;
 
-  /// No description provided for @homeConfidenceUnlogged.
+  /// Note under the next-period estimate when Ebb assumes periods went unlogged. date is the last logged period's start, already formatted short, e.g. 'Jun 3'.
   ///
   /// In en, this message translates to:
   /// **'Estimated from the last period logged, on {date}, so it may be less accurate than usual.'**
   String homeConfidenceUnlogged(String date);
 
-  /// No description provided for @homeConfidenceNone.
+  /// Note under the next-period estimate when there is no history to go on.
   ///
   /// In en, this message translates to:
   /// **'Nothing logged yet.'**
   String get homeConfidenceNone;
 
-  /// No description provided for @homeConfidenceTypical.
+  /// Note under the estimate when only one period is logged, so no cycle length has been measured yet.
   ///
   /// In en, this message translates to:
   /// **'Based on a typical 28-day cycle for now. This will get more accurate as you log.'**
   String get homeConfidenceTypical;
 
-  /// No description provided for @homeConfidenceFew.
+  /// Note under the estimate when only a few cycles have been measured. count is 1 or more.
   ///
   /// In en, this message translates to:
   /// **'{count, plural, =1{Based on 1 cycle so far, so it may be less accurate for now.} other{Based on {count} cycles so far, so it may be less accurate for now.}}'**
@@ -1673,43 +1673,43 @@ abstract class AppLocalizations {
   /// **'First period logged'**
   String get homeMilestoneFirstPeriod;
 
-  /// No description provided for @homeMilestoneFirstCycle.
+  /// Milestone name, in History and on the celebration: the first full cycle, start to start, logged.
   ///
   /// In en, this message translates to:
   /// **'First full cycle'**
   String get homeMilestoneFirstCycle;
 
-  /// No description provided for @homeMilestoneThreeCycles.
+  /// Milestone name, in History and on the celebration: three full cycles logged.
   ///
   /// In en, this message translates to:
   /// **'Three full cycles'**
   String get homeMilestoneThreeCycles;
 
-  /// No description provided for @homeMilestoneSixCycles.
+  /// Milestone name, in History and on the celebration: six full cycles logged.
   ///
   /// In en, this message translates to:
   /// **'Six full cycles'**
   String get homeMilestoneSixCycles;
 
-  /// No description provided for @homeMilestoneOneYear.
+  /// Milestone name, in History and on the celebration: a year of history in Ebb.
   ///
   /// In en, this message translates to:
   /// **'A year of history'**
   String get homeMilestoneOneYear;
 
-  /// No description provided for @homeMilestoneTwoYears.
+  /// Milestone name, in History and on the celebration: two years of history in Ebb.
   ///
   /// In en, this message translates to:
   /// **'Two years of history'**
   String get homeMilestoneTwoYears;
 
-  /// No description provided for @homeMilestoneFiveYears.
+  /// Milestone name, in History and on the celebration: five years of history in Ebb.
   ///
   /// In en, this message translates to:
   /// **'Five years of history'**
   String get homeMilestoneFiveYears;
 
-  /// No description provided for @homeMilestoneFirstBackup.
+  /// Milestone name, in History and on the celebration: the first backup file saved.
   ///
   /// In en, this message translates to:
   /// **'First backup saved'**
@@ -1727,13 +1727,13 @@ abstract class AppLocalizations {
   /// **'{who, select, you{A first full cycle. Ebb can start learning your rhythm.} other{A first full cycle. Ebb can start learning {name}’s rhythm.}}'**
   String homeMilestoneFirstCycleMessage(String who, String name);
 
-  /// No description provided for @homeMilestoneThreeCyclesMessage.
+  /// Said on the celebration when the milestone is reached. About the record, never the body.
   ///
   /// In en, this message translates to:
   /// **'Three full cycles logged. Each one gives Ebb more to go on.'**
   String get homeMilestoneThreeCyclesMessage;
 
-  /// No description provided for @homeMilestoneSixCyclesMessage.
+  /// Said when the milestone is reached. Six is how many recent cycles the estimate looks at, so this is a fact about the count, not a promise the estimate is now right.
   ///
   /// In en, this message translates to:
   /// **'Six full cycles logged: as many as Ebb looks at for each estimate.'**
@@ -1757,55 +1757,55 @@ abstract class AppLocalizations {
   /// **'{who, select, you{Five years of your history in Ebb.} other{Five years of {name}’s history in Ebb.}}'**
   String homeMilestoneFiveYearsMessage(String who, String name);
 
-  /// No description provided for @homeMilestoneFirstBackupMessage.
+  /// Said when the first backup file is saved, in place of the usual settingsBackupSaved message; give the same advice.
   ///
   /// In en, this message translates to:
   /// **'Your first backup is saved. Keep a copy somewhere other than this phone.'**
   String get homeMilestoneFirstBackupMessage;
 
-  /// No description provided for @homeProblemStartInFuture.
+  /// Error in red in the period editor when the start date picked is after today; Save stays disabled.
   ///
   /// In en, this message translates to:
   /// **'The start date can\'t be in the future.'**
   String get homeProblemStartInFuture;
 
-  /// No description provided for @homeProblemEndInFuture.
+  /// Error in red in the period editor when the end date picked is after today; Save stays disabled.
   ///
   /// In en, this message translates to:
   /// **'The end date can\'t be in the future.'**
   String get homeProblemEndInFuture;
 
-  /// No description provided for @homeProblemEndBeforeStart.
+  /// Error in red in the period editor when the end date is earlier than the start; Save stays disabled.
   ///
   /// In en, this message translates to:
   /// **'The end date is before the start date.'**
   String get homeProblemEndBeforeStart;
 
-  /// No description provided for @homeProblemDuplicateStart.
+  /// Error in red in the period editor when another period already starts on that day; Save stays disabled.
   ///
   /// In en, this message translates to:
   /// **'A period starting on that day is already recorded.'**
   String get homeProblemDuplicateStart;
 
-  /// No description provided for @homeProblemOverlapsPrevious.
+  /// Error in red in the period editor when this period starts before the one before it ended; Save stays disabled.
   ///
   /// In en, this message translates to:
   /// **'This overlaps the period before it. Check the earlier entry’s end date.'**
   String get homeProblemOverlapsPrevious;
 
-  /// No description provided for @homeProblemOverlapsNext.
+  /// Error in red in the period editor when this period runs into the next one's start; Save stays disabled.
   ///
   /// In en, this message translates to:
   /// **'This overlaps the period after it. Check the end date.'**
   String get homeProblemOverlapsNext;
 
-  /// No description provided for @homeDeleteCycleTitle.
+  /// Title of the dialog asking before a period is deleted from History or the calendar.
   ///
   /// In en, this message translates to:
   /// **'Delete this cycle?'**
   String get homeDeleteCycleTitle;
 
-  /// No description provided for @homeDeleteCycleBody.
+  /// Body of the dialog asking before a period is deleted. date is the period's start, already formatted, e.g. 'Jun 3, 2026'.
   ///
   /// In en, this message translates to:
   /// **'The entry starting {date} will be removed. This cannot be undone.'**
@@ -1829,7 +1829,7 @@ abstract class AppLocalizations {
   /// **'Add a past period'**
   String get homeAddPastPeriodTitle;
 
-  /// No description provided for @homeEditPeriod.
+  /// Title of the period editor sheet for an existing period (homeAddPastPeriodTitle is for a new one).
   ///
   /// In en, this message translates to:
   /// **'Edit period'**
@@ -1859,19 +1859,19 @@ abstract class AppLocalizations {
   /// **'Not recorded'**
   String get homeNotRecorded;
 
-  /// No description provided for @homeClearEnd.
+  /// Tooltip of the × beside the end date in the period editor: forgets the end date.
   ///
   /// In en, this message translates to:
   /// **'Clear end date'**
   String get homeClearEnd;
 
-  /// No description provided for @homeCountInPredictions.
+  /// Switch in the period editor, on by default: whether this cycle feeds the estimates.
   ///
   /// In en, this message translates to:
   /// **'Count this cycle in predictions'**
   String get homeCountInPredictions;
 
-  /// No description provided for @homeCountInPredictionsHint.
+  /// Under the 'Count this cycle in predictions' switch. Name the examples plainly, no euphemism.
   ///
   /// In en, this message translates to:
   /// **'Turn off for a cycle that doesn’t reflect the usual rhythm — illness, a medication change, a pregnancy loss. It stays in your history either way.'**
@@ -1883,19 +1883,19 @@ abstract class AppLocalizations {
   /// **'Note'**
   String get homeNote;
 
-  /// No description provided for @homeNoteExcludedHint.
+  /// Helper under the period editor's note field when the cycle is switched out of predictions.
   ///
   /// In en, this message translates to:
   /// **'Why it isn’t counted, so it’s easy to remember later.'**
   String get homeNoteExcludedHint;
 
-  /// No description provided for @homeNoteHint.
+  /// Helper under the period editor's note field.
   ///
   /// In en, this message translates to:
   /// **'Anything worth remembering about this one.'**
   String get homeNoteHint;
 
-  /// No description provided for @homeDeletePeriod.
+  /// Button at the foot of the period editor, for an existing period.
   ///
   /// In en, this message translates to:
   /// **'Delete this period'**
@@ -1907,7 +1907,7 @@ abstract class AppLocalizations {
   /// **'Add past period'**
   String get homeAddPastPeriod;
 
-  /// No description provided for @homeHistoryEmpty.
+  /// The History screen when no cycle is recorded.
   ///
   /// In en, this message translates to:
   /// **'No cycles recorded yet. If you remember when recent periods started, adding them gives Ebb a head start.'**
@@ -1925,13 +1925,13 @@ abstract class AppLocalizations {
   /// **'{count, plural, =1{1-day period} other{{count}-day period}}'**
   String homePeriodLength(int count);
 
-  /// No description provided for @homePeriodInProgress.
+  /// In History, in place of the period length, for the current period that has not ended.
   ///
   /// In en, this message translates to:
   /// **'Period in progress'**
   String get homePeriodInProgress;
 
-  /// No description provided for @homeEndNotRecorded.
+  /// In History, in place of the period length, for a past period whose end was never logged.
   ///
   /// In en, this message translates to:
   /// **'End not recorded'**
@@ -1979,7 +1979,7 @@ abstract class AppLocalizations {
   /// **'Last 3 months'**
   String get homeSpanMonths3;
 
-  /// No description provided for @homeSpanMonths6.
+  /// Menu of date ranges for charts and sending: the last 6 months.
   ///
   /// In en, this message translates to:
   /// **'Last 6 months'**
@@ -1997,7 +1997,7 @@ abstract class AppLocalizations {
   /// **'Everything'**
   String get homeSpanAll;
 
-  /// No description provided for @homeSpanCustom.
+  /// Menu of date ranges: opens Android's date-range picker, so it ends with an ellipsis like any menu item that asks more.
   ///
   /// In en, this message translates to:
   /// **'Choose dates…'**
@@ -2009,7 +2009,7 @@ abstract class AppLocalizations {
   /// **'Settings'**
   String get settingsTitle;
 
-  /// No description provided for @settingsNotificationsOff.
+  /// Message when turning reminders on and the phone refuses notification permission.
   ///
   /// In en, this message translates to:
   /// **'Notifications are turned off for Ebb in system settings.'**
@@ -2021,37 +2021,37 @@ abstract class AppLocalizations {
   /// **'No browser to open it with. Visit {website} instead.'**
   String settingsNoBrowser(String website);
 
-  /// No description provided for @settingsNothingToBackUp.
+  /// Message when 'Back up to a file' is tapped with nothing logged for anyone.
   ///
   /// In en, this message translates to:
   /// **'Nothing to back up yet.'**
   String get settingsNothingToBackUp;
 
-  /// No description provided for @settingsBackupSaved.
+  /// Message after a backup file is saved. homeMilestoneFirstBackupMessage gives the same advice the first time.
   ///
   /// In en, this message translates to:
   /// **'Backup saved. Keep a copy somewhere other than this phone.'**
   String get settingsBackupSaved;
 
-  /// No description provided for @settingsBackupNotSaved.
+  /// Message when the phone could not write the backup where it was pointed.
   ///
   /// In en, this message translates to:
   /// **'The backup couldn\'t be saved there. Try another location.'**
   String get settingsBackupNotSaved;
 
-  /// No description provided for @settingsNoPicker.
+  /// Message when the phone has no file picker, so a backup can't be saved or opened; sending by codes needs none.
   ///
   /// In en, this message translates to:
   /// **'This phone has no file picker for Ebb to use. Sending to another phone works without one.'**
   String get settingsNoPicker;
 
-  /// No description provided for @settingsFileTooLarge.
+  /// Message when the file picked to restore is far bigger than any Ebb backup could be.
   ///
   /// In en, this message translates to:
   /// **'That file is too large to be an Ebb backup.'**
   String get settingsFileTooLarge;
 
-  /// No description provided for @settingsFileUnreadable.
+  /// Message when the file picked to restore could not be opened at all.
   ///
   /// In en, this message translates to:
   /// **'That file couldn\'t be read.'**
@@ -2127,7 +2127,7 @@ abstract class AppLocalizations {
   /// **'{name} updated.'**
   String settingsPersonUpdated(String name);
 
-  /// No description provided for @settingsAddThisHistoryTitle.
+  /// Title of the dialog when a backup of one unnamed person arrives on a phone that already has history (settingsAddNamedTitle when they have a name).
   ///
   /// In en, this message translates to:
   /// **'Add this history?'**
@@ -2151,37 +2151,37 @@ abstract class AppLocalizations {
   /// **'{name}’s history has {periods}. You can add it alongside what’s already here, or replace everything on this phone with it.'**
   String settingsAddNamedBody(String name, String periods);
 
-  /// No description provided for @settingsAddAsNew.
+  /// Button in that dialog: add the arrived person alongside everyone already here.
   ///
   /// In en, this message translates to:
   /// **'Add as someone new'**
   String get settingsAddAsNew;
 
-  /// No description provided for @settingsWhoIsThis.
+  /// Title of the name dialog after choosing to add an arrived person as someone new.
   ///
   /// In en, this message translates to:
   /// **'Who is this?'**
   String get settingsWhoIsThis;
 
-  /// No description provided for @settingsWhoIsThisHint.
+  /// Helper under the name field in that dialog.
   ///
   /// In en, this message translates to:
   /// **'A name to tell them apart on this phone.'**
   String get settingsWhoIsThisHint;
 
-  /// No description provided for @settingsPersonAdded.
+  /// Message after adding an arrived person. name is what the user typed.
   ///
   /// In en, this message translates to:
   /// **'{name} added.'**
   String settingsPersonAdded(String name);
 
-  /// No description provided for @settingsRestored.
+  /// Message after a backup replaced everything in Ebb.
   ///
   /// In en, this message translates to:
   /// **'Done. Ebb has been updated.'**
   String get settingsRestored;
 
-  /// No description provided for @settingsReplaceTitle.
+  /// Title of the dialog asking before a backup replaces everything in Ebb.
   ///
   /// In en, this message translates to:
   /// **'Replace what’s in Ebb?'**
@@ -2211,37 +2211,37 @@ abstract class AppLocalizations {
   /// **'Replace'**
   String get settingsReplace;
 
-  /// No description provided for @settingsDeleteAllTitle.
+  /// Title of the dialog asking before all data is deleted.
   ///
   /// In en, this message translates to:
   /// **'Delete all data?'**
   String get settingsDeleteAllTitle;
 
-  /// No description provided for @settingsDeleteAllBody.
+  /// Body of the 'Delete all data?' dialog when only the owner is tracked.
   ///
   /// In en, this message translates to:
   /// **'Every cycle and note will be permanently erased. Ebb keeps no other copy, so this cannot be undone unless you have saved a backup file.'**
   String get settingsDeleteAllBody;
 
-  /// No description provided for @settingsDeleteAllBodyEveryone.
+  /// Body of the 'Delete all data?' dialog when more than one person is tracked on the phone.
   ///
   /// In en, this message translates to:
   /// **'Every cycle and note, for everyone on this phone, will be permanently erased. Ebb keeps no other copy, so this cannot be undone unless you have saved a backup file.'**
   String get settingsDeleteAllBodyEveryone;
 
-  /// No description provided for @settingsDeleteEverything.
+  /// Button that confirms deleting all data.
   ///
   /// In en, this message translates to:
   /// **'Delete everything'**
   String get settingsDeleteEverything;
 
-  /// No description provided for @settingsAllDeleted.
+  /// Message after all data was deleted.
   ///
   /// In en, this message translates to:
   /// **'All data deleted.'**
   String get settingsAllDeleted;
 
-  /// No description provided for @settingsYourName.
+  /// Settings item, and the title of the name dialog it opens, for the owner's own name (settingsName and settingsRename are for someone else).
   ///
   /// In en, this message translates to:
   /// **'Your name'**
@@ -2265,7 +2265,7 @@ abstract class AppLocalizations {
   /// **'Remove {name} from this phone?'**
   String settingsRemoveTitle(String name);
 
-  /// No description provided for @settingsRemoveBody.
+  /// Body of the dialog asking before someone you track is removed from this phone. name is that person's name, as typed by the user.
   ///
   /// In en, this message translates to:
   /// **'Every cycle and note for {name} will be permanently erased. Nobody else’s history is affected.'**
@@ -2337,25 +2337,25 @@ abstract class AppLocalizations {
   /// **'{count, plural, one{{count} day} other{{count} days}}'**
   String settingsDays(int count);
 
-  /// No description provided for @settingsFertile.
+  /// Switch in Settings, offered only to the phone's owner; off by default.
   ///
   /// In en, this message translates to:
   /// **'Show fertile window estimate'**
   String get settingsFertile;
 
-  /// No description provided for @settingsFertileHint.
+  /// Under the 'Show fertile window estimate' switch. Keep the caution: not reliable as contraception.
   ///
   /// In en, this message translates to:
   /// **'Off by default. An estimate from cycle timing only — not reliable enough to use as contraception.'**
   String get settingsFertileHint;
 
-  /// No description provided for @settingsMoon.
+  /// Switch in Settings: draw moon phases on the calendar and charts.
   ///
   /// In en, this message translates to:
   /// **'Show moon phases'**
   String get settingsMoon;
 
-  /// No description provided for @settingsMoonHint.
+  /// Under the 'Show moon phases' switch, naming the four phases: use the same words as calendarMoonNew, calendarMoonFirstQuarter, calendarMoonFull and calendarMoonLastQuarter.
   ///
   /// In en, this message translates to:
   /// **'New, first quarter, full and last quarter, on the calendar and charts.'**
@@ -2367,7 +2367,7 @@ abstract class AppLocalizations {
   /// **'Track temperature and cervical mucus'**
   String get settingsTemperature;
 
-  /// No description provided for @settingsTemperatureHint.
+  /// Under the 'Track temperature and cervical mucus' switch. Temperature is only recorded and charted; it never feeds the estimate.
   ///
   /// In en, this message translates to:
   /// **'On each day of the calendar, with a temperature chart. Recorded and drawn, never used to estimate anything.'**
@@ -2379,7 +2379,7 @@ abstract class AppLocalizations {
   /// **'Temperature in'**
   String get settingsTemperatureIn;
 
-  /// No description provided for @settingsCelebrate.
+  /// Switch in Settings: the small on-screen celebration when a milestone is reached.
   ///
   /// In en, this message translates to:
   /// **'Celebrate milestones'**
@@ -2391,7 +2391,7 @@ abstract class AppLocalizations {
   /// **'{who, select, you{A small celebration for things like a first full cycle or a year of history, listed in your History.} other{A small celebration for things like a first full cycle or a year of history, listed in {name}’s History.}}'**
   String settingsCelebrateHint(String who, String name);
 
-  /// No description provided for @settingsPeople.
+  /// Settings section heading: the people tracked on this phone.
   ///
   /// In en, this message translates to:
   /// **'People'**
@@ -2403,7 +2403,7 @@ abstract class AppLocalizations {
   /// **'Add someone'**
   String get settingsAddSomeone;
 
-  /// No description provided for @settingsTrackSomeoneElse.
+  /// Settings item, while only the owner is tracked, that adds a second person (settingsAddSomeone once there are more).
   ///
   /// In en, this message translates to:
   /// **'Track someone else too'**
@@ -2421,31 +2421,31 @@ abstract class AppLocalizations {
   /// **'Backup & moving'**
   String get settingsBackupSection;
 
-  /// No description provided for @settingsBackUp.
+  /// Settings item that saves a backup file through the phone's own Save picker.
   ///
   /// In en, this message translates to:
   /// **'Back up to a file'**
   String get settingsBackUp;
 
-  /// No description provided for @settingsBackUpHint.
+  /// Under 'Back up to a file' when only the owner is tracked.
   ///
   /// In en, this message translates to:
   /// **'Save your history to a file, wherever you choose.'**
   String get settingsBackUpHint;
 
-  /// No description provided for @settingsBackUpHintEveryone.
+  /// Under 'Back up to a file' when more than one person is tracked.
   ///
   /// In en, this message translates to:
   /// **'Save everyone’s history to a file, wherever you choose.'**
   String get settingsBackUpHintEveryone;
 
-  /// No description provided for @settingsRestore.
+  /// Settings item that opens a backup file.
   ///
   /// In en, this message translates to:
   /// **'Restore from a backup'**
   String get settingsRestore;
 
-  /// No description provided for @settingsRestoreHint.
+  /// Under 'Restore from a backup'. A backup normally replaces everything; only a file holding a single person is also offered as an addition or update.
   ///
   /// In en, this message translates to:
   /// **'Replaces what is in Ebb now.'**
@@ -2475,13 +2475,13 @@ abstract class AppLocalizations {
   /// **'Receive from another phone'**
   String get settingsReceive;
 
-  /// No description provided for @settingsReceiveHint.
+  /// Under 'Receive from another phone': what scanning the codes can do.
   ///
   /// In en, this message translates to:
   /// **'Scan the codes to add someone, update them, or replace everything.'**
   String get settingsReceiveHint;
 
-  /// No description provided for @settingsAdvanced.
+  /// Settings section heading, holding the groups option.
   ///
   /// In en, this message translates to:
   /// **'Advanced'**
@@ -2493,67 +2493,67 @@ abstract class AppLocalizations {
   /// **'Groups'**
   String get settingsGroups;
 
-  /// No description provided for @settingsGroupsHint.
+  /// Under the Groups switch, which is phone-wide and off by default.
   ///
   /// In en, this message translates to:
   /// **'For circles and clubs that track together: gather people under a name. Turning this off hides groups without deleting them.'**
   String get settingsGroupsHint;
 
-  /// No description provided for @settingsManageGroups.
+  /// Settings item under the Groups switch, shown while it is on: opens the Groups screen.
   ///
   /// In en, this message translates to:
   /// **'Manage groups'**
   String get settingsManageGroups;
 
-  /// No description provided for @settingsAboutEbb.
+  /// Settings section heading: help, your data, website and feedback.
   ///
   /// In en, this message translates to:
   /// **'About Ebb'**
   String get settingsAboutEbb;
 
-  /// No description provided for @settingsHowEbbWorks.
+  /// Settings item, and the title of the help screen it opens.
   ///
   /// In en, this message translates to:
   /// **'How Ebb works'**
   String get settingsHowEbbWorks;
 
-  /// No description provided for @settingsHowEbbWorksHint.
+  /// Under 'How Ebb works': what the help screen covers.
   ///
   /// In en, this message translates to:
   /// **'Logging, estimates, backups and more.'**
   String get settingsHowEbbWorksHint;
 
-  /// No description provided for @settingsYourData.
+  /// Settings item, and the title of the 'Your data' screen it opens, which explains where the data lives.
   ///
   /// In en, this message translates to:
   /// **'Your data'**
   String get settingsYourData;
 
-  /// No description provided for @settingsYourDataHint.
+  /// Under the 'Your data' item in Settings.
   ///
   /// In en, this message translates to:
   /// **'Where it lives and who can see it.'**
   String get settingsYourDataHint;
 
-  /// No description provided for @settingsWebsite.
+  /// Settings item that opens Ebb's website in the phone's browser; the address is shown under it.
   ///
   /// In en, this message translates to:
   /// **'Website'**
   String get settingsWebsite;
 
-  /// No description provided for @settingsSendFeedback.
+  /// Settings item that opens the feedback form on Ebb's website in the phone's browser.
   ///
   /// In en, this message translates to:
   /// **'Send feedback'**
   String get settingsSendFeedback;
 
-  /// No description provided for @settingsSendFeedbackHint.
+  /// Under 'Send feedback': the form is on the website, not in Ebb, so only what is typed there is sent.
   ///
   /// In en, this message translates to:
   /// **'A form on the website, in your browser.'**
   String get settingsSendFeedbackHint;
 
-  /// No description provided for @settingsDeleteAll.
+  /// Settings item, in red, at the foot of Settings.
   ///
   /// In en, this message translates to:
   /// **'Delete all data'**
@@ -2571,31 +2571,31 @@ abstract class AppLocalizations {
   /// **'Your cycle is your business.'**
   String get settingsDataHeadline;
 
-  /// No description provided for @settingsDataLede.
+  /// Opening paragraph of the "Your data" screen, under settingsDataHeadline. The quoted question is one a user might ask; the answer is deliberately boring. Calm, not secretive.
   ///
   /// In en, this message translates to:
   /// **'Ebb is built so that the question \"what do they do with my data?\" has a boring answer: nothing, because we never receive it.'**
   String get settingsDataLede;
 
-  /// No description provided for @settingsDataTradeOff.
+  /// Closing note on the "Your data" screen: the honest cost of having no cloud backup, and what to do about it.
   ///
   /// In en, this message translates to:
   /// **'One trade-off worth knowing: because there is no cloud backup, a lost or wiped phone means lost history. If that matters to you, save a backup file from Settings now and then, and keep it somewhere other than this phone.'**
   String get settingsDataTradeOff;
 
-  /// No description provided for @settingsWhereDataLives.
+  /// Item at the foot of the help screen that opens the "Your data" screen.
   ///
   /// In en, this message translates to:
   /// **'Where your data lives'**
   String get settingsWhereDataLives;
 
-  /// No description provided for @settingsWhereDataLivesHint.
+  /// Under that item at the foot of the help screen.
   ///
   /// In en, this message translates to:
   /// **'Your data, and who can see it.'**
   String get settingsWhereDataLivesHint;
 
-  /// No description provided for @settingsDataStaysTitle.
+  /// Heading of one point on the "Your data" screen, which says plainly where the data lives; its body is settingsDataStaysBody.
   ///
   /// In en, this message translates to:
   /// **'It stays on your phone'**
@@ -2607,7 +2607,7 @@ abstract class AppLocalizations {
   /// **'Everything you log is written to a database on this device. There is no account to create and no server to sync with. It only goes anywhere else if you move it yourself — a backup file, or another phone you send it to.'**
   String get settingsDataStaysBody;
 
-  /// No description provided for @settingsDataUnseenTitle.
+  /// Heading of one point on the "Your data" screen, which says plainly where the data lives; its body is settingsDataUnseenBody.
   ///
   /// In en, this message translates to:
   /// **'We cannot see it'**
@@ -2619,7 +2619,7 @@ abstract class AppLocalizations {
   /// **'Ebb is built without permission to use the internet at all. Android enforces that, and you can verify it yourself in the app\'s permission list.'**
   String get settingsDataUnseenBody;
 
-  /// No description provided for @settingsDataPermissionsTitle.
+  /// Heading of one point on the "Your data" screen, which says plainly where the data lives; its body is settingsDataPermissionsBody.
   ///
   /// In en, this message translates to:
   /// **'What the permissions are for'**
@@ -2631,7 +2631,7 @@ abstract class AppLocalizations {
   /// **'Notifications, for reminders. Camera, only while you receive history from another phone — it reads the codes and nothing is recorded or kept. Ebb also re-arms your reminders when the phone restarts. That is the whole list.'**
   String get settingsDataPermissionsBody;
 
-  /// No description provided for @settingsDataNotForSaleTitle.
+  /// Heading of one point on the "Your data" screen, which says plainly where the data lives; its body is settingsDataNotForSaleBody.
   ///
   /// In en, this message translates to:
   /// **'There is nothing to sell'**
@@ -2643,7 +2643,7 @@ abstract class AppLocalizations {
   /// **'No analytics, no advertising, no third-party libraries phoning home. Since your data never reaches us, there is no copy of it for anyone to buy, subpoena, or leak.'**
   String get settingsDataNotForSaleBody;
 
-  /// No description provided for @settingsDataEraseTitle.
+  /// Heading of one point on the "Your data" screen, which says plainly where the data lives; its body is settingsDataEraseBody.
   ///
   /// In en, this message translates to:
   /// **'You can erase it instantly'**
@@ -2655,7 +2655,7 @@ abstract class AppLocalizations {
   /// **'Deleting your data in Settings, or uninstalling Ebb, removes everything Ebb holds. Ebb keeps no other copy — the only ones are backup files you saved or phones you sent it to yourself.'**
   String get settingsDataEraseBody;
 
-  /// No description provided for @settingsDataOpenSourceTitle.
+  /// Heading of one point on the "Your data" screen, which says plainly where the data lives; its body is settingsDataOpenSourceBody.
   ///
   /// In en, this message translates to:
   /// **'You can check our work'**
@@ -2667,7 +2667,7 @@ abstract class AppLocalizations {
   /// **'Ebb is open source under the GNU General Public License. Anyone can read exactly what it does, and the published builds are made from that same code.'**
   String get settingsDataOpenSourceBody;
 
-  /// No description provided for @settingsHelpLoggingTitle.
+  /// Heading of the help topic about logging a period.
   ///
   /// In en, this message translates to:
   /// **'Logging a period'**
@@ -2679,7 +2679,7 @@ abstract class AppLocalizations {
   /// **'Tap “My period started today” on the first day of bleeding, and “My period ended today” on the last.\n\nForgot to log it? Use “It started on an earlier day” instead. Any past period can be added or corrected in History (the clock icon): tap one to change its dates or add a note.\n\nIf no end is logged within two weeks, Ebb stops treating the period as still going and offers to add the end instead.'**
   String get settingsHelpLoggingBody;
 
-  /// No description provided for @settingsHelpEstimateTitle.
+  /// Heading of the help topic about how the next-period estimate is made.
   ///
   /// In en, this message translates to:
   /// **'How the estimate works'**
@@ -2691,7 +2691,7 @@ abstract class AppLocalizations {
   /// **'Ebb looks at the gaps between the starts of your recent periods — up to the last six.\n\nWith only a little history it leans on a typical 28-day cycle, and says so. The more you log, the more the estimate is your own rhythm.\n\nIt shows a range rather than a single date, and tells you how sure it is. If your cycles vary a lot, the range is wider.\n\nIf a period is late, Ebb says how late. If nothing is logged for nearly two cycles, it assumes a period went unlogged, estimates from there, and says so. History points out long gaps, and adding a missed period puts the estimate right.'**
   String get settingsHelpEstimateBody;
 
-  /// No description provided for @settingsHelpExcludeTitle.
+  /// Heading of the help topic about leaving a cycle out of predictions.
   ///
   /// In en, this message translates to:
   /// **'A cycle that shouldn’t count'**
@@ -2715,7 +2715,7 @@ abstract class AppLocalizations {
   /// **'For circles and clubs that track together. Turn them on in Settings → Advanced, then make a group and choose who’s in it. “See … together” in the list of people shows everyone side by side, with the moon.\n\nA group can have two kinds of member. Someone added to it is tracked on this phone, and you log for them here. Someone imported keeps tracking on their own phone and provides their history to the group: it stays theirs, and can’t be changed on anyone else’s phone.\n\nTo be imported, send just your history (Settings → Send to another phone) — as much or as little as you like, with or without your daily notes. The other phone imports it from the group: Manage groups → the group → Import from their phone. Importing you again brings it up to date.\n\nImported history belongs to its group. Taking someone imported out of their last group, or deleting that group, takes their history off the phone too. And it can’t be sent on: only your own history can.'**
   String get settingsHelpGroupsBody;
 
-  /// No description provided for @settingsHelpRatingsTitle.
+  /// Heading of the help topic about day ratings, feelings and charts.
   ///
   /// In en, this message translates to:
   /// **'Day ratings, feelings and charts'**
@@ -2751,7 +2751,7 @@ abstract class AppLocalizations {
   /// **'A heads-up a few days before your period is expected, and another on the day. Choose how far ahead in Settings.\n\nThey’re scheduled on the phone itself, so they arrive with no signal and in airplane mode.\n\nEbb sets them each time you open it, from the latest estimate. The phone keeps them through restarts, but Ebb can’t update them while it’s closed, so open it now and then — logging a period is enough.\n\nAndroid may deliver them a little after the usual time to save battery. If Ebb is force-stopped, or a battery saver restricts it, they may not arrive until you next open Ebb.'**
   String get settingsHelpRemindersBody;
 
-  /// No description provided for @settingsHelpFertileTitle.
+  /// Heading of the help topic about the fertile window estimate.
   ///
   /// In en, this message translates to:
   /// **'The fertile window'**
@@ -2763,7 +2763,7 @@ abstract class AppLocalizations {
   /// **'Off unless you turn it on in Settings. It’s estimated from cycle timing alone, which is not reliable enough to use as contraception.'**
   String get settingsHelpFertileBody;
 
-  /// No description provided for @settingsHelpBackupTitle.
+  /// Heading of the help topic about backup files.
   ///
   /// In en, this message translates to:
   /// **'Backing up'**
@@ -2775,7 +2775,7 @@ abstract class AppLocalizations {
   /// **'There’s no cloud copy of your history, so a lost or wiped phone means lost history.\n\nSettings → “Back up to a file” saves everything as a file, wherever you choose. Keep it somewhere other than this phone. “Restore from a backup” brings it back.'**
   String get settingsHelpBackupBody;
 
-  /// No description provided for @settingsHelpMovingTitle.
+  /// Heading of the help topic about moving history to a new phone.
   ///
   /// In en, this message translates to:
   /// **'Moving to a new phone'**
@@ -2787,7 +2787,7 @@ abstract class AppLocalizations {
   /// **'On the old phone: Settings → “Send to another phone”. On the new one: Settings → “Receive from another phone”, and point the camera at the screen.\n\nLonger histories take a few codes, which change on their own; the new phone collects them in any order. No internet is involved — one phone shows, the other looks.'**
   String get settingsHelpMovingBody;
 
-  /// No description provided for @settingsHelpSomeoneElseTitle.
+  /// Heading of the help topic about tracking another person on this phone.
   ///
   /// In en, this message translates to:
   /// **'Tracking someone else'**
@@ -2799,7 +2799,7 @@ abstract class AppLocalizations {
   /// **'Helping someone else keep track — a child who’s just starting, say? Settings → “Track someone else too”, and give them a name. A nickname or initial is fine.\n\nTap the name at the top of the home screen to switch between people. Everyone has their own reminders, which start off for people you add. The fertile window is only ever offered for you.'**
   String get settingsHelpSomeoneElseBody;
 
-  /// No description provided for @settingsHelpHandoverTitle.
+  /// Heading of the help topic about sending someone's history to their own phone.
   ///
   /// In en, this message translates to:
   /// **'Handing someone over'**
@@ -2811,7 +2811,7 @@ abstract class AppLocalizations {
   /// **'When someone you track gets their own phone: “Send to another phone”, and choose just them. On their phone, “Receive from another phone”. On a fresh install their history simply becomes theirs.\n\nAfterwards Ebb asks whether to remove them from your phone. It never does that on its own.'**
   String get settingsHelpHandoverBody;
 
-  /// No description provided for @settingsHelpDeletingTitle.
+  /// Heading of the help topic about deleting data.
   ///
   /// In en, this message translates to:
   /// **'Deleting'**
@@ -2829,7 +2829,7 @@ abstract class AppLocalizations {
   /// **'Remove {name} from this phone?'**
   String shareRemoveTitle(String name);
 
-  /// No description provided for @shareRemoveBody.
+  /// Body of the dialog after Done on the codes screen, when one person other than the owner was sent. It offers, never assumes. name is that person's name.
   ///
   /// In en, this message translates to:
   /// **'If {name}’s history arrived on the other phone, it can come off this one. You can also keep it here as well.'**
@@ -2853,7 +2853,7 @@ abstract class AppLocalizations {
   /// **'Send to another phone'**
   String get shareTitle;
 
-  /// No description provided for @shareWhatToSend.
+  /// Heading of the Send screen's first step: choosing whose history to send.
   ///
   /// In en, this message translates to:
   /// **'What would you like to send?'**
@@ -2865,7 +2865,7 @@ abstract class AppLocalizations {
   /// **'Everyone'**
   String get shareEveryone;
 
-  /// No description provided for @shareEveryoneHint.
+  /// Under the 'Everyone on this phone' send choice: what it is for.
   ///
   /// In en, this message translates to:
   /// **'Moving to a new phone.'**
@@ -2877,7 +2877,7 @@ abstract class AppLocalizations {
   /// **'Just one person'**
   String get shareJustOne;
 
-  /// No description provided for @shareJustYours.
+  /// Send choice: only the owner's history.
   ///
   /// In en, this message translates to:
   /// **'Just your history'**
@@ -2889,13 +2889,13 @@ abstract class AppLocalizations {
   /// **'Just {name}'**
   String shareJustName(String name);
 
-  /// No description provided for @shareForTheirPhone.
+  /// Under the send choice for one person the owner tracks: what it is for. name is that person's name.
   ///
   /// In en, this message translates to:
   /// **'For {name}’s own phone.'**
   String shareForTheirPhone(String name);
 
-  /// No description provided for @shareCopiesNotOffered.
+  /// Note at the foot of the send choices when an imported copy is on the phone, saying why it is not listed.
   ///
   /// In en, this message translates to:
   /// **'People imported from other phones aren’t offered here: each person shares only their own history.'**
@@ -2907,7 +2907,7 @@ abstract class AppLocalizations {
   /// **'{who, select, you{How much of your history?} other{How much of {name}’s history?}}'**
   String shareHowMuch(String who, String name);
 
-  /// No description provided for @shareHowMuchHint.
+  /// Under the 'How much of your history?' heading on the Send screen.
   ///
   /// In en, this message translates to:
   /// **'Sending everything suits a new phone. Sharing with a group, you might send less. Nothing is removed from this phone.'**
@@ -2925,7 +2925,7 @@ abstract class AppLocalizations {
   /// **'Everything'**
   String get shareSpanEverything;
 
-  /// No description provided for @shareSpanYear.
+  /// How far back to send: the last 12 months.
   ///
   /// In en, this message translates to:
   /// **'The last year'**
@@ -2937,7 +2937,7 @@ abstract class AppLocalizations {
   /// **'{months, plural, one{The last {months} month} other{The last {months} months}}'**
   String shareSpanMonths(int months);
 
-  /// No description provided for @shareSpanLatest.
+  /// How far back to send: only the most recent period.
   ///
   /// In en, this message translates to:
   /// **'Just the latest period'**
@@ -2949,37 +2949,37 @@ abstract class AppLocalizations {
   /// **'What to include'**
   String get shareWhatToInclude;
 
-  /// No description provided for @shareWithDays.
+  /// What to include when sending: periods and daily entries, one of two choices.
   ///
   /// In en, this message translates to:
   /// **'Periods and daily entries'**
   String get shareWithDays;
 
-  /// No description provided for @shareWithDaysHint.
+  /// Under the 'Periods and daily entries' choice: what a daily entry holds.
   ///
   /// In en, this message translates to:
   /// **'Notes, ratings, feelings and flow too.'**
   String get shareWithDaysHint;
 
-  /// No description provided for @sharePeriodsOnly.
+  /// What to include when sending: periods only, no daily entries.
   ///
   /// In en, this message translates to:
   /// **'Periods only'**
   String get sharePeriodsOnly;
 
-  /// No description provided for @sharePeriodsOnlyHint.
+  /// Under the 'Periods only' choice.
   ///
   /// In en, this message translates to:
   /// **'Just when each period started and ended.'**
   String get sharePeriodsOnlyHint;
 
-  /// No description provided for @shareShowCodes.
+  /// Button at the foot of the 'How much' step: shows the QR codes.
   ///
   /// In en, this message translates to:
   /// **'Show the codes'**
   String get shareShowCodes;
 
-  /// No description provided for @shareNothing.
+  /// On the codes screen when the chosen history has nothing in it.
   ///
   /// In en, this message translates to:
   /// **'Nothing to send yet.'**
@@ -3021,7 +3021,7 @@ abstract class AppLocalizations {
   /// **'Next code'**
   String get shareNextCode;
 
-  /// No description provided for @shareCodesChange.
+  /// Under the codes when there is more than one: they cycle on their own, and scanning order does not matter.
   ///
   /// In en, this message translates to:
   /// **'The codes change on their own. The other phone collects them in any order.'**
@@ -3103,43 +3103,43 @@ abstract class AppLocalizations {
     int months,
   );
 
-  /// No description provided for @shareNotEbb.
+  /// On the Receive screen after scanning a QR code that is not Ebb's.
   ///
   /// In en, this message translates to:
   /// **'That code isn\'t from Ebb.'**
   String get shareNotEbb;
 
-  /// No description provided for @shareNewerVersion.
+  /// On the Receive screen when the codes come from a newer Ebb than this one.
   ///
   /// In en, this message translates to:
   /// **'The other phone has a newer version of Ebb. Update this one first.'**
   String get shareNewerVersion;
 
-  /// No description provided for @shareRestarted.
+  /// On the Receive screen when the sender started a new transfer part way through, so the codes collected so far are dropped.
   ///
   /// In en, this message translates to:
   /// **'The other phone started over. Collecting the new codes.'**
   String get shareRestarted;
 
-  /// No description provided for @shareUnreadable.
+  /// On the Receive screen when the collected codes did not assemble into a readable backup; scanning starts again.
   ///
   /// In en, this message translates to:
   /// **'Some codes didn\'t read cleanly. Let\'s scan them again.'**
   String get shareUnreadable;
 
-  /// No description provided for @shareNeedsCamera.
+  /// On the Receive screen in place of the camera view when camera permission was refused.
   ///
   /// In en, this message translates to:
   /// **'Ebb needs the camera to read the codes. You can allow it in the system settings for Ebb.'**
   String get shareNeedsCamera;
 
-  /// No description provided for @sharePointCamera.
+  /// Status at the top of the Receive screen before any code is read.
   ///
   /// In en, this message translates to:
   /// **'Point the camera at the code on the other phone.'**
   String get sharePointCamera;
 
-  /// No description provided for @shareReading.
+  /// Status on the Receive screen while a single-code transfer is being read; with more codes a count shows instead.
   ///
   /// In en, this message translates to:
   /// **'Reading…'**
@@ -3163,7 +3163,7 @@ abstract class AppLocalizations {
   /// **'Still needed: {codes}'**
   String shareStillNeeded(String codes);
 
-  /// No description provided for @groupsMoreThanOne.
+  /// Title of the dialog when codes scanned into a group hold a whole phone's history rather than one person's.
   ///
   /// In en, this message translates to:
   /// **'That’s more than one person'**
@@ -3222,7 +3222,7 @@ abstract class AppLocalizations {
   /// **'{periods}, sent {sent}. Imported read-only: it can’t be changed here, and is brought up to date when it’s sent again.'**
   String groupsImportHint(String periods, String sent);
 
-  /// No description provided for @groupsImported.
+  /// Message after someone is imported into a group. name is what the user typed; group is the group's name.
   ///
   /// In en, this message translates to:
   /// **'{name} imported into {group}.'**
@@ -3246,31 +3246,31 @@ abstract class AppLocalizations {
   /// **'Periods'**
   String get groupsPeriods;
 
-  /// No description provided for @groupsChartHint.
+  /// Caption under the group chart, which draws each person's periods as bars in their own lane with moon lines across all of them.
   ///
   /// In en, this message translates to:
   /// **'Each bar is a period; an outline is one whose end wasn’t logged, drawn at the usual length. Solid lines run down from each full moon, dashed ones from each new moon.'**
   String get groupsChartHint;
 
-  /// No description provided for @groupsNew.
+  /// Button on the Groups screen, and the title of the name dialog for a new group.
   ///
   /// In en, this message translates to:
   /// **'New group'**
   String get groupsNew;
 
-  /// No description provided for @groupsRename.
+  /// Title of the name dialog when renaming a group.
   ///
   /// In en, this message translates to:
   /// **'Rename group'**
   String get groupsRename;
 
-  /// No description provided for @groupsNameHint.
+  /// Helper under the group name field.
   ///
   /// In en, this message translates to:
   /// **'For example, the name of your circle or club.'**
   String get groupsNameHint;
 
-  /// No description provided for @groupsNameTaken.
+  /// Error under the group name field.
   ///
   /// In en, this message translates to:
   /// **'There’s already a group with that name.'**
@@ -3288,31 +3288,31 @@ abstract class AppLocalizations {
   /// **'Groups'**
   String get groupsTitle;
 
-  /// No description provided for @groupsIntro.
+  /// The Groups screen when no group exists yet.
   ///
   /// In en, this message translates to:
   /// **'A group gathers people on this phone under one name — a circle or club that tracks together. Someone can be in more than one, and deleting a group never deletes anyone.'**
   String get groupsIntro;
 
-  /// No description provided for @groupsAddSomeoneTo.
+  /// Title of the name dialog when adding a new person, tracked on this phone, straight into a group. group is the group's name.
   ///
   /// In en, this message translates to:
   /// **'Add someone to {group}'**
   String groupsAddSomeoneTo(String group);
 
-  /// No description provided for @groupsAddSomeoneHint.
+  /// Helper under the name field in that dialog.
   ///
   /// In en, this message translates to:
   /// **'Tracked on this phone: you log and change their history here. Someone who tracks on their own phone can be imported instead.'**
   String get groupsAddSomeoneHint;
 
-  /// No description provided for @groupsTakeOutTitle.
+  /// Title of the dialog asking before an imported copy is unticked from the only group it is in. name is that person's name; group is the group's name.
   ///
   /// In en, this message translates to:
   /// **'Take {name} out of {group}?'**
   String groupsTakeOutTitle(String name, String group);
 
-  /// No description provided for @groupsTakeOutBody.
+  /// Body of the dialog asking before an imported copy leaves its only group. name is that person's name, used three times.
   ///
   /// In en, this message translates to:
   /// **'{name} was imported from their phone and isn’t in any other group, so the imported history comes off this phone too. {name} can send it again to rejoin.'**
@@ -3324,13 +3324,13 @@ abstract class AppLocalizations {
   /// **'Take out'**
   String get groupsTakeOut;
 
-  /// No description provided for @groupsDeleteTitle.
+  /// Title of the dialog asking before a group is deleted. group is the group's name.
   ///
   /// In en, this message translates to:
   /// **'Delete {group}?'**
   String groupsDeleteTitle(String group);
 
-  /// No description provided for @groupsDeleteBodyNone.
+  /// Body of the 'Delete group?' dialog when no imported copy is only in this group (groupsDeleteBodySome otherwise).
   ///
   /// In en, this message translates to:
   /// **'Only the group goes. Everyone in it stays on this phone, with all their history.'**
@@ -3342,7 +3342,7 @@ abstract class AppLocalizations {
   /// **'The people imported only into this group come off this phone too: {names}. Everyone else stays, with all their history.'**
   String groupsDeleteBodySome(String names);
 
-  /// No description provided for @groupsDeleteGroup.
+  /// Button that confirms deleting the group.
   ///
   /// In en, this message translates to:
   /// **'Delete group'**
@@ -3360,13 +3360,13 @@ abstract class AppLocalizations {
   /// **'Who’s in it'**
   String get groupsWhoIsIn;
 
-  /// No description provided for @groupsImportedAsOf.
+  /// Under an imported person's name in a group's member list. date is when they sent it, already formatted.
   ///
   /// In en, this message translates to:
   /// **'Imported · read-only, as of {date}'**
   String groupsImportedAsOf(String date);
 
-  /// No description provided for @groupsTrackedHere.
+  /// Under the name of a group member whose history is logged on this phone.
   ///
   /// In en, this message translates to:
   /// **'Tracked on this phone'**
@@ -3378,37 +3378,37 @@ abstract class AppLocalizations {
   /// **'Add to the group'**
   String get groupsAddTo;
 
-  /// No description provided for @groupsAddNew.
+  /// Item on a group's screen: add a new person tracked on this phone.
   ///
   /// In en, this message translates to:
   /// **'Add someone new'**
   String get groupsAddNew;
 
-  /// No description provided for @groupsAddNewHint.
+  /// Under the 'Add someone new' item on a group's screen.
   ///
   /// In en, this message translates to:
   /// **'Tracked on this phone: you log their periods here.'**
   String get groupsAddNewHint;
 
-  /// No description provided for @groupsImportFromPhone.
+  /// Item on a group's screen: scan someone's codes from their own phone.
   ///
   /// In en, this message translates to:
   /// **'Import from their phone'**
   String get groupsImportFromPhone;
 
-  /// No description provided for @groupsImportFromPhoneHint.
+  /// Under the 'Import from their phone' item on a group's screen.
   ///
   /// In en, this message translates to:
   /// **'They keep tracking on their own phone and send it here, read-only. Importing them again brings them up to date.'**
   String get groupsImportFromPhoneHint;
 
-  /// No description provided for @groupsDeleteThis.
+  /// Item, in red, at the foot of a group's screen.
   ///
   /// In en, this message translates to:
   /// **'Delete this group'**
   String get groupsDeleteThis;
 
-  /// No description provided for @peopleNameTaken.
+  /// Error under a name field when the name is already used by someone on this phone, including 'You'.
   ///
   /// In en, this message translates to:
   /// **'That name is already used on this phone.'**
@@ -3444,7 +3444,7 @@ abstract class AppLocalizations {
   /// **'Track someone else'**
   String get peopleTrackSomeoneElse;
 
-  /// No description provided for @peopleNameHint.
+  /// Helper under the name field when adding someone to track.
   ///
   /// In en, this message translates to:
   /// **'Just something to tell people apart — a first name, a nickname or an initial.'**
@@ -3462,19 +3462,19 @@ abstract class AppLocalizations {
   /// **'This file isn\'t an Ebb backup.'**
   String get backupNotEbb;
 
-  /// No description provided for @backupNewer.
+  /// Error when restoring or receiving a backup made by a newer Ebb.
   ///
   /// In en, this message translates to:
   /// **'This backup was made by a newer version of Ebb. Update Ebb, then try again.'**
   String get backupNewer;
 
-  /// No description provided for @backupNoOne.
+  /// Error when a backup file has no people in it.
   ///
   /// In en, this message translates to:
   /// **'This backup has no one in it.'**
   String get backupNoOne;
 
-  /// No description provided for @backupSameId.
+  /// Error when a backup file has two people with the same id; the file is damaged.
   ///
   /// In en, this message translates to:
   /// **'This backup looks damaged: two people in it have the same id.'**
@@ -3486,13 +3486,13 @@ abstract class AppLocalizations {
   /// **'{date} is after the day this backup was made.'**
   String backupAfterExport(String date);
 
-  /// No description provided for @backupSameName.
+  /// Error when two people in a backup file share a name. name is as it appears in the file.
   ///
   /// In en, this message translates to:
   /// **'Two people in this backup are both called {name}.'**
   String backupSameName(String name);
 
-  /// No description provided for @backupSameGroupName.
+  /// Error when two groups in a backup file share a name. group is as it appears in the file.
   ///
   /// In en, this message translates to:
   /// **'Two groups in this backup are both called {group}.'**

@@ -5,16 +5,49 @@
     "description": "How the phone's owner is labelled in the list of people, until they set a name."
   },
   "ok": "OK",
+  "@ok": {
+    "description": "Button that dismisses a plain notice, such as the dialog saying the scanned codes hold more than one person."
+  },
   "cancel": "Cancel",
+  "@cancel": {
+    "description": "Button that closes a dialog or editor without doing anything: used in every dialog in the app."
+  },
   "save": "Save",
+  "@save": {
+    "description": "Button that keeps what was entered: in the period editor, the calendar day's sheet and the name dialogs."
+  },
   "delete": "Delete",
+  "@delete": {
+    "description": "Button in the 'Delete this cycle?' dialog that confirms deleting it."
+  },
   "remove": "Remove",
+  "@remove": {
+    "description": "Button that confirms taking someone off this phone: in that person's Settings, and after sending their history to their own phone."
+  },
   "close": "Close",
+  "@close": {
+    "description": "Button at the foot of a day's sheet for an imported, read-only copy of someone's history, which only shows what was logged."
+  },
   "done": "Done",
+  "@done": {
+    "description": "Button at the foot of the Send screen, under the codes, for when the other phone has scanned them."
+  },
   "back": "Back",
+  "@back": {
+    "description": "Generic button label. Not used on any screen at present."
+  },
   "next": "Next",
+  "@next": {
+    "description": "Generic button label. Not used on any screen at present."
+  },
   "edit": "Edit",
+  "@edit": {
+    "description": "Generic button label. Not used on any screen at present."
+  },
   "add": "Add",
+  "@add": {
+    "description": "Generic button label. Not used on any screen at present."
+  },
   "continueAction": "Continue",
   "@continueAction": {
     "description": "A button that goes on to the next step."
@@ -41,6 +74,9 @@
     "description": "Name of the Android notification channel, shown in the phone's notification settings."
   },
   "notifChannelDescription": "Heads-up before your period is expected, and a nudge to log it.",
+  "@notifChannelDescription": {
+    "description": "Description of the Android notification channel, shown under notifChannelName in the phone's notification settings."
+  },
   "notifUpcomingTitle": "{who, select, you{Period expected soon} other{{name}’s period expected soon}}",
   "@notifUpcomingTitle": {
     "description": "Reminder title a few days before a period is expected. who is 'you' for the phone's owner or 'other' for someone else they track; name is that person's name.",
@@ -55,6 +91,7 @@
   },
   "notifUpcomingTomorrow": "{who, select, you{Ebb expects your period to start tomorrow.} other{Ebb expects {name}’s period to start tomorrow.}}",
   "@notifUpcomingTomorrow": {
+    "description": "Reminder body the day before a period is expected, used when the heads-up is set to 1 day ahead. who is 'you' for the phone's owner or 'other' for someone else they track; name is that person's name.",
     "placeholders": {
       "who": {
         "type": "String"
@@ -81,6 +118,7 @@
   },
   "notifTodayTitle": "{who, select, you{Period expected today} other{{name}’s period expected today}}",
   "@notifTodayTitle": {
+    "description": "Reminder title on the day a period is expected. who is 'you' for the phone's owner or 'other' for someone else they track; name is that person's name.",
     "placeholders": {
       "who": {
         "type": "String"
@@ -91,6 +129,9 @@
     }
   },
   "notifTodayBody": "Tap to log how things are going.",
+  "@notifTodayBody": {
+    "description": "Reminder body on the day a period is expected; tapping the notification opens Ebb."
+  },
   "calendarTitle": "Calendar",
   "@calendarTitle": {
     "description": "Title of the calendar screen."
@@ -216,6 +257,7 @@
   },
   "calendarStatusUnlogged": "{who, select, you{Day {day} of your cycle. The end of this period wasn’t logged, so it’s drawn at the usual length.} other{Day {day} of {name}’s cycle. The end of this period wasn’t logged, so it’s drawn at the usual length.}}",
   "@calendarStatusUnlogged": {
+    "description": "On a day's sheet: a day of a period whose end was never logged, so Ebb draws it at the usual period length. day counts from the period's first day. who is 'you' for the phone's owner or 'other' for someone else they track; name is that person's name.",
     "placeholders": {
       "who": {
         "type": "String"
@@ -229,6 +271,9 @@
     }
   },
   "calendarStatusFertile": "In the estimated fertile window. Not reliable enough to use as contraception.",
+  "@calendarStatusFertile": {
+    "description": "On a day's sheet: the day falls in the estimated fertile window. Keep the caution: the estimate is from cycle timing alone and must never read as reliable contraception."
+  },
   "calendarStatusCycleDay": "{who, select, you{Day {day} of your cycle.} other{Day {day} of {name}’s cycle.}}",
   "@calendarStatusCycleDay": {
     "description": "On a day's sheet: which day of the cycle this is, counted from the period's first day.",
@@ -254,7 +299,13 @@
     }
   },
   "calendarPreviousDay": "Previous day",
+  "@calendarPreviousDay": {
+    "description": "Tooltip of the arrow on a day's sheet that moves to the day before."
+  },
   "calendarNextDay": "Next day",
+  "@calendarNextDay": {
+    "description": "Tooltip of the arrow on a day's sheet that moves to the day after."
+  },
   "calendarMoonAt": "{phase}, {time}",
   "@calendarMoonAt": {
     "description": "On a day's sheet: the moon phase and the time it happens, e.g. 'Full moon, 3:14 PM'.",
@@ -268,6 +319,9 @@
     }
   },
   "calendarFutureDay": "Days still to come can’t be logged yet.",
+  "@calendarFutureDay": {
+    "description": "On a day's sheet for a day after today, in place of the logging controls."
+  },
   "calendarMarkStarted": "{who, select, you{Mark as the day your period started} other{Mark as the day {name}’s period started}}",
   "@calendarMarkStarted": {
     "description": "A button on a day's sheet. Worded as something to do, not a fact about the day.",
@@ -310,6 +364,9 @@
     "description": "A button on a day's sheet: moves an already-logged period end to this day."
   },
   "calendarEditPeriod": "Edit this period",
+  "@calendarEditPeriod": {
+    "description": "Button on a day's sheet, on a period day: opens the editor for that period."
+  },
   "calendarRateDay": "{who, select, you{Rate your day, 1–5} other{Rate {name}’s day, 1–5}}",
   "@calendarRateDay": {
     "description": "Heading above five buttons to rate the day from 1 to 5.",
@@ -379,6 +436,9 @@
     "description": "Examples under calendarTemperatureAffected."
   },
   "calendarMucus": "Cervical mucus",
+  "@calendarMucus": {
+    "description": "Heading on a day's sheet above the cervical mucus choices ('How it felt', 'How it looked'). Use the usual term in the language, as a doctor or a fertility-awareness guide would."
+  },
   "calendarMucusFelt": "How it felt",
   "@calendarMucusFelt": {
     "description": "Above the choices for how cervical mucus felt (dry, wet…)."
@@ -457,12 +517,21 @@
     }
   },
   "calendarNothingLogged": "Nothing logged this day.",
+  "@calendarNothingLogged": {
+    "description": "On a day's sheet for an imported, read-only copy of someone's history: no entry was made for that day."
+  },
   "calendarMoonNew": "New moon",
+  "@calendarMoonNew": {
+    "description": "The moon phase, on a day's sheet beside the time it happens and wherever phases are named."
+  },
   "calendarMoonFirstQuarter": "First quarter",
   "@calendarMoonFirstQuarter": {
     "description": "The moon phase."
   },
   "calendarMoonFull": "Full moon",
+  "@calendarMoonFull": {
+    "description": "The moon phase, on a day's sheet beside the time it happens and wherever phases are named."
+  },
   "calendarMoonLastQuarter": "Last quarter",
   "@calendarMoonLastQuarter": {
     "description": "The moon phase."
@@ -534,14 +603,41 @@
     "description": "A named feeling, shown with a face. Each is a kind of feeling, not a score."
   },
   "dayFeelingCalm": "Calm",
+  "@dayFeelingCalm": {
+    "description": "A named feeling, shown with its face on the calendar day's 'How did you feel?' row and counted in the feelings chart. A kind of feeling, not a score."
+  },
   "dayFeelingLoving": "Loving",
+  "@dayFeelingLoving": {
+    "description": "A named feeling, shown with its face on the calendar day's 'How did you feel?' row and counted in the feelings chart. A kind of feeling, not a score."
+  },
   "dayFeelingEnergetic": "Energetic",
+  "@dayFeelingEnergetic": {
+    "description": "A named feeling, shown with its face on the calendar day's 'How did you feel?' row and counted in the feelings chart. A kind of feeling, not a score."
+  },
   "dayFeelingTired": "Tired",
+  "@dayFeelingTired": {
+    "description": "A named feeling, shown with its face on the calendar day's 'How did you feel?' row and counted in the feelings chart. A kind of feeling, not a score."
+  },
   "dayFeelingSad": "Sad",
+  "@dayFeelingSad": {
+    "description": "A named feeling, shown with its face on the calendar day's 'How did you feel?' row and counted in the feelings chart. A kind of feeling, not a score."
+  },
   "dayFeelingAnxious": "Anxious",
+  "@dayFeelingAnxious": {
+    "description": "A named feeling, shown with its face on the calendar day's 'How did you feel?' row and counted in the feelings chart. A kind of feeling, not a score."
+  },
   "dayFeelingIrritable": "Irritable",
+  "@dayFeelingIrritable": {
+    "description": "A named feeling, shown with its face on the calendar day's 'How did you feel?' row and counted in the feelings chart. A kind of feeling, not a score. Irritable: easily annoyed."
+  },
   "dayFeelingAngry": "Angry",
+  "@dayFeelingAngry": {
+    "description": "A named feeling, shown with its face on the calendar day's 'How did you feel?' row and counted in the feelings chart. A kind of feeling, not a score."
+  },
   "dayFeelingConfused": "Confused",
+  "@dayFeelingConfused": {
+    "description": "A named feeling, shown with its face on the calendar day's 'How did you feel?' row and counted in the feelings chart. A kind of feeling, not a score."
+  },
   "chartsTitle": "Charts",
   "@chartsTitle": {
     "description": "Title of the charts screen."
@@ -551,6 +647,9 @@
     "description": "Heading of the chart of how each day went, rated 1 to 5."
   },
   "chartsNoRatings": "No days in this range have a rating yet.",
+  "@chartsNoRatings": {
+    "description": "In the day-rating section of the Charts screen, when no day in the chosen date range has a rating."
+  },
   "chartsBars": "Bars",
   "@chartsBars": {
     "description": "Toggle: draw the day ratings as a bar chart."
@@ -560,7 +659,13 @@
     "description": "Toggle: draw the day ratings as a line chart."
   },
   "chartsRatingCaptionBars": "Each bar is one day’s rating, 1 to 5. Period days are shaded.",
+  "@chartsRatingCaptionBars": {
+    "description": "Caption under the day-rating chart when it is drawn as bars."
+  },
   "chartsRatingCaptionLine": "Each point is one day’s rating, joined to the next day’s when both were rated, 1 to 5. Period days are shaded.",
+  "@chartsRatingCaptionLine": {
+    "description": "Caption under the day-rating chart when it is drawn as a line."
+  },
   "chartsRatingCaptionMoon": "Moons mark the moon’s phases; over a long range, only the new and full moons, or just the full ones.",
   "@chartsRatingCaptionMoon": {
     "description": "Added after the rating chart's caption when moon phases are shown."
@@ -570,6 +675,9 @@
     "description": "Heading of the chart of waking (basal body) temperature and cervical mucus."
   },
   "chartsTemperatureEmpty": "Nothing logged in this range yet. Tap a day on the calendar to add a temperature or cervical mucus.",
+  "@chartsTemperatureEmpty": {
+    "description": "In the temperature section of the Charts screen, when no temperature or cervical mucus was logged in the chosen range."
+  },
   "chartsTemperatureCaption": "Each point is one day’s temperature, in {unit}, joined to the next day’s when both were taken. A hollow point may have been affected, and isn’t joined. Below, cervical mucus: taller bars are wetter (felt) and clearer and stretchier (looked). Period days are shaded.",
   "@chartsTemperatureCaption": {
     "description": "unit is °C or °F. 'Affected' means the person ticked that something, such as illness or little sleep, may have thrown the reading off. 'Felt' and 'looked' are the two rows of mucus bars.",
@@ -592,9 +700,21 @@
     "description": "Toggle: group feelings by the moon's phase."
   },
   "chartsFeelingsEmptyMoon": "Once you’ve picked how you felt on some days in this range, this shows which feelings came around full and new moons.",
+  "@chartsFeelingsEmptyMoon": {
+    "description": "In the feelings section of the Charts screen, grouped around the moon, when no day in the range has a feeling yet."
+  },
   "chartsFeelingsEmptyPeriods": "Once you’ve picked how you felt on some days in this range, and a period has started since, this shows which feelings came when.",
+  "@chartsFeelingsEmptyPeriods": {
+    "description": "In the feelings section, grouped around periods, when there is nothing to count yet: no feelings picked, or none before a period that has started since."
+  },
   "chartsFeelingsCaptionMoon": "How many days each face was picked.",
+  "@chartsFeelingsCaptionMoon": {
+    "description": "Caption under the feelings chart when it is grouped around the moon."
+  },
   "chartsFeelingsCaptionPeriods": "How many days each face was picked. Days since the latest period started aren’t counted until the next one does.",
+  "@chartsFeelingsCaptionPeriods": {
+    "description": "Caption under the feelings chart when it is grouped around periods. Days after the latest period started wait until the next period shows where they fall."
+  },
   "chartsNoneYet": "None yet.",
   "@chartsNoneYet": {
     "description": "Under a feelings group that has no feelings picked."
@@ -892,54 +1012,201 @@
     "description": "Screen-reader name of an emoji face someone can pick for how they felt."
   },
   "faceGrinningCat": "Grinning cat",
+  "@faceGrinningCat": {
+    "description": "Screen-reader name of the 😸 emoji face, in the 'More faces' dialog, which someone can pick for how they felt."
+  },
   "faceCatTearsOfJoy": "Cat with tears of joy",
+  "@faceCatTearsOfJoy": {
+    "description": "Screen-reader name of the 😹 emoji face, in the 'More faces' dialog, which someone can pick for how they felt."
+  },
   "faceCatHeartEyes": "Cat with heart eyes",
+  "@faceCatHeartEyes": {
+    "description": "Screen-reader name of the 😻 emoji face, in the 'More faces' dialog, which someone can pick for how they felt."
+  },
   "faceSmirkingCat": "Smirking cat",
+  "@faceSmirkingCat": {
+    "description": "Screen-reader name of the 😼 emoji face, in the 'More faces' dialog, which someone can pick for how they felt."
+  },
   "faceKissingCat": "Kissing cat",
+  "@faceKissingCat": {
+    "description": "Screen-reader name of the 😽 emoji face, in the 'More faces' dialog, which someone can pick for how they felt."
+  },
   "faceWearyCat": "Weary cat",
+  "@faceWearyCat": {
+    "description": "Screen-reader name of the 🙀 emoji face, in the 'More faces' dialog, which someone can pick for how they felt."
+  },
   "faceCryingCat": "Crying cat",
+  "@faceCryingCat": {
+    "description": "Screen-reader name of the 😿 emoji face, in the 'More faces' dialog, which someone can pick for how they felt."
+  },
   "facePoutingCat": "Pouting cat",
+  "@facePoutingCat": {
+    "description": "Screen-reader name of the 😾 emoji face, in the 'More faces' dialog, which someone can pick for how they felt."
+  },
   "faceAlien": "Alien",
+  "@faceAlien": {
+    "description": "Screen-reader name of the 👽 emoji face, in the 'More faces' dialog, which someone can pick for how they felt."
+  },
   "faceSpaceInvader": "Space invader",
+  "@faceSpaceInvader": {
+    "description": "Screen-reader name of the 👾 emoji face, in the 'More faces' dialog, which someone can pick for how they felt."
+  },
   "faceRobot": "Robot",
+  "@faceRobot": {
+    "description": "Screen-reader name of the 🤖 emoji face, in the 'More faces' dialog, which someone can pick for how they felt."
+  },
   "faceGhost": "Ghost",
+  "@faceGhost": {
+    "description": "Screen-reader name of the 👻 emoji face, in the 'More faces' dialog, which someone can pick for how they felt."
+  },
   "faceSkull": "Skull",
+  "@faceSkull": {
+    "description": "Screen-reader name of the 💀 emoji face, in the 'More faces' dialog, which someone can pick for how they felt."
+  },
   "faceClown": "Clown",
+  "@faceClown": {
+    "description": "Screen-reader name of the 🤡 emoji face, in the 'More faces' dialog, which someone can pick for how they felt."
+  },
   "faceDevil": "Devil",
+  "@faceDevil": {
+    "description": "Screen-reader name of the 😈 emoji face, in the 'More faces' dialog, which someone can pick for how they felt."
+  },
   "faceUnicorn": "Unicorn",
+  "@faceUnicorn": {
+    "description": "Screen-reader name of the 🦄 emoji face, in the 'More faces' dialog, which someone can pick for how they felt."
+  },
   "faceFrog": "Frog",
+  "@faceFrog": {
+    "description": "Screen-reader name of the 🐸 emoji face, in the 'More faces' dialog, which someone can pick for how they felt."
+  },
   "facePartying": "Partying",
+  "@facePartying": {
+    "description": "Screen-reader name of the 🥳 emoji face, in the 'More faces' dialog, which someone can pick for how they felt."
+  },
   "faceCool": "Cool",
+  "@faceCool": {
+    "description": "Screen-reader name of the 😎 emoji face, in the 'More faces' dialog, which someone can pick for how they felt."
+  },
   "faceNerdy": "Nerdy",
+  "@faceNerdy": {
+    "description": "Screen-reader name of the 🤓 emoji face, in the 'More faces' dialog, which someone can pick for how they felt."
+  },
   "faceAngelic": "Angelic",
+  "@faceAngelic": {
+    "description": "Screen-reader name of the 😇 emoji face, in the 'More faces' dialog, which someone can pick for how they felt."
+  },
   "faceHugging": "Hugging",
+  "@faceHugging": {
+    "description": "Screen-reader name of the 🤗 emoji face, in the 'More faces' dialog, which someone can pick for how they felt."
+  },
   "faceSilly": "Silly",
+  "@faceSilly": {
+    "description": "Screen-reader name of the 🤪 emoji face, in the 'More faces' dialog, which someone can pick for how they felt."
+  },
   "faceUpsideDown": "Upside down",
+  "@faceUpsideDown": {
+    "description": "Screen-reader name of the 🙃 emoji face, in the 'More faces' dialog, which someone can pick for how they felt."
+  },
   "faceSmirking": "Smirking",
+  "@faceSmirking": {
+    "description": "Screen-reader name of the 😏 emoji face, in the 'More faces' dialog, which someone can pick for how they felt."
+  },
   "faceGrimacing": "Grimacing",
+  "@faceGrimacing": {
+    "description": "Screen-reader name of the 😬 emoji face, in the 'More faces' dialog, which someone can pick for how they felt."
+  },
   "faceEyeRoll": "Eye roll",
+  "@faceEyeRoll": {
+    "description": "Screen-reader name of the 🙄 emoji face, in the 'More faces' dialog, which someone can pick for how they felt."
+  },
   "faceSpeechless": "Speechless",
+  "@faceSpeechless": {
+    "description": "Screen-reader name of the 😶 emoji face, in the 'More faces' dialog, which someone can pick for how they felt."
+  },
   "facePleading": "Pleading",
+  "@facePleading": {
+    "description": "Screen-reader name of the 🥺 emoji face, in the 'More faces' dialog, which someone can pick for how they felt."
+  },
   "faceSobbing": "Sobbing",
+  "@faceSobbing": {
+    "description": "Screen-reader name of the 😭 emoji face, in the 'More faces' dialog, which someone can pick for how they felt."
+  },
   "faceScreaming": "Screaming",
+  "@faceScreaming": {
+    "description": "Screen-reader name of the 😱 emoji face, in the 'More faces' dialog, which someone can pick for how they felt."
+  },
   "faceFlushed": "Flushed",
+  "@faceFlushed": {
+    "description": "Screen-reader name of the 😳 emoji face, in the 'More faces' dialog, which someone can pick for how they felt."
+  },
   "faceOverwhelmed": "Overwhelmed",
+  "@faceOverwhelmed": {
+    "description": "Screen-reader name of the 🤯 emoji face, in the 'More faces' dialog, which someone can pick for how they felt."
+  },
   "faceWoozy": "Woozy",
+  "@faceWoozy": {
+    "description": "Screen-reader name of the 🥴 emoji face, in the 'More faces' dialog, which someone can pick for how they felt."
+  },
   "faceUnwell": "Unwell",
+  "@faceUnwell": {
+    "description": "Screen-reader name of the 🤒 emoji face, in the 'More faces' dialog, which someone can pick for how they felt."
+  },
   "faceHurting": "Hurting",
+  "@faceHurting": {
+    "description": "Screen-reader name of the 🤕 emoji face, in the 'More faces' dialog, which someone can pick for how they felt."
+  },
   "faceQueasy": "Queasy",
+  "@faceQueasy": {
+    "description": "Screen-reader name of the 🤢 emoji face, in the 'More faces' dialog, which someone can pick for how they felt."
+  },
   "faceTooHot": "Too hot",
+  "@faceTooHot": {
+    "description": "Screen-reader name of the 🥵 emoji face, in the 'More faces' dialog, which someone can pick for how they felt."
+  },
   "faceTooCold": "Too cold",
+  "@faceTooCold": {
+    "description": "Screen-reader name of the 🥶 emoji face, in the 'More faces' dialog, which someone can pick for how they felt."
+  },
   "faceSparklingHeart": "Sparkling heart",
+  "@faceSparklingHeart": {
+    "description": "Screen-reader name of the 💖 emoji face, in the 'More faces' dialog, which someone can pick for how they felt."
+  },
   "faceBrokenHeart": "Broken heart",
+  "@faceBrokenHeart": {
+    "description": "Screen-reader name of the 💔 emoji face, in the 'More faces' dialog, which someone can pick for how they felt."
+  },
   "faceFire": "Fire",
+  "@faceFire": {
+    "description": "Screen-reader name of the 🔥 emoji face, in the 'More faces' dialog, which someone can pick for how they felt."
+  },
   "faceRainbow": "Rainbow",
+  "@faceRainbow": {
+    "description": "Screen-reader name of the 🌈 emoji face, in the 'More faces' dialog, which someone can pick for how they felt."
+  },
   "faceSun": "Sun",
+  "@faceSun": {
+    "description": "Screen-reader name of the ☀️ emoji face, in the 'More faces' dialog, which someone can pick for how they felt."
+  },
   "faceRain": "Rain",
+  "@faceRain": {
+    "description": "Screen-reader name of the 🌧️ emoji face, in the 'More faces' dialog, which someone can pick for how they felt."
+  },
   "faceStorm": "Storm",
+  "@faceStorm": {
+    "description": "Screen-reader name of the ⛈️ emoji face, in the 'More faces' dialog, which someone can pick for how they felt."
+  },
   "faceBlossom": "Blossom",
+  "@faceBlossom": {
+    "description": "Screen-reader name of the 🌸 emoji face, in the 'More faces' dialog, which someone can pick for how they felt."
+  },
   "faceChocolate": "Chocolate",
+  "@faceChocolate": {
+    "description": "Screen-reader name of the 🍫 emoji face, in the 'More faces' dialog, which someone can pick for how they felt."
+  },
   "faceInBed": "In bed",
+  "@faceInBed": {
+    "description": "Screen-reader name of the 🛌 emoji face, in the 'More faces' dialog, which someone can pick for how they felt."
+  },
   "homeCalendar": "Calendar",
   "@homeCalendar": {
     "description": "Button and screen title: the calendar of logged days."
@@ -1025,7 +1292,13 @@
     }
   },
   "homeEndedEarlier": "It ended on an earlier day",
+  "@homeEndedEarlier": {
+    "description": "Small button under 'My period ended today' on the home screen: opens a date picker for the day it ended."
+  },
   "homeStartedEarlier": "It started on an earlier day",
+  "@homeStartedEarlier": {
+    "description": "Small button under 'My period started today' on the home screen: opens a date picker for the day it started."
+  },
   "homeAddLastEnd": "{who, select, you{Add when your last period ended} other{Add when {name}’s last period ended}}",
   "@homeAddLastEnd": {
     "description": "who is 'you' for the phone's owner or 'other' for someone else they track; name is that person's name.",
@@ -1063,8 +1336,17 @@
     }
   },
   "homeMissedOne": "Ebb has assumed a period went unlogged and estimated from there. If you remember when it started, add it to put the estimate right.",
+  "@homeMissedOne": {
+    "description": "Detail in the home screen's cycle card, under homeNoPeriodSince, when the gap is long enough for one period to have gone unlogged."
+  },
   "homeMissedSome": "Ebb has assumed some periods went unlogged and estimated from there. If you remember when any started, add them to put the estimate right.",
+  "@homeMissedSome": {
+    "description": "Detail in the home screen's cycle card, under homeNoPeriodSince, when the gap is long enough for two or more periods to have gone unlogged."
+  },
   "homeWelcome": "Welcome to Ebb",
+  "@homeWelcome": {
+    "description": "Headline of the cycle card for the phone's owner when nothing is logged yet (homeNothingYet for someone else they track)."
+  },
   "homeNothingYet": "Nothing logged yet",
   "@homeNothingYet": {
     "description": "Headline for someone else the owner tracks, with nothing logged."
@@ -1112,6 +1394,9 @@
     }
   },
   "homeTellEnd": "Let Ebb know when it ends so the estimate stays accurate.",
+  "@homeTellEnd": {
+    "description": "Detail under 'Day N of your period' in the cycle card while a period is in progress."
+  },
   "homeDaysUntil": "{who, select, you{{days, plural, other{About {days} days until your period is expected.}}} other{{days, plural, other{About {days} days until {name}’s period is expected.}}}}",
   "@homeDaysUntil": {
     "description": "days is always 2 or more. who is 'you' for the phone's owner or 'other' for someone else they track; name is that person's name.",
@@ -1201,7 +1486,13 @@
     "description": "Key under the cycle ring: the dot for today."
   },
   "homeAddPastPeriods": "Add past periods",
+  "@homeAddPastPeriods": {
+    "description": "Button in the cycle card when no period is recorded yet: opens the editor for a past period."
+  },
   "homeAddMissedPeriod": "Add a missed period",
+  "@homeAddMissedPeriod": {
+    "description": "Button in the cycle card when Ebb assumes a period went unlogged: opens the editor to add it."
+  },
   "homeNextPeriod": "Next period",
   "@homeNextPeriod": {
     "description": "Heading over the estimated date of the next period."
@@ -1219,9 +1510,16 @@
     }
   },
   "homeFertileWindow": "Estimated fertile window",
+  "@homeFertileWindow": {
+    "description": "Heading in the 'Next period' card over the estimated fertile window's dates, shown only when the setting is on."
+  },
   "homeFertileWarning": "An estimate based on cycle timing alone. Not reliable enough to use as contraception.",
+  "@homeFertileWarning": {
+    "description": "Under the fertile window dates. Keep the caution: not reliable as contraception."
+  },
   "homeConfidenceUnlogged": "Estimated from the last period logged, on {date}, so it may be less accurate than usual.",
   "@homeConfidenceUnlogged": {
+    "description": "Note under the next-period estimate when Ebb assumes periods went unlogged. date is the last logged period's start, already formatted short, e.g. 'Jun 3'.",
     "placeholders": {
       "date": {
         "type": "String"
@@ -1229,9 +1527,16 @@
     }
   },
   "homeConfidenceNone": "Nothing logged yet.",
+  "@homeConfidenceNone": {
+    "description": "Note under the next-period estimate when there is no history to go on."
+  },
   "homeConfidenceTypical": "Based on a typical 28-day cycle for now. This will get more accurate as you log.",
+  "@homeConfidenceTypical": {
+    "description": "Note under the estimate when only one period is logged, so no cycle length has been measured yet."
+  },
   "homeConfidenceFew": "{count, plural, =1{Based on 1 cycle so far, so it may be less accurate for now.} other{Based on {count} cycles so far, so it may be less accurate for now.}}",
   "@homeConfidenceFew": {
+    "description": "Note under the estimate when only a few cycles have been measured. count is 1 or more.",
     "placeholders": {
       "count": {
         "type": "int"
@@ -1279,12 +1584,33 @@
     "description": "Milestone name, in History and on the celebration."
   },
   "homeMilestoneFirstCycle": "First full cycle",
+  "@homeMilestoneFirstCycle": {
+    "description": "Milestone name, in History and on the celebration: the first full cycle, start to start, logged."
+  },
   "homeMilestoneThreeCycles": "Three full cycles",
+  "@homeMilestoneThreeCycles": {
+    "description": "Milestone name, in History and on the celebration: three full cycles logged."
+  },
   "homeMilestoneSixCycles": "Six full cycles",
+  "@homeMilestoneSixCycles": {
+    "description": "Milestone name, in History and on the celebration: six full cycles logged."
+  },
   "homeMilestoneOneYear": "A year of history",
+  "@homeMilestoneOneYear": {
+    "description": "Milestone name, in History and on the celebration: a year of history in Ebb."
+  },
   "homeMilestoneTwoYears": "Two years of history",
+  "@homeMilestoneTwoYears": {
+    "description": "Milestone name, in History and on the celebration: two years of history in Ebb."
+  },
   "homeMilestoneFiveYears": "Five years of history",
+  "@homeMilestoneFiveYears": {
+    "description": "Milestone name, in History and on the celebration: five years of history in Ebb."
+  },
   "homeMilestoneFirstBackup": "First backup saved",
+  "@homeMilestoneFirstBackup": {
+    "description": "Milestone name, in History and on the celebration: the first backup file saved."
+  },
   "homeMilestoneFirstPeriodMessage": "{who, select, you{Your first period in Ebb.} other{{name}’s first period in Ebb.}}",
   "@homeMilestoneFirstPeriodMessage": {
     "description": "Said when the milestone is reached. About the record, never the body. who is 'you' for the phone's owner or 'other' for someone else they track; name is that person's name.",
@@ -1310,7 +1636,13 @@
     }
   },
   "homeMilestoneThreeCyclesMessage": "Three full cycles logged. Each one gives Ebb more to go on.",
+  "@homeMilestoneThreeCyclesMessage": {
+    "description": "Said on the celebration when the milestone is reached. About the record, never the body."
+  },
   "homeMilestoneSixCyclesMessage": "Six full cycles logged: as many as Ebb looks at for each estimate.",
+  "@homeMilestoneSixCyclesMessage": {
+    "description": "Said when the milestone is reached. Six is how many recent cycles the estimate looks at, so this is a fact about the count, not a promise the estimate is now right."
+  },
   "homeMilestoneOneYearMessage": "{who, select, you{A year of your history in Ebb.} other{A year of {name}’s history in Ebb.}}",
   "@homeMilestoneOneYearMessage": {
     "description": "who is 'you' for the phone's owner or 'other' for someone else they track; name is that person's name.",
@@ -1348,15 +1680,40 @@
     }
   },
   "homeMilestoneFirstBackupMessage": "Your first backup is saved. Keep a copy somewhere other than this phone.",
+  "@homeMilestoneFirstBackupMessage": {
+    "description": "Said when the first backup file is saved, in place of the usual settingsBackupSaved message; give the same advice."
+  },
   "homeProblemStartInFuture": "The start date can't be in the future.",
+  "@homeProblemStartInFuture": {
+    "description": "Error in red in the period editor when the start date picked is after today; Save stays disabled."
+  },
   "homeProblemEndInFuture": "The end date can't be in the future.",
+  "@homeProblemEndInFuture": {
+    "description": "Error in red in the period editor when the end date picked is after today; Save stays disabled."
+  },
   "homeProblemEndBeforeStart": "The end date is before the start date.",
+  "@homeProblemEndBeforeStart": {
+    "description": "Error in red in the period editor when the end date is earlier than the start; Save stays disabled."
+  },
   "homeProblemDuplicateStart": "A period starting on that day is already recorded.",
+  "@homeProblemDuplicateStart": {
+    "description": "Error in red in the period editor when another period already starts on that day; Save stays disabled."
+  },
   "homeProblemOverlapsPrevious": "This overlaps the period before it. Check the earlier entry’s end date.",
+  "@homeProblemOverlapsPrevious": {
+    "description": "Error in red in the period editor when this period starts before the one before it ended; Save stays disabled."
+  },
   "homeProblemOverlapsNext": "This overlaps the period after it. Check the end date.",
+  "@homeProblemOverlapsNext": {
+    "description": "Error in red in the period editor when this period runs into the next one's start; Save stays disabled."
+  },
   "homeDeleteCycleTitle": "Delete this cycle?",
+  "@homeDeleteCycleTitle": {
+    "description": "Title of the dialog asking before a period is deleted from History or the calendar."
+  },
   "homeDeleteCycleBody": "The entry starting {date} will be removed. This cannot be undone.",
   "@homeDeleteCycleBody": {
+    "description": "Body of the dialog asking before a period is deleted. date is the period's start, already formatted, e.g. 'Jun 3, 2026'.",
     "placeholders": {
       "date": {
         "type": "String"
@@ -1376,6 +1733,9 @@
     "description": "Title of the sheet for entering an earlier period."
   },
   "homeEditPeriod": "Edit period",
+  "@homeEditPeriod": {
+    "description": "Title of the period editor sheet for an existing period (homeAddPastPeriodTitle is for a new one)."
+  },
   "homeStarted": "Started",
   "@homeStarted": {
     "description": "Label over the day the period started."
@@ -1393,20 +1753,41 @@
     "description": "The period's end date was never entered."
   },
   "homeClearEnd": "Clear end date",
+  "@homeClearEnd": {
+    "description": "Tooltip of the × beside the end date in the period editor: forgets the end date."
+  },
   "homeCountInPredictions": "Count this cycle in predictions",
+  "@homeCountInPredictions": {
+    "description": "Switch in the period editor, on by default: whether this cycle feeds the estimates."
+  },
   "homeCountInPredictionsHint": "Turn off for a cycle that doesn’t reflect the usual rhythm — illness, a medication change, a pregnancy loss. It stays in your history either way.",
+  "@homeCountInPredictionsHint": {
+    "description": "Under the 'Count this cycle in predictions' switch. Name the examples plainly, no euphemism."
+  },
   "homeNote": "Note",
   "@homeNote": {
     "description": "Label of the note field when editing a period from the home screen."
   },
   "homeNoteExcludedHint": "Why it isn’t counted, so it’s easy to remember later.",
+  "@homeNoteExcludedHint": {
+    "description": "Helper under the period editor's note field when the cycle is switched out of predictions."
+  },
   "homeNoteHint": "Anything worth remembering about this one.",
+  "@homeNoteHint": {
+    "description": "Helper under the period editor's note field."
+  },
   "homeDeletePeriod": "Delete this period",
+  "@homeDeletePeriod": {
+    "description": "Button at the foot of the period editor, for an existing period."
+  },
   "homeAddPastPeriod": "Add past period",
   "@homeAddPastPeriod": {
     "description": "Button in History. homeLongGap and homeNothingSince quote it, so keep them the same."
   },
   "homeHistoryEmpty": "No cycles recorded yet. If you remember when recent periods started, adding them gives Ebb a head start.",
+  "@homeHistoryEmpty": {
+    "description": "The History screen when no cycle is recorded."
+  },
   "homeMilestones": "Milestones",
   "@homeMilestones": {
     "description": "Heading in History over the milestones reached."
@@ -1421,7 +1802,13 @@
     }
   },
   "homePeriodInProgress": "Period in progress",
+  "@homePeriodInProgress": {
+    "description": "In History, in place of the period length, for the current period that has not ended."
+  },
   "homeEndNotRecorded": "End not recorded",
+  "@homeEndNotRecorded": {
+    "description": "In History, in place of the period length, for a past period whose end was never logged."
+  },
   "homeLongGap": "A long gap. If a period here wasn’t logged, add it with “Add past period”.",
   "@homeLongGap": {
     "description": "Quotes the button homeAddPastPeriod."
@@ -1456,6 +1843,9 @@
     "description": "Menu of date ranges for charts and sending."
   },
   "homeSpanMonths6": "Last 6 months",
+  "@homeSpanMonths6": {
+    "description": "Menu of date ranges for charts and sending: the last 6 months."
+  },
   "homeSpanYear": "Last year",
   "@homeSpanYear": {
     "description": "The last 12 months, not the previous calendar year."
@@ -1465,11 +1855,17 @@
     "description": "How far back the home screen's charts and history go: all of it."
   },
   "homeSpanCustom": "Choose dates…",
+  "@homeSpanCustom": {
+    "description": "Menu of date ranges: opens Android's date-range picker, so it ends with an ellipsis like any menu item that asks more."
+  },
   "settingsTitle": "Settings",
   "@settingsTitle": {
     "description": "Title of the Settings screen."
   },
   "settingsNotificationsOff": "Notifications are turned off for Ebb in system settings.",
+  "@settingsNotificationsOff": {
+    "description": "Message when turning reminders on and the phone refuses notification permission."
+  },
   "settingsNoBrowser": "No browser to open it with. Visit {website} instead.",
   "@settingsNoBrowser": {
     "description": "website is the address of Ebb's website.",
@@ -1480,11 +1876,29 @@
     }
   },
   "settingsNothingToBackUp": "Nothing to back up yet.",
+  "@settingsNothingToBackUp": {
+    "description": "Message when 'Back up to a file' is tapped with nothing logged for anyone."
+  },
   "settingsBackupSaved": "Backup saved. Keep a copy somewhere other than this phone.",
+  "@settingsBackupSaved": {
+    "description": "Message after a backup file is saved. homeMilestoneFirstBackupMessage gives the same advice the first time."
+  },
   "settingsBackupNotSaved": "The backup couldn't be saved there. Try another location.",
+  "@settingsBackupNotSaved": {
+    "description": "Message when the phone could not write the backup where it was pointed."
+  },
   "settingsNoPicker": "This phone has no file picker for Ebb to use. Sending to another phone works without one.",
+  "@settingsNoPicker": {
+    "description": "Message when the phone has no file picker, so a backup can't be saved or opened; sending by codes needs none."
+  },
   "settingsFileTooLarge": "That file is too large to be an Ebb backup.",
+  "@settingsFileTooLarge": {
+    "description": "Message when the file picked to restore is far bigger than any Ebb backup could be."
+  },
   "settingsFileUnreadable": "That file couldn't be read.",
+  "@settingsFileUnreadable": {
+    "description": "Message when the file picked to restore could not be opened at all."
+  },
   "settingsNotABackup": "This file isn't an Ebb backup.",
   "@settingsNotABackup": {
     "description": "Message shown in Settings after picking a file to restore that isn't an Ebb backup."
@@ -1588,6 +2002,9 @@
     }
   },
   "settingsAddThisHistoryTitle": "Add this history?",
+  "@settingsAddThisHistoryTitle": {
+    "description": "Title of the dialog when a backup of one unnamed person arrives on a phone that already has history (settingsAddNamedTitle when they have a name)."
+  },
   "settingsAddNamedTitle": "Add {name}?",
   "@settingsAddNamedTitle": {
     "description": "name is the name of the person whose history arrived.",
@@ -1619,10 +2036,20 @@
     }
   },
   "settingsAddAsNew": "Add as someone new",
+  "@settingsAddAsNew": {
+    "description": "Button in that dialog: add the arrived person alongside everyone already here."
+  },
   "settingsWhoIsThis": "Who is this?",
+  "@settingsWhoIsThis": {
+    "description": "Title of the name dialog after choosing to add an arrived person as someone new."
+  },
   "settingsWhoIsThisHint": "A name to tell them apart on this phone.",
+  "@settingsWhoIsThisHint": {
+    "description": "Helper under the name field in that dialog."
+  },
   "settingsPersonAdded": "{name} added.",
   "@settingsPersonAdded": {
+    "description": "Message after adding an arrived person. name is what the user typed.",
     "placeholders": {
       "name": {
         "type": "String"
@@ -1630,7 +2057,13 @@
     }
   },
   "settingsRestored": "Done. Ebb has been updated.",
+  "@settingsRestored": {
+    "description": "Message after a backup replaced everything in Ebb."
+  },
   "settingsReplaceTitle": "Replace what’s in Ebb?",
+  "@settingsReplaceTitle": {
+    "description": "Title of the dialog asking before a backup replaces everything in Ebb."
+  },
   "settingsReplaceSaved": "Saved {date}, with {periods}.",
   "@settingsReplaceSaved": {
     "description": "About the backup being restored. date is a date, written the local way, e.g. \"Oct 22, 2026\". periods is a count of periods, worded by settingsPeriodCount, e.g. \"3 periods\".",
@@ -1672,11 +2105,29 @@
     "description": "Button that confirms replacing everything with a backup."
   },
   "settingsDeleteAllTitle": "Delete all data?",
+  "@settingsDeleteAllTitle": {
+    "description": "Title of the dialog asking before all data is deleted."
+  },
   "settingsDeleteAllBody": "Every cycle and note will be permanently erased. Ebb keeps no other copy, so this cannot be undone unless you have saved a backup file.",
+  "@settingsDeleteAllBody": {
+    "description": "Body of the 'Delete all data?' dialog when only the owner is tracked."
+  },
   "settingsDeleteAllBodyEveryone": "Every cycle and note, for everyone on this phone, will be permanently erased. Ebb keeps no other copy, so this cannot be undone unless you have saved a backup file.",
+  "@settingsDeleteAllBodyEveryone": {
+    "description": "Body of the 'Delete all data?' dialog when more than one person is tracked on the phone."
+  },
   "settingsDeleteEverything": "Delete everything",
+  "@settingsDeleteEverything": {
+    "description": "Button that confirms deleting all data."
+  },
   "settingsAllDeleted": "All data deleted.",
+  "@settingsAllDeleted": {
+    "description": "Message after all data was deleted."
+  },
   "settingsYourName": "Your name",
+  "@settingsYourName": {
+    "description": "Settings item, and the title of the name dialog it opens, for the owner's own name (settingsName and settingsRename are for someone else)."
+  },
   "settingsRename": "Rename",
   "@settingsRename": {
     "description": "Settings item that renames a person you track (not yourself)."
@@ -1696,6 +2147,7 @@
   },
   "settingsRemoveBody": "Every cycle and note for {name} will be permanently erased. Nobody else’s history is affected.",
   "@settingsRemoveBody": {
+    "description": "Body of the dialog asking before someone you track is removed from this phone. name is that person's name, as typed by the user.",
     "placeholders": {
       "name": {
         "type": "String"
@@ -1780,19 +2232,37 @@
     }
   },
   "settingsFertile": "Show fertile window estimate",
+  "@settingsFertile": {
+    "description": "Switch in Settings, offered only to the phone's owner; off by default."
+  },
   "settingsFertileHint": "Off by default. An estimate from cycle timing only — not reliable enough to use as contraception.",
+  "@settingsFertileHint": {
+    "description": "Under the 'Show fertile window estimate' switch. Keep the caution: not reliable as contraception."
+  },
   "settingsMoon": "Show moon phases",
+  "@settingsMoon": {
+    "description": "Switch in Settings: draw moon phases on the calendar and charts."
+  },
   "settingsMoonHint": "New, first quarter, full and last quarter, on the calendar and charts.",
+  "@settingsMoonHint": {
+    "description": "Under the 'Show moon phases' switch, naming the four phases: use the same words as calendarMoonNew, calendarMoonFirstQuarter, calendarMoonFull and calendarMoonLastQuarter."
+  },
   "settingsTemperature": "Track temperature and cervical mucus",
   "@settingsTemperature": {
     "description": "Basal body temperature on waking, and cervical mucus, as in fertility-awareness charting."
   },
   "settingsTemperatureHint": "On each day of the calendar, with a temperature chart. Recorded and drawn, never used to estimate anything.",
+  "@settingsTemperatureHint": {
+    "description": "Under the 'Track temperature and cervical mucus' switch. Temperature is only recorded and charted; it never feeds the estimate."
+  },
   "settingsTemperatureIn": "Temperature in",
   "@settingsTemperatureIn": {
     "description": "Followed by a choice of °C or °F."
   },
   "settingsCelebrate": "Celebrate milestones",
+  "@settingsCelebrate": {
+    "description": "Switch in Settings: the small on-screen celebration when a milestone is reached."
+  },
   "settingsCelebrateHint": "{who, select, you{A small celebration for things like a first full cycle or a year of history, listed in your History.} other{A small celebration for things like a first full cycle or a year of history, listed in {name}’s History.}}",
   "@settingsCelebrateHint": {
     "description": "History is the name of a screen. who is \"you\" for the phone's owner, \"other\" for someone else they track; name is that person's name.",
@@ -1806,11 +2276,17 @@
     }
   },
   "settingsPeople": "People",
+  "@settingsPeople": {
+    "description": "Settings section heading: the people tracked on this phone."
+  },
   "settingsAddSomeone": "Add someone",
   "@settingsAddSomeone": {
     "description": "Settings item: start tracking another person on this phone."
   },
   "settingsTrackSomeoneElse": "Track someone else too",
+  "@settingsTrackSomeoneElse": {
+    "description": "Settings item, while only the owner is tracked, that adds a second person (settingsAddSomeone once there are more)."
+  },
   "settingsTrackSomeoneElseHint": "For example, a child who’s just starting.",
   "@settingsTrackSomeoneElseHint": {
     "description": "Starting to have periods."
@@ -1820,10 +2296,25 @@
     "description": "Settings section heading: backups, and moving history to another phone."
   },
   "settingsBackUp": "Back up to a file",
+  "@settingsBackUp": {
+    "description": "Settings item that saves a backup file through the phone's own Save picker."
+  },
   "settingsBackUpHint": "Save your history to a file, wherever you choose.",
+  "@settingsBackUpHint": {
+    "description": "Under 'Back up to a file' when only the owner is tracked."
+  },
   "settingsBackUpHintEveryone": "Save everyone’s history to a file, wherever you choose.",
+  "@settingsBackUpHintEveryone": {
+    "description": "Under 'Back up to a file' when more than one person is tracked."
+  },
   "settingsRestore": "Restore from a backup",
+  "@settingsRestore": {
+    "description": "Settings item that opens a backup file."
+  },
   "settingsRestoreHint": "Replaces what is in Ebb now.",
+  "@settingsRestoreHint": {
+    "description": "Under 'Restore from a backup'. A backup normally replaces everything; only a file holding a single person is also offered as an addition or update."
+  },
   "settingsSend": "Send to another phone",
   "@settingsSend": {
     "description": "Settings item that opens the Send to another phone screen (history as QR codes)."
@@ -1841,22 +2332,61 @@
     "description": "Settings item that opens the Receive from another phone screen."
   },
   "settingsReceiveHint": "Scan the codes to add someone, update them, or replace everything.",
+  "@settingsReceiveHint": {
+    "description": "Under 'Receive from another phone': what scanning the codes can do."
+  },
   "settingsAdvanced": "Advanced",
+  "@settingsAdvanced": {
+    "description": "Settings section heading, holding the groups option."
+  },
   "settingsGroups": "Groups",
   "@settingsGroups": {
     "description": "Settings item that opens the Groups screen."
   },
   "settingsGroupsHint": "For circles and clubs that track together: gather people under a name. Turning this off hides groups without deleting them.",
+  "@settingsGroupsHint": {
+    "description": "Under the Groups switch, which is phone-wide and off by default."
+  },
   "settingsManageGroups": "Manage groups",
+  "@settingsManageGroups": {
+    "description": "Settings item under the Groups switch, shown while it is on: opens the Groups screen."
+  },
   "settingsAboutEbb": "About Ebb",
+  "@settingsAboutEbb": {
+    "description": "Settings section heading: help, your data, website and feedback."
+  },
   "settingsHowEbbWorks": "How Ebb works",
+  "@settingsHowEbbWorks": {
+    "description": "Settings item, and the title of the help screen it opens."
+  },
   "settingsHowEbbWorksHint": "Logging, estimates, backups and more.",
+  "@settingsHowEbbWorksHint": {
+    "description": "Under 'How Ebb works': what the help screen covers."
+  },
   "settingsYourData": "Your data",
+  "@settingsYourData": {
+    "description": "Settings item, and the title of the 'Your data' screen it opens, which explains where the data lives."
+  },
   "settingsYourDataHint": "Where it lives and who can see it.",
+  "@settingsYourDataHint": {
+    "description": "Under the 'Your data' item in Settings."
+  },
   "settingsWebsite": "Website",
+  "@settingsWebsite": {
+    "description": "Settings item that opens Ebb's website in the phone's browser; the address is shown under it."
+  },
   "settingsSendFeedback": "Send feedback",
+  "@settingsSendFeedback": {
+    "description": "Settings item that opens the feedback form on Ebb's website in the phone's browser."
+  },
   "settingsSendFeedbackHint": "A form on the website, in your browser.",
+  "@settingsSendFeedbackHint": {
+    "description": "Under 'Send feedback': the form is on the website, not in Ebb, so only what is typed there is sent."
+  },
   "settingsDeleteAll": "Delete all data",
+  "@settingsDeleteAll": {
+    "description": "Settings item, in red, at the foot of Settings."
+  },
   "settingsVersion": "Ebb {version}\nMade by SuperDaveLab",
   "@settingsVersion": {
     "description": "At the foot of Settings. version is like \"0.9.0 (900)\".",
@@ -1871,50 +2401,89 @@
     "description": "Heading of the \"Your data\" screen. Warm, ordinary, not secretive."
   },
   "settingsDataLede": "Ebb is built so that the question \"what do they do with my data?\" has a boring answer: nothing, because we never receive it.",
+  "@settingsDataLede": {
+    "description": "Opening paragraph of the \"Your data\" screen, under settingsDataHeadline. The quoted question is one a user might ask; the answer is deliberately boring. Calm, not secretive."
+  },
   "settingsDataTradeOff": "One trade-off worth knowing: because there is no cloud backup, a lost or wiped phone means lost history. If that matters to you, save a backup file from Settings now and then, and keep it somewhere other than this phone.",
+  "@settingsDataTradeOff": {
+    "description": "Closing note on the \"Your data\" screen: the honest cost of having no cloud backup, and what to do about it."
+  },
   "settingsWhereDataLives": "Where your data lives",
+  "@settingsWhereDataLives": {
+    "description": "Item at the foot of the help screen that opens the \"Your data\" screen."
+  },
   "settingsWhereDataLivesHint": "Your data, and who can see it.",
+  "@settingsWhereDataLivesHint": {
+    "description": "Under that item at the foot of the help screen."
+  },
   "settingsDataStaysTitle": "It stays on your phone",
+  "@settingsDataStaysTitle": {
+    "description": "Heading of one point on the \"Your data\" screen, which says plainly where the data lives; its body is settingsDataStaysBody."
+  },
   "settingsDataStaysBody": "Everything you log is written to a database on this device. There is no account to create and no server to sync with. It only goes anywhere else if you move it yourself — a backup file, or another phone you send it to.",
   "@settingsDataStaysBody": {
     "description": "One point on the \"Your data\" screen, which says plainly where the data lives. Calm and matter-of-fact; tracking a cycle is ordinary."
   },
   "settingsDataUnseenTitle": "We cannot see it",
+  "@settingsDataUnseenTitle": {
+    "description": "Heading of one point on the \"Your data\" screen, which says plainly where the data lives; its body is settingsDataUnseenBody."
+  },
   "settingsDataUnseenBody": "Ebb is built without permission to use the internet at all. Android enforces that, and you can verify it yourself in the app's permission list.",
   "@settingsDataUnseenBody": {
     "description": "One point on the \"Your data\" screen, which says plainly where the data lives. Calm and matter-of-fact; tracking a cycle is ordinary."
   },
   "settingsDataPermissionsTitle": "What the permissions are for",
+  "@settingsDataPermissionsTitle": {
+    "description": "Heading of one point on the \"Your data\" screen, which says plainly where the data lives; its body is settingsDataPermissionsBody."
+  },
   "settingsDataPermissionsBody": "Notifications, for reminders. Camera, only while you receive history from another phone — it reads the codes and nothing is recorded or kept. Ebb also re-arms your reminders when the phone restarts. That is the whole list.",
   "@settingsDataPermissionsBody": {
     "description": "One point on the \"Your data\" screen, which says plainly where the data lives. Calm and matter-of-fact; tracking a cycle is ordinary."
   },
   "settingsDataNotForSaleTitle": "There is nothing to sell",
+  "@settingsDataNotForSaleTitle": {
+    "description": "Heading of one point on the \"Your data\" screen, which says plainly where the data lives; its body is settingsDataNotForSaleBody."
+  },
   "settingsDataNotForSaleBody": "No analytics, no advertising, no third-party libraries phoning home. Since your data never reaches us, there is no copy of it for anyone to buy, subpoena, or leak.",
   "@settingsDataNotForSaleBody": {
     "description": "One point on the \"Your data\" screen, which says plainly where the data lives. Calm and matter-of-fact; tracking a cycle is ordinary."
   },
   "settingsDataEraseTitle": "You can erase it instantly",
+  "@settingsDataEraseTitle": {
+    "description": "Heading of one point on the \"Your data\" screen, which says plainly where the data lives; its body is settingsDataEraseBody."
+  },
   "settingsDataEraseBody": "Deleting your data in Settings, or uninstalling Ebb, removes everything Ebb holds. Ebb keeps no other copy — the only ones are backup files you saved or phones you sent it to yourself.",
   "@settingsDataEraseBody": {
     "description": "One point on the \"Your data\" screen, which says plainly where the data lives. Calm and matter-of-fact; tracking a cycle is ordinary."
   },
   "settingsDataOpenSourceTitle": "You can check our work",
+  "@settingsDataOpenSourceTitle": {
+    "description": "Heading of one point on the \"Your data\" screen, which says plainly where the data lives; its body is settingsDataOpenSourceBody."
+  },
   "settingsDataOpenSourceBody": "Ebb is open source under the GNU General Public License. Anyone can read exactly what it does, and the published builds are made from that same code.",
   "@settingsDataOpenSourceBody": {
     "description": "One point on the \"Your data\" screen, which says plainly where the data lives. Calm and matter-of-fact; tracking a cycle is ordinary."
   },
   "settingsHelpLoggingTitle": "Logging a period",
+  "@settingsHelpLoggingTitle": {
+    "description": "Heading of the help topic about logging a period."
+  },
   "settingsHelpLoggingBody": "Tap “My period started today” on the first day of bleeding, and “My period ended today” on the last.\n\nForgot to log it? Use “It started on an earlier day” instead. Any past period can be added or corrected in History (the clock icon): tap one to change its dates or add a note.\n\nIf no end is logged within two weeks, Ebb stops treating the period as still going and offers to add the end instead.",
   "@settingsHelpLoggingBody": {
     "description": "A topic on the \"How Ebb works\" help screen. Words in quotation marks name buttons and settings elsewhere in the app: use exactly the same translation as those."
   },
   "settingsHelpEstimateTitle": "How the estimate works",
+  "@settingsHelpEstimateTitle": {
+    "description": "Heading of the help topic about how the next-period estimate is made."
+  },
   "settingsHelpEstimateBody": "Ebb looks at the gaps between the starts of your recent periods — up to the last six.\n\nWith only a little history it leans on a typical 28-day cycle, and says so. The more you log, the more the estimate is your own rhythm.\n\nIt shows a range rather than a single date, and tells you how sure it is. If your cycles vary a lot, the range is wider.\n\nIf a period is late, Ebb says how late. If nothing is logged for nearly two cycles, it assumes a period went unlogged, estimates from there, and says so. History points out long gaps, and adding a missed period puts the estimate right.",
   "@settingsHelpEstimateBody": {
     "description": "A topic on the \"How Ebb works\" help screen. Words in quotation marks name buttons and settings elsewhere in the app: use exactly the same translation as those."
   },
   "settingsHelpExcludeTitle": "A cycle that shouldn’t count",
+  "@settingsHelpExcludeTitle": {
+    "description": "Heading of the help topic about leaving a cycle out of predictions."
+  },
   "settingsHelpExcludeBody": "Illness, a medication change or a pregnancy loss can throw one cycle right off, and it would pull the estimate with it.\n\nIn History, tap that period and turn off “Count this cycle in predictions”. It stays in your history; the estimate just ignores it. Add a note there too, so you remember why.",
   "@settingsHelpExcludeBody": {
     "description": "A topic on the \"How Ebb works\" help screen. Words in quotation marks name buttons and settings elsewhere in the app: use exactly the same translation as those."
@@ -1928,6 +2497,9 @@
     "description": "A topic on the \"How Ebb works\" help screen. Words in quotation marks name buttons and settings elsewhere in the app: use exactly the same translation as those."
   },
   "settingsHelpRatingsTitle": "Day ratings, feelings and charts",
+  "@settingsHelpRatingsTitle": {
+    "description": "Heading of the help topic about day ratings, feelings and charts."
+  },
   "settingsHelpRatingsBody": "Tap any day on the calendar to rate it from 1 to 5, and to pick a face for how you felt. Both are optional; tap a choice again to clear it.\n\nCharts (the chart icon) shows each day’s rating over the dates you choose, with periods shaded, and which feelings came during and before periods. With moon phases turned on in Settings, the moon is there too.\n\nThe charts show what you logged. They don’t say what it means — that’s yours to judge.",
   "@settingsHelpRatingsBody": {
     "description": "A topic on the \"How Ebb works\" help screen. Words in quotation marks name buttons and settings elsewhere in the app: use exactly the same translation as those."
@@ -1949,31 +2521,49 @@
     "description": "A topic on the \"How Ebb works\" help screen. Words in quotation marks name buttons and settings elsewhere in the app: use exactly the same translation as those."
   },
   "settingsHelpFertileTitle": "The fertile window",
+  "@settingsHelpFertileTitle": {
+    "description": "Heading of the help topic about the fertile window estimate."
+  },
   "settingsHelpFertileBody": "Off unless you turn it on in Settings. It’s estimated from cycle timing alone, which is not reliable enough to use as contraception.",
   "@settingsHelpFertileBody": {
     "description": "A topic on the \"How Ebb works\" help screen. Words in quotation marks name buttons and settings elsewhere in the app: use exactly the same translation as those."
   },
   "settingsHelpBackupTitle": "Backing up",
+  "@settingsHelpBackupTitle": {
+    "description": "Heading of the help topic about backup files."
+  },
   "settingsHelpBackupBody": "There’s no cloud copy of your history, so a lost or wiped phone means lost history.\n\nSettings → “Back up to a file” saves everything as a file, wherever you choose. Keep it somewhere other than this phone. “Restore from a backup” brings it back.",
   "@settingsHelpBackupBody": {
     "description": "A topic on the \"How Ebb works\" help screen. Words in quotation marks name buttons and settings elsewhere in the app: use exactly the same translation as those."
   },
   "settingsHelpMovingTitle": "Moving to a new phone",
+  "@settingsHelpMovingTitle": {
+    "description": "Heading of the help topic about moving history to a new phone."
+  },
   "settingsHelpMovingBody": "On the old phone: Settings → “Send to another phone”. On the new one: Settings → “Receive from another phone”, and point the camera at the screen.\n\nLonger histories take a few codes, which change on their own; the new phone collects them in any order. No internet is involved — one phone shows, the other looks.",
   "@settingsHelpMovingBody": {
     "description": "A topic on the \"How Ebb works\" help screen. Words in quotation marks name buttons and settings elsewhere in the app: use exactly the same translation as those."
   },
   "settingsHelpSomeoneElseTitle": "Tracking someone else",
+  "@settingsHelpSomeoneElseTitle": {
+    "description": "Heading of the help topic about tracking another person on this phone."
+  },
   "settingsHelpSomeoneElseBody": "Helping someone else keep track — a child who’s just starting, say? Settings → “Track someone else too”, and give them a name. A nickname or initial is fine.\n\nTap the name at the top of the home screen to switch between people. Everyone has their own reminders, which start off for people you add. The fertile window is only ever offered for you.",
   "@settingsHelpSomeoneElseBody": {
     "description": "A topic on the \"How Ebb works\" help screen. Words in quotation marks name buttons and settings elsewhere in the app: use exactly the same translation as those."
   },
   "settingsHelpHandoverTitle": "Handing someone over",
+  "@settingsHelpHandoverTitle": {
+    "description": "Heading of the help topic about sending someone's history to their own phone."
+  },
   "settingsHelpHandoverBody": "When someone you track gets their own phone: “Send to another phone”, and choose just them. On their phone, “Receive from another phone”. On a fresh install their history simply becomes theirs.\n\nAfterwards Ebb asks whether to remove them from your phone. It never does that on its own.",
   "@settingsHelpHandoverBody": {
     "description": "A topic on the \"How Ebb works\" help screen. Words in quotation marks name buttons and settings elsewhere in the app: use exactly the same translation as those."
   },
   "settingsHelpDeletingTitle": "Deleting",
+  "@settingsHelpDeletingTitle": {
+    "description": "Heading of the help topic about deleting data."
+  },
   "settingsHelpDeletingBody": "Settings → “Delete all data” erases everything on this phone at once.\n\nTo remove one person you’ve added, open their settings and choose “Remove … from this phone”. Nobody else’s history is touched.",
   "@settingsHelpDeletingBody": {
     "description": "A topic on the \"How Ebb works\" help screen. Words in quotation marks name buttons and settings elsewhere in the app: use exactly the same translation as those."
@@ -1989,6 +2579,7 @@
   },
   "shareRemoveBody": "If {name}’s history arrived on the other phone, it can come off this one. You can also keep it here as well.",
   "@shareRemoveBody": {
+    "description": "Body of the dialog after Done on the codes screen, when one person other than the owner was sent. It offers, never assumes. name is that person's name.",
     "placeholders": {
       "name": {
         "type": "String"
@@ -2013,16 +2604,25 @@
     "description": "Screen title. History is shown as QR codes for another phone running Ebb to scan."
   },
   "shareWhatToSend": "What would you like to send?",
+  "@shareWhatToSend": {
+    "description": "Heading of the Send screen's first step: choosing whose history to send."
+  },
   "shareEveryone": "Everyone",
   "@shareEveryone": {
     "description": "Send choice: everyone on this phone."
   },
   "shareEveryoneHint": "Moving to a new phone.",
+  "@shareEveryoneHint": {
+    "description": "Under the 'Everyone on this phone' send choice: what it is for."
+  },
   "shareJustOne": "Just one person",
   "@shareJustOne": {
     "description": "Section heading."
   },
   "shareJustYours": "Just your history",
+  "@shareJustYours": {
+    "description": "Send choice: only the owner's history."
+  },
   "shareJustName": "Just {name}",
   "@shareJustName": {
     "description": "Send choice: only this person’s history.",
@@ -2034,6 +2634,7 @@
   },
   "shareForTheirPhone": "For {name}’s own phone.",
   "@shareForTheirPhone": {
+    "description": "Under the send choice for one person the owner tracks: what it is for. name is that person's name.",
     "placeholders": {
       "name": {
         "type": "String"
@@ -2041,6 +2642,9 @@
     }
   },
   "shareCopiesNotOffered": "People imported from other phones aren’t offered here: each person shares only their own history.",
+  "@shareCopiesNotOffered": {
+    "description": "Note at the foot of the send choices when an imported copy is on the phone, saying why it is not listed."
+  },
   "shareHowMuch": "{who, select, you{How much of your history?} other{How much of {name}’s history?}}",
   "@shareHowMuch": {
     "description": "who is 'you' for the phone's owner or 'other' for someone else tracked on the phone; name is that person's name.",
@@ -2054,6 +2658,9 @@
     }
   },
   "shareHowMuchHint": "Sending everything suits a new phone. Sharing with a group, you might send less. Nothing is removed from this phone.",
+  "@shareHowMuchHint": {
+    "description": "Under the 'How much of your history?' heading on the Send screen."
+  },
   "shareHowFarBack": "How far back",
   "@shareHowFarBack": {
     "description": "Section heading for choosing how much history to send."
@@ -2063,6 +2670,9 @@
     "description": "How far back: all of the history."
   },
   "shareSpanYear": "The last year",
+  "@shareSpanYear": {
+    "description": "How far back to send: the last 12 months."
+  },
   "shareSpanMonths": "{months, plural, one{The last {months} month} other{The last {months} months}}",
   "@shareSpanMonths": {
     "description": "How far back. months is 3 or 6.",
@@ -2073,16 +2683,37 @@
     }
   },
   "shareSpanLatest": "Just the latest period",
+  "@shareSpanLatest": {
+    "description": "How far back to send: only the most recent period."
+  },
   "shareWhatToInclude": "What to include",
   "@shareWhatToInclude": {
     "description": "Section heading."
   },
   "shareWithDays": "Periods and daily entries",
+  "@shareWithDays": {
+    "description": "What to include when sending: periods and daily entries, one of two choices."
+  },
   "shareWithDaysHint": "Notes, ratings, feelings and flow too.",
+  "@shareWithDaysHint": {
+    "description": "Under the 'Periods and daily entries' choice: what a daily entry holds."
+  },
   "sharePeriodsOnly": "Periods only",
+  "@sharePeriodsOnly": {
+    "description": "What to include when sending: periods only, no daily entries."
+  },
   "sharePeriodsOnlyHint": "Just when each period started and ended.",
+  "@sharePeriodsOnlyHint": {
+    "description": "Under the 'Periods only' choice."
+  },
   "shareShowCodes": "Show the codes",
+  "@shareShowCodes": {
+    "description": "Button at the foot of the 'How much' step: shows the QR codes."
+  },
   "shareNothing": "Nothing to send yet.",
+  "@shareNothing": {
+    "description": "On the codes screen when the chosen history has nothing in it."
+  },
   "shareHowToReceive": "On the other phone, open Ebb, go to Settings → Receive from another phone, and point the camera at this screen.",
   "@shareHowToReceive": {
     "description": "Settings → Receive from another phone must match those screens’ names."
@@ -2116,6 +2747,9 @@
     "description": "Tooltip."
   },
   "shareCodesChange": "The codes change on their own. The other phone collects them in any order.",
+  "@shareCodesChange": {
+    "description": "Under the codes when there is more than one: they cycle on their own, and scanning order does not matter."
+  },
   "sharePeriodCount": "{count, plural, one{{count} period} other{{count} periods}}",
   "@sharePeriodCount": {
     "description": "A number of periods, filled into other messages.",
@@ -2273,12 +2907,33 @@
     }
   },
   "shareNotEbb": "That code isn't from Ebb.",
+  "@shareNotEbb": {
+    "description": "On the Receive screen after scanning a QR code that is not Ebb's."
+  },
   "shareNewerVersion": "The other phone has a newer version of Ebb. Update this one first.",
+  "@shareNewerVersion": {
+    "description": "On the Receive screen when the codes come from a newer Ebb than this one."
+  },
   "shareRestarted": "The other phone started over. Collecting the new codes.",
+  "@shareRestarted": {
+    "description": "On the Receive screen when the sender started a new transfer part way through, so the codes collected so far are dropped."
+  },
   "shareUnreadable": "Some codes didn't read cleanly. Let's scan them again.",
+  "@shareUnreadable": {
+    "description": "On the Receive screen when the collected codes did not assemble into a readable backup; scanning starts again."
+  },
   "shareNeedsCamera": "Ebb needs the camera to read the codes. You can allow it in the system settings for Ebb.",
+  "@shareNeedsCamera": {
+    "description": "On the Receive screen in place of the camera view when camera permission was refused."
+  },
   "sharePointCamera": "Point the camera at the code on the other phone.",
+  "@sharePointCamera": {
+    "description": "Status at the top of the Receive screen before any code is read."
+  },
   "shareReading": "Reading…",
+  "@shareReading": {
+    "description": "Status on the Receive screen while a single-code transfer is being read; with more codes a count shows instead."
+  },
   "shareCodesReceived": "{total, plural, other{{received} of {total} codes received}}",
   "@shareCodesReceived": {
     "description": "total is 2 or more.",
@@ -2305,6 +2960,9 @@
     }
   },
   "groupsMoreThanOne": "That’s more than one person",
+  "@groupsMoreThanOne": {
+    "description": "Title of the dialog when codes scanned into a group hold a whole phone's history rather than one person's."
+  },
   "groupsMoreThanOneBody": "These codes hold a whole phone’s history. To join a group, each person sends just their own: on their phone, Settings → Send to another phone → Just your history.",
   "@groupsMoreThanOneBody": {
     "description": "The path must match the names of those screens and choices."
@@ -2401,6 +3059,7 @@
   },
   "groupsImported": "{name} imported into {group}.",
   "@groupsImported": {
+    "description": "Message after someone is imported into a group. name is what the user typed; group is the group's name.",
     "placeholders": {
       "name": {
         "type": "String"
@@ -2423,10 +3082,25 @@
     "description": "Section heading above a chart of everyone’s periods."
   },
   "groupsChartHint": "Each bar is a period; an outline is one whose end wasn’t logged, drawn at the usual length. Solid lines run down from each full moon, dashed ones from each new moon.",
+  "@groupsChartHint": {
+    "description": "Caption under the group chart, which draws each person's periods as bars in their own lane with moon lines across all of them."
+  },
   "groupsNew": "New group",
+  "@groupsNew": {
+    "description": "Button on the Groups screen, and the title of the name dialog for a new group."
+  },
   "groupsRename": "Rename group",
+  "@groupsRename": {
+    "description": "Title of the name dialog when renaming a group."
+  },
   "groupsNameHint": "For example, the name of your circle or club.",
+  "@groupsNameHint": {
+    "description": "Helper under the group name field."
+  },
   "groupsNameTaken": "There’s already a group with that name.",
+  "@groupsNameTaken": {
+    "description": "Error under the group name field."
+  },
   "groupsNoOneYet": "No one yet",
   "@groupsNoOneYet": {
     "description": "A group with no members."
@@ -2436,8 +3110,12 @@
     "description": "Title of the Groups screen."
   },
   "groupsIntro": "A group gathers people on this phone under one name — a circle or club that tracks together. Someone can be in more than one, and deleting a group never deletes anyone.",
+  "@groupsIntro": {
+    "description": "The Groups screen when no group exists yet."
+  },
   "groupsAddSomeoneTo": "Add someone to {group}",
   "@groupsAddSomeoneTo": {
+    "description": "Title of the name dialog when adding a new person, tracked on this phone, straight into a group. group is the group's name.",
     "placeholders": {
       "group": {
         "type": "String"
@@ -2445,8 +3123,12 @@
     }
   },
   "groupsAddSomeoneHint": "Tracked on this phone: you log and change their history here. Someone who tracks on their own phone can be imported instead.",
+  "@groupsAddSomeoneHint": {
+    "description": "Helper under the name field in that dialog."
+  },
   "groupsTakeOutTitle": "Take {name} out of {group}?",
   "@groupsTakeOutTitle": {
+    "description": "Title of the dialog asking before an imported copy is unticked from the only group it is in. name is that person's name; group is the group's name.",
     "placeholders": {
       "name": {
         "type": "String"
@@ -2458,6 +3140,7 @@
   },
   "groupsTakeOutBody": "{name} was imported from their phone and isn’t in any other group, so the imported history comes off this phone too. {name} can send it again to rejoin.",
   "@groupsTakeOutBody": {
+    "description": "Body of the dialog asking before an imported copy leaves its only group. name is that person's name, used three times.",
     "placeholders": {
       "name": {
         "type": "String"
@@ -2470,6 +3153,7 @@
   },
   "groupsDeleteTitle": "Delete {group}?",
   "@groupsDeleteTitle": {
+    "description": "Title of the dialog asking before a group is deleted. group is the group's name.",
     "placeholders": {
       "group": {
         "type": "String"
@@ -2477,6 +3161,9 @@
     }
   },
   "groupsDeleteBodyNone": "Only the group goes. Everyone in it stays on this phone, with all their history.",
+  "@groupsDeleteBodyNone": {
+    "description": "Body of the 'Delete group?' dialog when no imported copy is only in this group (groupsDeleteBodySome otherwise)."
+  },
   "groupsDeleteBodySome": "The people imported only into this group come off this phone too: {names}. Everyone else stays, with all their history.",
   "@groupsDeleteBodySome": {
     "description": "names is a list of names, like “Sam, Alex”.",
@@ -2487,6 +3174,9 @@
     }
   },
   "groupsDeleteGroup": "Delete group",
+  "@groupsDeleteGroup": {
+    "description": "Button that confirms deleting the group."
+  },
   "groupsRenameTooltip": "Rename",
   "@groupsRenameTooltip": {
     "description": "Tooltip of the rename button on the Groups screen."
@@ -2497,6 +3187,7 @@
   },
   "groupsImportedAsOf": "Imported · read-only, as of {date}",
   "@groupsImportedAsOf": {
+    "description": "Under an imported person's name in a group's member list. date is when they sent it, already formatted.",
     "placeholders": {
       "date": {
         "type": "String"
@@ -2504,16 +3195,37 @@
     }
   },
   "groupsTrackedHere": "Tracked on this phone",
+  "@groupsTrackedHere": {
+    "description": "Under the name of a group member whose history is logged on this phone."
+  },
   "groupsAddTo": "Add to the group",
   "@groupsAddTo": {
     "description": "Section heading."
   },
   "groupsAddNew": "Add someone new",
+  "@groupsAddNew": {
+    "description": "Item on a group's screen: add a new person tracked on this phone."
+  },
   "groupsAddNewHint": "Tracked on this phone: you log their periods here.",
+  "@groupsAddNewHint": {
+    "description": "Under the 'Add someone new' item on a group's screen."
+  },
   "groupsImportFromPhone": "Import from their phone",
+  "@groupsImportFromPhone": {
+    "description": "Item on a group's screen: scan someone's codes from their own phone."
+  },
   "groupsImportFromPhoneHint": "They keep tracking on their own phone and send it here, read-only. Importing them again brings them up to date.",
+  "@groupsImportFromPhoneHint": {
+    "description": "Under the 'Import from their phone' item on a group's screen."
+  },
   "groupsDeleteThis": "Delete this group",
+  "@groupsDeleteThis": {
+    "description": "Item, in red, at the foot of a group's screen."
+  },
   "peopleNameTaken": "That name is already used on this phone.",
+  "@peopleNameTaken": {
+    "description": "Error under a name field when the name is already used by someone on this phone, including 'You'."
+  },
   "peopleName": "Name",
   "@peopleName": {
     "description": "Label of the field for a person’s (or group’s) name."
@@ -2540,6 +3252,9 @@
     "description": "Title of the dialog that adds a person."
   },
   "peopleNameHint": "Just something to tell people apart — a first name, a nickname or an initial.",
+  "@peopleNameHint": {
+    "description": "Helper under the name field when adding someone to track."
+  },
   "backupUnnamedPerson": "Person {number}",
   "@backupUnnamedPerson": {
     "description": "A name given to an unnamed person when restoring a backup. Saved as their name; they can rename it.",
@@ -2554,8 +3269,17 @@
     "description": "Error raised while reading a backup file that isn't an Ebb backup; shown where the restore failed."
   },
   "backupNewer": "This backup was made by a newer version of Ebb. Update Ebb, then try again.",
+  "@backupNewer": {
+    "description": "Error when restoring or receiving a backup made by a newer Ebb."
+  },
   "backupNoOne": "This backup has no one in it.",
+  "@backupNoOne": {
+    "description": "Error when a backup file has no people in it."
+  },
   "backupSameId": "This backup looks damaged: two people in it have the same id.",
+  "@backupSameId": {
+    "description": "Error when a backup file has two people with the same id; the file is damaged."
+  },
   "backupAfterExport": "{date} is after the day this backup was made.",
   "@backupAfterExport": {
     "description": "date is written YYYY-MM-DD.",
@@ -2567,6 +3291,7 @@
   },
   "backupSameName": "Two people in this backup are both called {name}.",
   "@backupSameName": {
+    "description": "Error when two people in a backup file share a name. name is as it appears in the file.",
     "placeholders": {
       "name": {
         "type": "String"
@@ -2575,6 +3300,7 @@
   },
   "backupSameGroupName": "Two groups in this backup are both called {group}.",
   "@backupSameGroupName": {
+    "description": "Error when two groups in a backup file share a name. group is as it appears in the file.",
     "placeholders": {
       "group": {
         "type": "String"
