@@ -15,7 +15,9 @@ turns that section into the release's own when it's cut.
   in Settings → Language (or, on Android 13 and later, in the phone's
   settings for the app). Reminders are in the same language. The
   translations are new: if you speak one of them, the preview at
-  ebb.superdavelab.com/beta/ says how to help check it.
+  ebb.superdavelab.com/beta/ says how to help check it. Thanks to mrCabez
+  for reviewing the Italian
+  ([#40](https://github.com/SuperDaveOrg/Ebb/pull/40)).
 
 ## [0.8.0] - 2026-10-22
 
