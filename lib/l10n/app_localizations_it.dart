@@ -198,9 +198,9 @@ class AppLocalizationsIt extends AppLocalizations {
   String calendarStatusUnlogged(String who, String name, int day) {
     String _temp0 = intl.Intl.selectLogic(who, {
       'you':
-          'Giorno $day del tuo ciclo. La fine di queste mestruazioni non è stata registrata, quindi sono disegnate con la durata abituale.',
+          'Giorno $day del tuo ciclo. La fine di queste mestruazioni non è stata registrata, quindi sono mostrate con la durata abituale.',
       'other':
-          'Giorno $day del ciclo di $name. La fine di queste mestruazioni non è stata registrata, quindi sono disegnate con la durata abituale.',
+          'Giorno $day del ciclo di $name. La fine di queste mestruazioni non è stata registrata, quindi sono mostrate con la durata abituale.',
     });
     return '$_temp0';
   }
@@ -236,7 +236,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get calendarFutureDay =>
-      'I giorni che devono ancora venire non si possono ancora registrare.';
+      'I giorni futuri non si possono ancora registrare.';
 
   @override
   String calendarMarkStarted(String who, String name) {
@@ -412,7 +412,7 @@ class AppLocalizationsIt extends AppLocalizations {
   String get dayMucusLookCreamy => 'Cremoso';
 
   @override
-  String get dayMucusLookEggWhite => 'Albume';
+  String get dayMucusLookEggWhite => 'Come albume';
 
   @override
   String dayMucusFeelInline(String feel) {
@@ -502,7 +502,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String chartsTemperatureCaption(String unit) {
-    return 'Ogni punto è la temperatura di un giorno, in $unit, unita a quella del giorno dopo quando sono state misurate entrambe. Un punto vuoto potrebbe essere stato alterato e non viene unito. Sotto, il muco cervicale: barre più alte significano più bagnato (sensazione) e più trasparente ed elastico (aspetto). I giorni di mestruazioni sono ombreggiati.';
+    return 'Ogni punto è la temperatura di un giorno, in $unit, unita a quella del giorno dopo quando sono state misurate entrambe. Un punto vuoto indica una misurazione forse alterata e non viene unito agli altri. Sotto, il muco cervicale: barre più alte significano più bagnato (sensazione) e più trasparente ed elastico (aspetto). I giorni di mestruazioni sono ombreggiati.';
   }
 
   @override
@@ -1071,8 +1071,8 @@ class AppLocalizationsIt extends AppLocalizations {
       days,
       locale: localeName,
       other:
-          '$days giorni dopo il previsto. I cicli cambiano per tanti motivi.',
-      one: '1 giorno dopo il previsto. I cicli cambiano per tanti motivi.',
+          'In ritardo di $days giorni rispetto al previsto. I cicli variano per tanti motivi.',
+      one: 'In ritardo di 1 giorno rispetto al previsto. I cicli variano per tanti motivi.',
     );
     return '$_temp0';
   }
@@ -1130,7 +1130,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String homeConfidenceUnlogged(String date) {
-    return 'Stimato dalle ultime mestruazioni registrate, del $date, quindi potrebbe essere meno preciso del solito.';
+    return 'Stima basata sulle ultime mestruazioni registrate, iniziate il $date, quindi potrebbe essere meno precisa del solito.';
   }
 
   @override
@@ -1359,7 +1359,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get homeHistoryEmpty =>
-      'Ancora nessun ciclo registrato. Se ricordi quando sono iniziate le ultime mestruazioni, aggiungerle dà a Ebb un vantaggio.';
+      'Ancora nessun ciclo registrato. Se ricordi quando sono iniziate le ultime mestruazioni, aggiungile: così Ebb avrà già una base da cui partire.';
 
   @override
   String get homeMilestones => 'Traguardi';
@@ -1471,7 +1471,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String settingsSetUpBody(String periods, String date) {
-    return '$periods, inviato il $date. Su questo telefono diventa il tuo storico.';
+    return 'Storico inviato il $date, con $periods. Su questo telefono diventa il tuo storico.';
   }
 
   @override
@@ -1588,7 +1588,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String settingsReplaceCurrent(String periods) {
-    return 'Sostituisce tutto ciò che c’è ora in Ebb, comprese $periods su questo telefono.';
+    return 'Sostituisce tutto ciò che c’è ora in Ebb, tra cui $periods su questo telefono.';
   }
 
   @override
@@ -1711,7 +1711,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get settingsTemperatureHint =>
-      'In ogni giorno del calendario, con un grafico della temperatura. Registrati e disegnati, mai usati per stimare qualcosa.';
+      'In ogni giorno del calendario, con un grafico della temperatura. Vengono solo registrati e mostrati nel grafico, mai usati per le stime.';
 
   @override
   String get settingsTemperatureIn => 'Temperatura in';
@@ -1925,7 +1925,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get settingsHelpTemperatureBody =>
-      'Attiva «Registra temperatura e muco cervicale» nelle Impostazioni, e ogni giorno del calendario avrà spazio per la temperatura al risveglio e per la sensazione e l’aspetto del muco cervicale. Se qualcosa potrebbe aver alterato una misurazione (malattia, poco sonno, alcol, misurarla tardi), spunta la casella sotto.\n\nGrafici mostra le temperature come una linea, con il muco sotto e le mestruazioni ombreggiate, in °C o °F (Impostazioni).\n\nEbb li registra e li disegna, e nient’altro. Non cerca un rialzo né ne ricava i giorni fertili, e la sua stima della finestra fertile si basa comunque solo sulla durata del ciclo. Se segui un metodo come il metodo sintotermico, il grafico è lì perché tu lo legga secondo le sue regole.';
+      'Attiva «Registra temperatura e muco cervicale» nelle Impostazioni, e ogni giorno del calendario avrà spazio per la temperatura al risveglio e per la sensazione e l’aspetto del muco cervicale. Se qualcosa potrebbe aver alterato una misurazione (malattia, poco sonno, alcol, misurarla tardi), spunta la casella sotto.\n\nGrafici mostra le temperature come una linea, con il muco sotto e le mestruazioni ombreggiate, in °C o °F (Impostazioni).\n\nEbb li registra e li mostra nel grafico, e nient’altro. Non cerca un rialzo né ne ricava i giorni fertili, e la sua stima della finestra fertile si basa comunque solo sulla durata del ciclo. Se segui un metodo come il metodo sintotermico, il grafico è lì perché tu lo legga secondo le sue regole.';
 
   @override
   String get settingsHelpRemindersTitle => 'Promemoria';
@@ -2335,7 +2335,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String groupsImportHint(String periods, String sent) {
-    return '$periods, inviato il $sent. Importato in sola lettura: qui non si può modificare, e viene aggiornato quando viene inviato di nuovo.';
+    return 'Storico inviato il $sent, con $periods. Importato in sola lettura: qui non si può modificare, e viene aggiornato quando viene inviato di nuovo.';
   }
 
   @override
@@ -2355,7 +2355,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get groupsChartHint =>
-      'Ogni barra sono delle mestruazioni; un contorno indica mestruazioni la cui fine non è stata registrata, disegnate con la durata abituale. Le linee continue scendono da ogni luna piena, quelle tratteggiate da ogni luna nuova.';
+      'Ogni barra rappresenta delle mestruazioni; se ha solo il contorno, la fine non è stata registrata e la barra ha la durata abituale. Le linee continue scendono da ogni luna piena, quelle tratteggiate da ogni luna nuova.';
 
   @override
   String get groupsNew => 'Nuovo gruppo';
