@@ -119,6 +119,11 @@ doesn't speak yet is welcome too; see [docs/translating.md](docs/translating.md)
 
 <a href="https://hosted.weblate.org/engage/ebb/"><img src="https://hosted.weblate.org/widget/ebb/svg-badge.svg" alt="Translation status"></a>
 
+## Supporting Ebb
+
+Ebb costs nothing, and nothing in the app asks you for money. If you'd like to
+chip in anyway, you can [donate on Liberapay](https://liberapay.com/superdave/).
+
 ## Building
 
 Requires the Flutter SDK and the Android SDK.
